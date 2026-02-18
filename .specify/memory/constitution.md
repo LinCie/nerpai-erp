@@ -2,20 +2,21 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.0.0 → 1.1.0 (Minor - added technology standard)
+Version change: 1.1.0 → 1.1.1 (Patch - clarified package manager standard)
 
 Modified principles: None
 
-Added sections:
-  - Technology Standards: Database layer (Kysely + PostgreSQL)
-  - Development Workflow > File Organization: Added src/db/ directory
+Modified sections:
+  - Technology Standards > Package Manager: Explicit Bun-only requirement
+
+Added sections: None
 
 Removed sections: None
 
 Templates requiring updates:
-  ✅ plan-template.md - Constitution Check section compatible
-  ✅ spec-template.md - Requirements align with principles
-  ✅ tasks-template.md - Task structure supports principle-driven workflow
+  ✅ plan-template.md - No package manager references
+  ✅ spec-template.md - No package manager references
+  ✅ tasks-template.md - No package manager references
 
 Follow-up TODOs: None
 ================================================================================
@@ -100,7 +101,7 @@ Code MUST be reviewed, tested where specified, and follow security best practice
 **Authentication**: next-auth 4.x
 **Testing**: Jest + React Testing Library (when tests requested)
 **Linting**: ESLint 9.x with next/core-web-vitals config
-**Package Manager**: Bun
+**Package Manager**: Bun (exclusive - npm, yarn, pnpm, and deno are prohibited)
 
 **Versioning**: Semantic Versioning (MAJOR.MINOR.PATCH)
 - MAJOR: Breaking changes to public APIs or architecture
@@ -155,4 +156,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.1.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-19
+**Version**: 1.1.1 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-19
