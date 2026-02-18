@@ -2,17 +2,15 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 0.0.0 → 1.0.0 (Initial ratification)
+Version change: 1.0.0 → 1.1.0 (Minor - added technology standard)
 
-Modified principles: N/A (initial creation)
+Modified principles: None
 
 Added sections:
-  - Core Principles (5 principles)
-  - Technology Standards
-  - Development Workflow
-  - Governance
+  - Technology Standards: Database layer (Kysely + PostgreSQL)
+  - Development Workflow > File Organization: Added src/db/ directory
 
-Removed sections: N/A
+Removed sections: None
 
 Templates requiring updates:
   ✅ plan-template.md - Constitution Check section compatible
@@ -97,9 +95,12 @@ Code MUST be reviewed, tested where specified, and follow security best practice
 **Language**: TypeScript 5.x (strict mode)
 **UI Library**: React 19.x
 **Styling**: Tailwind CSS 4.x
+**Database**: PostgreSQL with Kysely query builder
+**Migrations**: kysely-ctl CLI
 **Authentication**: next-auth 4.x
 **Testing**: Jest + React Testing Library (when tests requested)
 **Linting**: ESLint 9.x with next/core-web-vitals config
+**Package Manager**: Bun
 
 **Versioning**: Semantic Versioning (MAJOR.MINOR.PATCH)
 - MAJOR: Breaking changes to public APIs or architecture
@@ -127,6 +128,7 @@ Code MUST be reviewed, tested where specified, and follow security best practice
 src/
 ├── app/           # Next.js App Router routes
 ├── components/    # Reusable UI components
+├── db/            # Database layer (Kysely instance, types, migrations)
 ├── hooks/         # Custom React hooks
 ├── lib/           # Utility functions, shared logic
 ├── types/         # TypeScript type definitions
@@ -153,4 +155,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.0.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-18
+**Version**: 1.1.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-19

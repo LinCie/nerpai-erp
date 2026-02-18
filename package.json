@@ -6,22 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate": "kysely migrate latest",
+    "db:migrate:make": "kysely migrate make",
+    "db:rollback": "kysely migrate rollback",
+    "db:status": "kysely migrate list",
+    "db:codegen": "kysely-codegen --out-file src/db/types.ts"
   },
   "dependencies": {
+    "kysely": "^0.28.11",
     "next": "16.1.6",
     "next-auth": "^4.24.13",
+    "pg": "^8.18.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "kysely-codegen": "^0.20.0",
+    "kysely-ctl": "^0.20.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
