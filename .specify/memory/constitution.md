@@ -1,50 +1,156 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+================================================================================
+SYNC IMPACT REPORT
+================================================================================
+Version change: 0.0.0 → 1.0.0 (Initial ratification)
+
+Modified principles: N/A (initial creation)
+
+Added sections:
+  - Core Principles (5 principles)
+  - Technology Standards
+  - Development Workflow
+  - Governance
+
+Removed sections: N/A
+
+Templates requiring updates:
+  ✅ plan-template.md - Constitution Check section compatible
+  ✅ spec-template.md - Requirements align with principles
+  ✅ tasks-template.md - Task structure supports principle-driven workflow
+
+Follow-up TODOs: None
+================================================================================
+-->
+
+# NERPAI ERP Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Type Safety First
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+TypeScript strict mode MUST be enabled at all times. The `any` type is prohibited; use `unknown` with proper type guards instead.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- Enable `strict: true` in tsconfig.json (non-negotiable)
+- Handle `null` and `undefined` explicitly with strictNullChecks
+- Use discriminated unions for state management
+- Prefer interfaces for public APIs, types for unions/intersections
+- Throw Error objects, never strings; consider Result/Option types for functional error handling
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**Rationale**: Type safety catches bugs at compile time, improves IDE support, and serves as living documentation.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. React Component Discipline
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Follow React Hooks rules strictly. Components MUST be focused, testable, and performant.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Never call hooks inside loops or conditions
+- Use custom hooks to encapsulate reusable logic (prefix with `use`)
+- Memoize context values and expensive calculations with `useMemo`/`useCallback`
+- Keep effects focused on a single concern with proper cleanup
+- Extract complex state logic to `useReducer` or custom hooks
+- Use ESLint plugin for React hooks
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**Rationale**: Predictable component behavior, better performance, easier testing and debugging.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. Next.js App Router Standards
+
+Leverage Next.js 16 App Router capabilities for optimal performance and UX.
+
+- Server Components are the default; use `'use client'` directive only when necessary
+- Server Actions handle mutations; validate inputs with Zod or similar
+- Use streaming and Suspense for progressive loading
+- Implement proper loading.tsx and error.tsx boundaries
+- Route handlers follow RESTful conventions
+- Internationalization via next-intl for multi-language support
+
+**Rationale**: Server Components reduce client bundle size; proper error boundaries improve UX; standards ensure consistency.
+
+### IV. Accessibility & Performance
+
+All user-facing features MUST meet accessibility standards and performance budgets.
+
+- Use semantic HTML elements (`<button>`, `<nav>`, `<main>`, etc.)
+- ARIA attributes only when semantic HTML is insufficient
+- Tailwind CSS for styling; avoid arbitrary values when design tokens exist
+- Target Core Web Vitals: LCP < 2.5s, FID < 100ms, CLS < 0.1
+- Images use next/image with proper sizing and lazy loading
+- Keyboard navigation MUST work for all interactive elements
+
+**Rationale**: Accessibility is a legal requirement and moral obligation; performance directly impacts user satisfaction and conversion.
+
+### V. Code Quality & Security
+
+Code MUST be reviewed, tested where specified, and follow security best practices.
+
+- All code changes require review before merge
+- Secrets and credentials NEVER committed to repository
+- Sanitize and validate all user inputs
+- Use parameterized queries; never concatenate SQL
+- Authentication via next-auth; authorize on every protected route
+- Log security-relevant events without exposing sensitive data
+
+**Rationale**: Security breaches are costly; code review catches issues automation misses; consistent practices reduce cognitive load.
+
+## Technology Standards
+
+**Framework**: Next.js 16.x with App Router
+**Language**: TypeScript 5.x (strict mode)
+**UI Library**: React 19.x
+**Styling**: Tailwind CSS 4.x
+**Authentication**: next-auth 4.x
+**Testing**: Jest + React Testing Library (when tests requested)
+**Linting**: ESLint 9.x with next/core-web-vitals config
+
+**Versioning**: Semantic Versioning (MAJOR.MINOR.PATCH)
+- MAJOR: Breaking changes to public APIs or architecture
+- MINOR: New features, backwards-compatible
+- PATCH: Bug fixes, minor improvements
+
+## Development Workflow
+
+### Branch Strategy
+
+- `main`: Production-ready code, protected
+- Feature branches: `###-feature-name` pattern
+- All changes via pull request
+
+### Quality Gates
+
+1. TypeScript compilation passes with no errors
+2. ESLint passes with no warnings
+3. Code review approved
+4. No secrets in commit history
+
+### File Organization
+
+```
+src/
+├── app/           # Next.js App Router routes
+├── components/    # Reusable UI components
+├── hooks/         # Custom React hooks
+├── lib/           # Utility functions, shared logic
+├── types/         # TypeScript type definitions
+└── styles/        # Global styles, Tailwind config
+```
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other development practices within this project.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Amendment Process**:
+1. Propose change via pull request to constitution.md
+2. Document rationale and impact on existing code
+3. Increment version per semantic versioning rules
+4. Update `LAST_AMENDED_DATE` on ratification
+5. Propagate changes to dependent templates and documentation
+
+**Compliance Review**:
+- All PRs MUST verify compliance with constitution principles
+- Deviations require explicit justification documented in Complexity Tracking
+- Use AGENTS.md for runtime development guidance and rule references
+
+**Guidance Files**:
+- AGENTS.md: Primary development guidance with rule references
+- `.agent/rules/*.md`: Detailed guides for specific domains
+
+**Version**: 1.0.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-18
