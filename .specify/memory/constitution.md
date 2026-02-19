@@ -2,26 +2,21 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.1.2 → 1.2.0 (Minor - added Context7 documentation-first research principle)
+Version change: 1.2.0 → 1.3.0 (Minor - added React Compiler, updated memoization guidance)
 
-Modified principles: None
+Modified principles:
+  - II. React Component Discipline → II. React Component Discipline (revised memoization rules)
 
 Modified sections:
-  - Technology Standards: Added specific Kysely version (v0.28.x)
-  - Technology Standards: Added kysely-ctl version (v0.20.x)
-  - Technology Standards: Added Jest version (v30.x)
-  - Technology Standards: Added React Testing Library mention
+  - Technology Standards: Added React Compiler
 
-Added sections:
-  - Core Principles VI. Documentation-First Research (NEW)
+Added sections: None
 
 Removed sections: None
 
 Templates requiring updates:
-  ✅ plan-template.md - Updated Constitution Check section with Context7 requirements
-  ✅ spec-template.md - No updates required
-  ✅ tasks-template.md - No updates required
-  ✅ commands/ - No command files present
+  ✅ plan-template.md - Updated Constitution Check item II wording
+  ✅ react-hooks-guide.md - Updated for React Compiler guidance
 
 Follow-up TODOs: None
 ================================================================================
@@ -45,16 +40,15 @@ TypeScript strict mode MUST be enabled at all times. The `any` type is prohibite
 
 ### II. React Component Discipline
 
-Follow React Hooks rules strictly. Components MUST be focused, testable, and performant.
+Follow React Hooks rules strictly. Components MUST be focused, testable, and performant. React Compiler handles automatic memoization.
 
 - Never call hooks inside loops or conditions
 - Use custom hooks to encapsulate reusable logic (prefix with `use`)
-- Memoize context values and expensive calculations with `useMemo`/`useCallback`
+- Minimize manual memoization (`useMemo`, `useCallback`, `useReducer`) - rely on React Compiler
 - Keep effects focused on a single concern with proper cleanup
-- Extract complex state logic to `useReducer` or custom hooks
 - Use ESLint plugin for React hooks
 
-**Rationale**: Predictable component behavior, better performance, easier testing and debugging.
+**Rationale**: Predictable component behavior, better performance, easier testing and debugging. React Compiler eliminates the need for manual memoization in most cases.
 
 ### III. Next.js App Router Standards
 
@@ -111,7 +105,7 @@ All research MUST utilize Context7 when available as the authoritative source fo
 
 **Framework**: Next.js 16.x with App Router
 **Language**: TypeScript 5.x (strict mode)
-**UI Library**: React 19.x
+**UI Library**: React 19.x with React Compiler
 **Styling**: Tailwind CSS 4.x
 **Database**: PostgreSQL with Kysely v0.28.x query builder
 **Migrations**: kysely-ctl v0.20.x CLI
@@ -174,4 +168,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.2.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-19
+**Version**: 1.3.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-19

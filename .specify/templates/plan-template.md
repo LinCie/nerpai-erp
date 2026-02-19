@@ -34,7 +34,7 @@
 **Required Verification:**
 
 - [ ] **I. Type Safety**: Strict mode enabled, no `any` types
-- [ ] **II. React Discipline**: Hooks rules followed, proper memoization
+- [ ] **II. React Discipline**: Hooks rules followed, minimize manual memoization (React Compiler)
 - [ ] **III. Next.js Standards**: App Router patterns, Server Actions validation
 - [ ] **IV. A11y & Performance**: Semantic HTML, Core Web Vitals targets
 - [ ] **V. Code Quality**: Review process, security practices

@@ -6,19 +6,19 @@ Key Principles:
 - Use custom hooks for reusable logic
 - Optimize dependency arrays
 - Avoid complex logic in components
+- React Compiler handles memoization automatically - minimize manual useMemo/useCallback/useReducer
 
 Common Hooks:
 
 - useState: Use functional updates for state based on previous state
 - useEffect: Clean up side effects, handle dependencies correctly
 - useContext: Avoid deep prop drilling
-- useReducer: Manage complex state logic
 - useRef: Access DOM nodes or mutable values
 
-Performance Hooks:
+Performance Hooks (use sparingly - React Compiler handles most cases):
 
-- useMemo: Memoize expensive calculations
-- useCallback: Memoize functions passed to children
+- useMemo: Only for truly expensive calculations that React Compiler cannot optimize
+- useCallback: Rarely needed with React Compiler
 - useTransition: Handle non-urgent state updates
 - useDeferredValue: Defer updating UI parts
 
@@ -36,4 +36,4 @@ Best Practices:
 - Keep effects focused on one concern
 - Use ESLint plugin for hooks
 - Avoid stale closures
-- Memoize context values
+- Trust React Compiler for memoization
