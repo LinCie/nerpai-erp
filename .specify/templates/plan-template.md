@@ -31,7 +31,19 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+**Required Verification:**
+
+- [ ] **I. Type Safety**: Strict mode enabled, no `any` types
+- [ ] **II. React Discipline**: Hooks rules followed, proper memoization
+- [ ] **III. Next.js Standards**: App Router patterns, Server Actions validation
+- [ ] **IV. A11y & Performance**: Semantic HTML, Core Web Vitals targets
+- [ ] **V. Code Quality**: Review process, security practices
+- [ ] **VI. Documentation-First Research**: Context7 verification for all library research (resolve IDs, use specific versions, document references)
+
+**Research Phase Check:**
+- [ ] All library versions verified via Context7 (where available)
+- [ ] Context7 library IDs documented in research.md
+- [ ] Prior knowledge invalidated when Context7 data retrieved
 
 ## Project Structure
 

@@ -2,21 +2,26 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.1.0 → 1.1.1 (Patch - clarified package manager standard)
+Version change: 1.1.2 → 1.2.0 (Minor - added Context7 documentation-first research principle)
 
 Modified principles: None
 
 Modified sections:
-  - Technology Standards > Package Manager: Explicit Bun-only requirement
+  - Technology Standards: Added specific Kysely version (v0.28.x)
+  - Technology Standards: Added kysely-ctl version (v0.20.x)
+  - Technology Standards: Added Jest version (v30.x)
+  - Technology Standards: Added React Testing Library mention
 
-Added sections: None
+Added sections:
+  - Core Principles VI. Documentation-First Research (NEW)
 
 Removed sections: None
 
 Templates requiring updates:
-  ✅ plan-template.md - No package manager references
-  ✅ spec-template.md - No package manager references
-  ✅ tasks-template.md - No package manager references
+  ✅ plan-template.md - Updated Constitution Check section with Context7 requirements
+  ✅ spec-template.md - No updates required
+  ✅ tasks-template.md - No updates required
+  ✅ commands/ - No command files present
 
 Follow-up TODOs: None
 ================================================================================
@@ -90,16 +95,28 @@ Code MUST be reviewed, tested where specified, and follow security best practice
 
 **Rationale**: Security breaches are costly; code review catches issues automation misses; consistent practices reduce cognitive load.
 
+### VI. Documentation-First Research
+
+All research MUST utilize Context7 when available as the authoritative source for library documentation. Previous knowledge of libraries is invalidated when Context7 documentation is accessible.
+
+- MUST resolve library IDs via Context7 before querying documentation
+- MUST use specific versions from Context7 (e.g., `/org/project/version`) when available
+- MUST prioritize Context7 code snippets and examples over external sources
+- MUST invalidate all prior library knowledge when Context7 data is retrieved
+- SHOULD document which Context7 library IDs were referenced in research artifacts
+
+**Rationale**: Context7 provides version-specific, authoritative documentation directly from official sources. This eliminates knowledge drift, ensures accurate version compatibility, and prevents decisions based on outdated or incorrect information.
+
 ## Technology Standards
 
 **Framework**: Next.js 16.x with App Router
 **Language**: TypeScript 5.x (strict mode)
 **UI Library**: React 19.x
 **Styling**: Tailwind CSS 4.x
-**Database**: PostgreSQL with Kysely query builder
-**Migrations**: kysely-ctl CLI
+**Database**: PostgreSQL with Kysely v0.28.x query builder
+**Migrations**: kysely-ctl v0.20.x CLI
 **Authentication**: next-auth 4.x
-**Testing**: Jest + React Testing Library (when tests requested)
+**Testing**: Jest v30.x + React Testing Library (when tests requested)
 **Linting**: ESLint 9.x with next/core-web-vitals config
 **Package Manager**: Bun (exclusive - npm, yarn, pnpm, and deno are prohibited)
 
@@ -122,6 +139,7 @@ Code MUST be reviewed, tested where specified, and follow security best practice
 2. ESLint passes with no warnings
 3. Code review approved
 4. No secrets in commit history
+5. **NEW**: Library research uses Context7 documentation (where available)
 
 ### File Organization
 
@@ -156,4 +174,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.1.1 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-19
+**Version**: 1.2.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-19
