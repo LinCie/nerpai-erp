@@ -20,10 +20,11 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Single project**: `src/modules/`, `tests/` at repository root (vertical slice architecture)
+- **Web app**: `backend/src/modules/`, `frontend/src/modules/`
+- **Mobile**: `api/src/modules/`, `ios/src/` or `android/src/`
+- Paths shown below assume vertical slice structure - each module has domain, application, infrastructure, presentation layers
+- Example module path: `src/modules/[module-name]/{domain,application,infrastructure,presentation}/`
 
 <!-- 
   ============================================================================
@@ -88,12 +89,16 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T012 [P] [US1] Create [Entity1] entity in src/modules/[module]/domain/entities/[entity1].ts
+- [ ] T013 [P] [US1] Create [Entity2] entity in src/modules/[module]/domain/entities/[entity2].ts
+- [ ] T014 [P] [US1] Define [IEntityRepository] interface in src/modules/[module]/application/repositories/
+- [ ] T015 [US1] Implement [EntityRepository] in src/modules/[module]/infrastructure/repositories/ (depends on T014)
+- [ ] T016 [US1] Implement [Service] in src/modules/[module]/application/services/[service].ts (depends on T012, T013)
+- [ ] T017 [US1] Create Zod schema in src/modules/[module]/presentation/schemas/
+- [ ] T018 [US1] Implement [Server Action] in src/modules/[module]/presentation/actions/
+- [ ] T019 [US1] Implement [API route] in src/modules/[module]/presentation/api/
+- [ ] T020 [US1] Create [Component] in src/modules/[module]/presentation/components/
+- [ ] T021 [US1] Add validation and error handling
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -112,10 +117,14 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T022 [P] [US2] Create [Entity] entity in src/modules/[module]/domain/entities/
+- [ ] T023 [P] [US2] Define repository interface in src/modules/[module]/application/repositories/
+- [ ] T024 [US2] Implement repository in src/modules/[module]/infrastructure/repositories/
+- [ ] T025 [US2] Implement [Service] in src/modules/[module]/application/services/
+- [ ] T026 [US2] Create Zod schema in src/modules/[module]/presentation/schemas/
+- [ ] T027 [US2] Implement [Server Action/API] in src/modules/[module]/presentation/
+- [ ] T028 [US2] Create [Component] in src/modules/[module]/presentation/components/
+- [ ] T029 [US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -134,9 +143,13 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T030 [P] [US3] Create [Entity] entity in src/modules/[module]/domain/entities/
+- [ ] T031 [P] [US3] Define repository interface in src/modules/[module]/application/repositories/
+- [ ] T032 [US3] Implement repository in src/modules/[module]/infrastructure/repositories/
+- [ ] T033 [US3] Implement [Service] in src/modules/[module]/application/services/
+- [ ] T034 [US3] Create Zod schema in src/modules/[module]/presentation/schemas/
+- [ ] T035 [US3] Implement [Server Action/API] in src/modules/[module]/presentation/
+- [ ] T036 [US3] Create [Component] in src/modules/[module]/presentation/components/
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -179,8 +192,9 @@ Examples of foundational tasks (adjust based on your project):
 ### Within Each User Story
 
 - Tests (if included) MUST be written and FAIL before implementation
-- Models before services
-- Services before endpoints
+- Domain entities first (no dependencies)
+- Repository interfaces before implementations
+- Application services before presentation layer
 - Core implementation before integration
 - Story complete before moving to next priority
 
@@ -190,8 +204,10 @@ Examples of foundational tasks (adjust based on your project):
 - All Foundational tasks marked [P] can run in parallel (within Phase 2)
 - Once Foundational phase completes, all user stories can start in parallel (if team capacity allows)
 - All tests for a user story marked [P] can run in parallel
-- Models within a story marked [P] can run in parallel
+- Domain entities within a story marked [P] can run in parallel
+- Presentation layer components (actions, components, schemas) within a story marked [P] can run in parallel
 - Different user stories can be worked on in parallel by different team members
+- Different modules can be developed in parallel with minimal conflicts due to vertical slice isolation
 
 ---
 
@@ -202,9 +218,18 @@ Examples of foundational tasks (adjust based on your project):
 Task: "Contract test for [endpoint] in tests/contract/test_[name].py"
 Task: "Integration test for [user journey] in tests/integration/test_[name].py"
 
-# Launch all models for User Story 1 together:
-Task: "Create [Entity1] model in src/models/[entity1].py"
-Task: "Create [Entity2] model in src/models/[entity2].py"
+# Launch all domain entities for User Story 1 together:
+Task: "Create [Entity1] entity in src/modules/[module]/domain/entities/"
+Task: "Create [Entity2] entity in src/modules/[module]/domain/entities/"
+
+# Launch repository interface and implementation (sequential dependency):
+Task: "Define [IEntityRepository] interface in src/modules/[module]/application/repositories/"
+Task: "Implement [EntityRepository] in src/modules/[module]/infrastructure/repositories/"
+
+# Launch presentation layer components in parallel:
+Task: "Create Zod schema in src/modules/[module]/presentation/schemas/"
+Task: "Implement [Server Action] in src/modules/[module]/presentation/actions/"
+Task: "Create [Component] in src/modules/[module]/presentation/components/"
 ```
 
 ---

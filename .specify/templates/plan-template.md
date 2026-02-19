@@ -39,6 +39,7 @@
 - [ ] **IV. A11y & Performance**: Semantic HTML, Core Web Vitals targets
 - [ ] **V. Code Quality**: Review process, security practices
 - [ ] **VI. Documentation-First Research**: Context7 verification for all library research (resolve IDs, use specific versions, document references)
+- [ ] **VII. Vertical Slice Architecture**: Code organized in `src/modules/[feature]/` with domain, application, infrastructure, presentation layers
 
 **Research Phase Check:**
 - [ ] All library versions verified via Context7 (where available)

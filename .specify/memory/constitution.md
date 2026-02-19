@@ -2,23 +2,28 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.2.0 → 1.3.0 (Minor - added React Compiler, updated memoization guidance)
+Version change: 1.3.0 → 1.4.0 (Minor - added Vertical Slice Architecture principle)
 
 Modified principles:
-  - II. React Component Discipline → II. React Component Discipline (revised memoization rules)
+  - None renamed, but order adjusted: VII added as new principle
 
 Modified sections:
-  - Technology Standards: Added React Compiler
+  - File Organization: Complete rewrite to reflect vertical slice structure
 
-Added sections: None
+Added sections:
+  - VII. Vertical Slice Architecture with Clean Architecture
 
 Removed sections: None
 
 Templates requiring updates:
-  ✅ plan-template.md - Updated Constitution Check item II wording
-  ✅ react-hooks-guide.md - Updated for React Compiler guidance
+  ✅ plan-template.md - Updated Constitution Check to include item VII
+  ✅ tasks-template.md - Updated path conventions and task examples for module structure
+  ⚠ spec-template.md - No changes needed (entity section already flexible)
 
-Follow-up TODOs: None
+Follow-up TODOs:
+  - TODO(FILE_ORGANIZATION_MIGRATION): Existing code in src/app/, src/components/, etc.
+    needs migration to src/modules/ structure. This is a gradual migration;
+    new features MUST use the module structure immediately.
 ================================================================================
 -->
 
@@ -101,6 +106,36 @@ All research MUST utilize Context7 when available as the authoritative source fo
 
 **Rationale**: Context7 provides version-specific, authoritative documentation directly from official sources. This eliminates knowledge drift, ensures accurate version compatibility, and prevents decisions based on outdated or incorrect information.
 
+### VII. Vertical Slice Architecture with Clean Architecture
+
+Code MUST be organized by feature modules using vertical slices, with each module implementing Clean Architecture layers. This ensures high cohesion, low coupling, and clear separation of concerns.
+
+**Module Structure**:
+All feature code lives in `src/modules/[module-name]/` with four distinct layers:
+
+- **Domain Layer**: Entities (database tables) and domain types
+  - Location: `domain/entities/`, `domain/types/`
+  - Contains: Entity definitions, value objects, domain events
+
+- **Application Layer**: Business logic and repository interfaces
+  - Location: `application/services/`, `application/repositories/`, `application/types/`
+  - Contains: Services implementing business rules, repository interfaces (not implementations), DTOs for service/repository contracts
+
+- **Infrastructure Layer**: Repository implementations and external integrations
+  - Location: `infrastructure/repositories/`, `infrastructure/external/`
+  - Contains: Concrete repository implementations using Kysely, external API clients, database mappers
+
+- **Presentation Layer**: Outward-facing interfaces
+  - Location: `presentation/actions/`, `presentation/api/`, `presentation/components/`, `presentation/stores/`, `presentation/types/`, `presentation/schemas/`
+  - Contains: Server Actions, API route handlers, React components, state management (Zustand), Zod schemas, presentation types
+
+**Cross-Cutting Concerns**:
+- Shared utilities: `src/lib/`
+- Cross-module types: `src/types/`
+- Global styles: `src/styles/`
+
+**Rationale**: Vertical slices group related code by feature rather than technical layer, improving discoverability and reducing merge conflicts. Clean Architecture enforces dependency direction (Domain ← Application ← Infrastructure ← Presentation), making business logic independent of frameworks and infrastructure. This structure scales with team size and enables parallel development on different features.
+
 ## Technology Standards
 
 **Framework**: Next.js 16.x with App Router
@@ -133,20 +168,46 @@ All research MUST utilize Context7 when available as the authoritative source fo
 2. ESLint passes with no warnings
 3. Code review approved
 4. No secrets in commit history
-5. **NEW**: Library research uses Context7 documentation (where available)
+5. Library research uses Context7 documentation (where available)
+6. New features use vertical slice module structure (VII)
 
 ### File Organization
 
 ```
 src/
-├── app/           # Next.js App Router routes
-├── components/    # Reusable UI components
-├── db/            # Database layer (Kysely instance, types, migrations)
-├── hooks/         # Custom React hooks
-├── lib/           # Utility functions, shared logic
-├── types/         # TypeScript type definitions
-└── styles/        # Global styles, Tailwind config
+├── modules/              # Feature modules (vertical slices)
+│   ├── products/         # Example: Products module
+│   │   ├── domain/       # Entities and domain types
+│   │   │   ├── entities/
+│   │   │   └── types/
+│   │   ├── application/  # Services, repository interfaces, DTOs
+│   │   │   ├── services/
+│   │   │   ├── repositories/  # Interfaces only (e.g., IProductRepository)
+│   │   │   └── types/    # getManyProps, getManyReturn, etc.
+│   │   ├── infrastructure/  # Repository implementations
+│   │   │   └── repositories/  # Concrete implementations (e.g., ProductRepository)
+│   │   └── presentation/ # Actions, APIs, components, stores, schemas
+│   │       ├── actions/  # Server Actions
+│   │       ├── api/      # API route handlers
+│   │       ├── components/  # React components
+│   │       ├── stores/   # Zustand stores
+│   │       ├── types/    # Presentation-layer types
+│   │       └── schemas/  # Zod validation schemas
+│   ├── auth/             # Example: Authentication module
+│   ├── orders/           # Example: Orders module
+│   └── ...               # Other feature modules
+├── lib/                  # Shared utilities and helpers
+├── types/                # Cross-module TypeScript definitions
+└── styles/               # Global styles, Tailwind config
 ```
+
+**Key Rules**:
+- Each module is self-contained; minimize cross-module imports
+- Domain layer has ZERO external dependencies (no React, no Kysely)
+- Application layer depends only on Domain layer
+- Infrastructure layer implements Application layer interfaces
+- Presentation layer can depend on Application and Infrastructure layers
+- Import direction: Domain ← Application ← Infrastructure ← Presentation
 
 ## Governance
 
@@ -168,4 +229,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.3.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-19
+**Version**: 1.4.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-19
