@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@daveyplate/better-auth-ui": "^3.3.15",
+    "@fontsource-variable/roboto": "^5.2.9",
     "argon2": "^0.44.0",
     "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",
