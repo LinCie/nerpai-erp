@@ -1,4 +1,4 @@
-FROM oven/bun:1-alpine
+FROM oven/bun:1
 
 WORKDIR /app
 
@@ -10,7 +10,4 @@ RUN bun install --frozen-lockfile
 COPY kysely.config.ts ./
 COPY src/shared/infrastructure/persistence/migrations ./src/shared/infrastructure/persistence/migrations
 
-ARG MIGRATE_CMD="migrate latest"
-ENV MIGRATE_CMD=${MIGRATE_CMD}
-
-CMD ["sh", "-c", "bun run kysely ${MIGRATE_CMD}"]
+CMD ["sh", "-c", "bun run db:migrate"]
