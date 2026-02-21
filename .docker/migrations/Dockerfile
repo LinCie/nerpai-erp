@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copy manifests first for better caching
 COPY package.json bun.lock* ./
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile --verbose
 
 # Copy only what migrations need
 COPY kysely.config.ts ./
