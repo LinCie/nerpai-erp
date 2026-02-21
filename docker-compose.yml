@@ -3,3 +3,5 @@ services:
     build:
       context: .
       dockerfile: .docker/app/Dockerfile
+    env_file:
+      - path: .env
