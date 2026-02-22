@@ -40,6 +40,7 @@
 - [ ] **V. Code Quality**: Review process, security practices
 - [ ] **VI. Documentation-First Research**: Context7 verification for all library research (resolve IDs, use specific versions, document references)
 - [ ] **VII. Vertical Slice Architecture**: Code organized in `src/modules/[feature]/` with domain, application, infrastructure, presentation layers
+- [ ] **VIII. Database Naming Conventions**: Database uses snake_case, application uses camelCase, migrations use `db:migrate:create`, types regenerated with `db:codegen`
 
 **Research Phase Check:**
 - [ ] All library versions verified via Context7 (where available)

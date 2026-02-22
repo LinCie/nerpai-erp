@@ -2,28 +2,26 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.3.0 → 1.4.0 (Minor - added Vertical Slice Architecture principle)
+Version change: 1.4.0 → 1.5.0 (Minor - added Database Naming Conventions principle)
 
 Modified principles:
-  - None renamed, but order adjusted: VII added as new principle
+  - None renamed
 
 Modified sections:
-  - File Organization: Complete rewrite to reflect vertical slice structure
+  - Technology Standards: Added migration and type generation commands
+  - Quality Gates: Added item 7 for database naming conventions
 
 Added sections:
-  - VII. Vertical Slice Architecture with Clean Architecture
+  - VIII. Database Naming Conventions
 
 Removed sections: None
 
 Templates requiring updates:
-  ✅ plan-template.md - Updated Constitution Check to include item VII
-  ✅ tasks-template.md - Updated path conventions and task examples for module structure
-  ⚠ spec-template.md - No changes needed (entity section already flexible)
+  ✅ plan-template.md - Updated Constitution Check to include item VIII
+  ✅ spec-template.md - No changes needed
+  ✅ tasks-template.md - No changes needed
 
-Follow-up TODOs:
-  - TODO(FILE_ORGANIZATION_MIGRATION): Existing code in src/app/, src/components/, etc.
-    needs migration to src/modules/ structure. This is a gradual migration;
-    new features MUST use the module structure immediately.
+Follow-up TODOs: None
 ================================================================================
 -->
 
@@ -136,6 +134,19 @@ All feature code lives in `src/modules/[module-name]/` with four distinct layers
 
 **Rationale**: Vertical slices group related code by feature rather than technical layer, improving discoverability and reducing merge conflicts. Clean Architecture enforces dependency direction (Domain ← Application ← Infrastructure ← Presentation), making business logic independent of frameworks and infrastructure. This structure scales with team size and enables parallel development on different features.
 
+### VIII. Database Naming Conventions
+
+Database schemas use snake_case; application code uses camelCase. Transformation is handled automatically by Kysely camelCase plugins.
+
+- Database tables and columns MUST use snake_case (e.g., `user_id`, `created_at`)
+- TypeScript interfaces and application code MUST use camelCase (e.g., `userId`, `createdAt`)
+- Kysely camelCase plugins handle automatic case conversion between database and client
+- NEVER manually map column names; rely on the plugin transformation
+- Migrations MUST be created using `db:migrate:create` command
+- Database types MUST NOT be edited manually; regenerate using `db:codegen`
+
+**Rationale**: Consistent naming conventions reduce cognitive load when switching between SQL and TypeScript. Automatic transformation eliminates boilerplate mapping code and prevents naming inconsistencies. Standardized commands ensure migration and type generation follow project conventions.
+
 ## Technology Standards
 
 **Framework**: Next.js 16.x with App Router
@@ -143,7 +154,8 @@ All feature code lives in `src/modules/[module-name]/` with four distinct layers
 **UI Library**: React 19.x with React Compiler
 **Styling**: Tailwind CSS 4.x
 **Database**: PostgreSQL with Kysely v0.28.x query builder
-**Migrations**: kysely-ctl v0.20.x CLI
+**Migrations**: kysely-ctl v0.20.x CLI (use `db:migrate:create` command)
+**Type Generation**: `db:codegen` command for database types
 **Authentication**: better-auth 1.4.x
 **Testing**: Jest v30.x + React Testing Library (when tests requested)
 **Linting**: ESLint 9.x with next/core-web-vitals config
@@ -170,6 +182,7 @@ All feature code lives in `src/modules/[module-name]/` with four distinct layers
 4. No secrets in commit history
 5. Library research uses Context7 documentation (where available)
 6. New features use vertical slice module structure (VII)
+7. Database naming conventions followed: snake_case in DB, camelCase in code (VIII)
 
 ### File Organization
 
@@ -229,4 +242,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.4.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-19
+**Version**: 1.5.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-23
