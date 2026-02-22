@@ -2,7 +2,7 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.5.0 → 1.6.0 (Minor - expanded Database Naming Conventions with UUID requirements)
+Version change: 1.6.0 → 1.6.1 (Patch - clarified UUID generation must use uuidv7() SQL function)
 
 Modified principles:
   - VIII. Database Naming Conventions: Added UUID v7 requirements
@@ -139,8 +139,8 @@ Database schemas use snake_case; application code uses camelCase. Transformation
 
 - Database tables and columns MUST use snake_case (e.g., `user_id`, `created_at`)
 - TypeScript interfaces and application code MUST use camelCase (e.g., `userId`, `createdAt`)
-- **All primary key columns MUST be UUID type and auto-generated using UUID v7**
-- NEVER use auto-incrementing integers or serial types for IDs
+- **All primary key columns MUST be UUID type and auto-generated using the `uuidv7()` SQL function**
+- NEVER use auto-incrementing integers, serial types, or any other ID generation method
 - Kysely camelCase plugins handle automatic case conversion between database and client
 - NEVER manually map column names; rely on the plugin transformation
 - Migrations MUST be created using `db:migrate:create` command
@@ -244,4 +244,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.6.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-23
+**Version**: 1.6.1 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-23
