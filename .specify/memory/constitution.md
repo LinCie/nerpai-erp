@@ -2,21 +2,21 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.6.0 → 1.6.1 (Patch - clarified UUID generation must use uuidv7() SQL function)
+Version change: 1.6.1 → 1.7.0 (Minor - added Soft Delete Enforcement principle)
 
 Modified principles:
-  - VIII. Database Naming Conventions: Added UUID v7 requirements
+  - None renamed
 
 Modified sections:
-  - Principle VIII: Added ID type and generation rules
-  - Quality Gates: Added item 8 for UUID compliance
+  - None
 
-Added sections: None
+Added sections:
+  - IX. Soft Delete Enforcement
 
 Removed sections: None
 
 Templates requiring updates:
-  ✅ plan-template.md - Updated Constitution Check to include item VIII (UUID requirements)
+  ✅ plan-template.md - Updated Constitution Check to include item IX (soft delete requirements)
   ✅ spec-template.md - No changes needed
   ✅ tasks-template.md - No changes needed
 
@@ -148,6 +148,20 @@ Database schemas use snake_case; application code uses camelCase. Transformation
 
 **Rationale**: Consistent naming conventions reduce cognitive load when switching between SQL and TypeScript. Automatic transformation eliminates boilerplate mapping code and prevents naming inconsistencies. UUID v7 provides time-ordered, globally unique identifiers that are sortable by creation time and suitable for distributed systems. Standardized commands ensure migration and type generation follow project conventions.
 
+### IX. Soft Delete Enforcement
+
+All database entities MUST implement soft delete patterns; physical deletion is prohibited except for explicit data purging operations.
+
+- All tables MUST include `deleted_at` timestamp column (nullable, null = not deleted)
+- Queries MUST filter out soft-deleted records by default using `deleted_at IS NULL`
+- Repository implementations MUST provide explicit `softDelete()` and `restore()` methods
+- NEVER use SQL `DELETE` statements for normal entity removal
+- Hard delete operations MUST require explicit approval and audit logging
+- Soft-deleted records MUST remain accessible via explicit "include deleted" query options
+- Foreign key constraints MUST handle soft-deleted references appropriately
+
+**Rationale**: Soft deletes preserve data integrity and audit trails while preventing accidental data loss. They enable data recovery, maintain referential integrity history, and support compliance requirements. Explicit hard delete operations with approval ensure intentional permanent removal when truly required.
+
 ## Technology Standards
 
 **Framework**: Next.js 16.x with App Router
@@ -185,6 +199,7 @@ Database schemas use snake_case; application code uses camelCase. Transformation
 6. New features use vertical slice module structure (VII)
 7. Database naming conventions followed: snake_case in DB, camelCase in code (VIII)
 8. All primary keys use UUID v7 auto-generation, never auto-increment integers (VIII)
+9. Soft delete patterns implemented with `deleted_at` column, no hard deletes without approval (IX)
 
 ### File Organization
 
@@ -244,4 +259,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.6.1 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-23
+**Version**: 1.7.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-23
