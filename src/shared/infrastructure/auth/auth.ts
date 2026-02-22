@@ -1,13 +1,16 @@
-import { Pool } from "pg";
 import { betterAuth } from "better-auth";
 import { organization } from "better-auth/plugins";
 import argon2 from "argon2";
 import { sendEmail } from "../external/email.service";
+import { db } from "../persistence";
 
 export const auth = betterAuth({
-  database: new Pool({
-    connectionString: process.env.DATABASE_URL,
-  }),
+  database: {
+    db: db,
+    type: "postgres",
+    // casing: "snake",
+    transaction: true,
+  },
   plugins: [organization()],
   advanced: { database: { generateId: false } },
   emailAndPassword: {

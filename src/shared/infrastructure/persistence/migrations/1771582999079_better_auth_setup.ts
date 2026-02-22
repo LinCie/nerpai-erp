@@ -11,12 +11,12 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     )
     .addColumn("name", "text", (col) => col.notNull())
     .addColumn("email", "text", (col) => col.notNull().unique())
-    .addColumn("emailVerified", "boolean", (col) => col.notNull())
+    .addColumn("email_verified", "boolean", (col) => col.notNull())
     .addColumn("image", "text")
-    .addColumn("createdAt", "timestamptz", (col) =>
+    .addColumn("created_at", "timestamptz", (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
-    .addColumn("updatedAt", "timestamptz", (col) =>
+    .addColumn("updated_at", "timestamptz", (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
     .execute();
@@ -27,18 +27,18 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn("id", "uuid", (col) =>
       col.primaryKey().defaultTo(db.fn("uuidv7")),
     )
-    .addColumn("expiresAt", "timestamptz", (col) => col.notNull())
+    .addColumn("expires_at", "timestamptz", (col) => col.notNull())
     .addColumn("token", "text", (col) => col.notNull().unique())
-    .addColumn("ipAddress", "text")
-    .addColumn("userAgent", "text")
-    .addColumn("userId", "uuid", (col) =>
+    .addColumn("ip_address", "text")
+    .addColumn("user_agent", "text")
+    .addColumn("user_id", "uuid", (col) =>
       col.notNull().references("user.id").onDelete("cascade"),
     )
-    .addColumn("activeOrganizationId", "text")
-    .addColumn("createdAt", "timestamptz", (col) =>
+    .addColumn("active_organization_id", "text")
+    .addColumn("created_at", "timestamptz", (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
-    .addColumn("updatedAt", "timestamptz", (col) => col.notNull())
+    .addColumn("updated_at", "timestamptz", (col) => col.notNull())
     .execute();
 
   // Create account table
@@ -47,22 +47,22 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn("id", "uuid", (col) =>
       col.primaryKey().defaultTo(db.fn("uuidv7")),
     )
-    .addColumn("accountId", "text", (col) => col.notNull())
-    .addColumn("providerId", "text", (col) => col.notNull())
-    .addColumn("userId", "uuid", (col) =>
+    .addColumn("account_id", "text", (col) => col.notNull())
+    .addColumn("provider_id", "text", (col) => col.notNull())
+    .addColumn("user_id", "uuid", (col) =>
       col.notNull().references("user.id").onDelete("cascade"),
     )
-    .addColumn("accessToken", "text")
-    .addColumn("refreshToken", "text")
-    .addColumn("idToken", "text")
-    .addColumn("accessTokenExpiresAt", "timestamptz")
-    .addColumn("refreshTokenExpiresAt", "timestamptz")
+    .addColumn("access_token", "text")
+    .addColumn("refresh_token", "text")
+    .addColumn("id_token", "text")
+    .addColumn("access_token_expires_at", "timestamptz")
+    .addColumn("refresh_token_expires_at", "timestamptz")
     .addColumn("scope", "text")
     .addColumn("password", "text")
-    .addColumn("createdAt", "timestamptz", (col) =>
+    .addColumn("created_at", "timestamptz", (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
-    .addColumn("updatedAt", "timestamptz", (col) => col.notNull())
+    .addColumn("updated_at", "timestamptz", (col) => col.notNull())
     .execute();
 
   // Create verification table
@@ -73,11 +73,11 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     )
     .addColumn("identifier", "text", (col) => col.notNull())
     .addColumn("value", "text", (col) => col.notNull())
-    .addColumn("expiresAt", "timestamptz", (col) => col.notNull())
-    .addColumn("createdAt", "timestamptz", (col) =>
+    .addColumn("expires_at", "timestamptz", (col) => col.notNull())
+    .addColumn("created_at", "timestamptz", (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
-    .addColumn("updatedAt", "timestamptz", (col) =>
+    .addColumn("updated_at", "timestamptz", (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
     .execute();
@@ -91,7 +91,7 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn("name", "text", (col) => col.notNull())
     .addColumn("slug", "text", (col) => col.notNull().unique())
     .addColumn("logo", "text")
-    .addColumn("createdAt", "timestamptz", (col) => col.notNull())
+    .addColumn("created_at", "timestamptz", (col) => col.notNull())
     .addColumn("metadata", "text")
     .execute();
 
@@ -101,14 +101,14 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn("id", "uuid", (col) =>
       col.primaryKey().defaultTo(db.fn("uuidv7")),
     )
-    .addColumn("organizationId", "uuid", (col) =>
+    .addColumn("organization_id", "uuid", (col) =>
       col.notNull().references("organization.id").onDelete("cascade"),
     )
-    .addColumn("userId", "uuid", (col) =>
+    .addColumn("user_id", "uuid", (col) =>
       col.notNull().references("user.id").onDelete("cascade"),
     )
     .addColumn("role", "text", (col) => col.notNull())
-    .addColumn("createdAt", "timestamptz", (col) => col.notNull())
+    .addColumn("created_at", "timestamptz", (col) => col.notNull())
     .execute();
 
   // Create invitation table
@@ -117,32 +117,32 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn("id", "uuid", (col) =>
       col.primaryKey().defaultTo(db.fn("uuidv7")),
     )
-    .addColumn("organizationId", "uuid", (col) =>
+    .addColumn("organization_id", "uuid", (col) =>
       col.notNull().references("organization.id").onDelete("cascade"),
     )
     .addColumn("email", "text", (col) => col.notNull())
     .addColumn("role", "text")
     .addColumn("status", "text", (col) => col.notNull())
-    .addColumn("expiresAt", "timestamptz", (col) => col.notNull())
-    .addColumn("createdAt", "timestamptz", (col) =>
+    .addColumn("expires_at", "timestamptz", (col) => col.notNull())
+    .addColumn("created_at", "timestamptz", (col) =>
       col.defaultTo(sql`CURRENT_TIMESTAMP`).notNull(),
     )
-    .addColumn("inviterId", "uuid", (col) =>
+    .addColumn("inviter_id", "uuid", (col) =>
       col.notNull().references("user.id").onDelete("cascade"),
     )
     .execute();
 
   // Create indexes
   await db.schema
-    .createIndex("session_userId_idx")
+    .createIndex("session_user_id_idx")
     .on("session")
-    .column("userId")
+    .column("user_id")
     .execute();
 
   await db.schema
-    .createIndex("account_userId_idx")
+    .createIndex("account_user_id_idx")
     .on("account")
-    .column("userId")
+    .column("user_id")
     .execute();
 
   await db.schema
@@ -152,21 +152,21 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .execute();
 
   await db.schema
-    .createIndex("member_organizationId_idx")
+    .createIndex("member_organization_id_idx")
     .on("member")
-    .column("organizationId")
+    .column("organization_id")
     .execute();
 
   await db.schema
-    .createIndex("member_userId_idx")
+    .createIndex("member_user_id_idx")
     .on("member")
-    .column("userId")
+    .column("user_id")
     .execute();
 
   await db.schema
-    .createIndex("invitation_organizationId_idx")
+    .createIndex("invitation_organization_id_idx")
     .on("invitation")
-    .column("organizationId")
+    .column("organization_id")
     .execute();
 
   await db.schema
@@ -181,14 +181,14 @@ export async function down(db: Kysely<unknown>): Promise<void> {
   // Drop indexes
   await db.schema.dropIndex("invitation_email_idx").ifExists().execute();
   await db.schema
-    .dropIndex("invitation_organizationId_idx")
+    .dropIndex("invitation_organization_id_idx")
     .ifExists()
     .execute();
-  await db.schema.dropIndex("member_userId_idx").ifExists().execute();
-  await db.schema.dropIndex("member_organizationId_idx").ifExists().execute();
+  await db.schema.dropIndex("member_user_id_idx").ifExists().execute();
+  await db.schema.dropIndex("member_organization_id_idx").ifExists().execute();
   await db.schema.dropIndex("verification_identifier_idx").ifExists().execute();
-  await db.schema.dropIndex("account_userId_idx").ifExists().execute();
-  await db.schema.dropIndex("session_userId_idx").ifExists().execute();
+  await db.schema.dropIndex("account_user_id_idx").ifExists().execute();
+  await db.schema.dropIndex("session_user_id_idx").ifExists().execute();
 
   // Drop tables in reverse order of creation
   await db.schema.dropTable("invitation").ifExists().execute();
