@@ -89,7 +89,7 @@ Code MUST be reviewed, tested where specified, and follow security best practice
 - Secrets and credentials NEVER committed to repository
 - Sanitize and validate all user inputs
 - Use parameterized queries; never concatenate SQL
-- Authentication via next-auth; authorize on every protected route
+- Authentication via better-auth; authorize on every protected route
 - Log security-relevant events without exposing sensitive data
 
 **Rationale**: Security breaches are costly; code review catches issues automation misses; consistent practices reduce cognitive load.
@@ -144,7 +144,7 @@ All feature code lives in `src/modules/[module-name]/` with four distinct layers
 **Styling**: Tailwind CSS 4.x
 **Database**: PostgreSQL with Kysely v0.28.x query builder
 **Migrations**: kysely-ctl v0.20.x CLI
-**Authentication**: next-auth 4.x
+**Authentication**: better-auth 1.4.x
 **Testing**: Jest v30.x + React Testing Library (when tests requested)
 **Linting**: ESLint 9.x with next/core-web-vitals config
 **Package Manager**: Bun (exclusive - npm, yarn, pnpm, and deno are prohibited)
