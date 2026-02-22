@@ -14,7 +14,7 @@
   "rtl": false,
   "aliases": {
     "components": "@/shared/presentation/components",
-    "utils": "@/shared/presentation/utils",
+    "utils": "@/shared/presentation/library/utils",
     "ui": "@/shared/presentation/components/ui",
     "lib": "@/shared/presentation/lib",
     "hooks": "@/shared/presentation/hooks"
