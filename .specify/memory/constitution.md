@@ -2,22 +2,21 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.4.0 → 1.5.0 (Minor - added Database Naming Conventions principle)
+Version change: 1.5.0 → 1.6.0 (Minor - expanded Database Naming Conventions with UUID requirements)
 
 Modified principles:
-  - None renamed
+  - VIII. Database Naming Conventions: Added UUID v7 requirements
 
 Modified sections:
-  - Technology Standards: Added migration and type generation commands
-  - Quality Gates: Added item 7 for database naming conventions
+  - Principle VIII: Added ID type and generation rules
+  - Quality Gates: Added item 8 for UUID compliance
 
-Added sections:
-  - VIII. Database Naming Conventions
+Added sections: None
 
 Removed sections: None
 
 Templates requiring updates:
-  ✅ plan-template.md - Updated Constitution Check to include item VIII
+  ✅ plan-template.md - Updated Constitution Check to include item VIII (UUID requirements)
   ✅ spec-template.md - No changes needed
   ✅ tasks-template.md - No changes needed
 
@@ -140,12 +139,14 @@ Database schemas use snake_case; application code uses camelCase. Transformation
 
 - Database tables and columns MUST use snake_case (e.g., `user_id`, `created_at`)
 - TypeScript interfaces and application code MUST use camelCase (e.g., `userId`, `createdAt`)
+- **All primary key columns MUST be UUID type and auto-generated using UUID v7**
+- NEVER use auto-incrementing integers or serial types for IDs
 - Kysely camelCase plugins handle automatic case conversion between database and client
 - NEVER manually map column names; rely on the plugin transformation
 - Migrations MUST be created using `db:migrate:create` command
 - Database types MUST NOT be edited manually; regenerate using `db:codegen`
 
-**Rationale**: Consistent naming conventions reduce cognitive load when switching between SQL and TypeScript. Automatic transformation eliminates boilerplate mapping code and prevents naming inconsistencies. Standardized commands ensure migration and type generation follow project conventions.
+**Rationale**: Consistent naming conventions reduce cognitive load when switching between SQL and TypeScript. Automatic transformation eliminates boilerplate mapping code and prevents naming inconsistencies. UUID v7 provides time-ordered, globally unique identifiers that are sortable by creation time and suitable for distributed systems. Standardized commands ensure migration and type generation follow project conventions.
 
 ## Technology Standards
 
@@ -183,6 +184,7 @@ Database schemas use snake_case; application code uses camelCase. Transformation
 5. Library research uses Context7 documentation (where available)
 6. New features use vertical slice module structure (VII)
 7. Database naming conventions followed: snake_case in DB, camelCase in code (VIII)
+8. All primary keys use UUID v7 auto-generation, never auto-increment integers (VIII)
 
 ### File Organization
 
@@ -242,4 +244,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.5.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-23
+**Version**: 1.6.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-23
