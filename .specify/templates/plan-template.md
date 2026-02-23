@@ -43,6 +43,7 @@
 - [ ] **VIII. Database Naming Conventions**: Database uses snake_case, application uses camelCase, migrations use `db:migrate:create`, types regenerated with `db:codegen`
 - [ ] **UUID v7 Compliance**: All primary keys use UUID v7 auto-generation, never auto-increment integers (VIII)
 - [ ] **Soft Delete Enforcement**: All entities have `deleted_at` column, use soft delete methods, no hard deletes without approval (IX)
+- [ ] **X. Multi-Tenancy**: organization_id present on all business entities, queries scoped to active org (X)
 
 **Research Phase Check:**
 - [ ] All library versions verified via Context7 (where available)

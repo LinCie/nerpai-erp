@@ -2,7 +2,7 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.6.1 → 1.7.0 (Minor - added Soft Delete Enforcement principle)
+Version change: 1.7.0 → 1.8.0 (Minor - added Multi-Tenancy principle)
 
 Modified principles:
   - None renamed
@@ -11,12 +11,12 @@ Modified sections:
   - None
 
 Added sections:
-  - IX. Soft Delete Enforcement
+  - X. Multi-Tenancy & Organization Isolation
 
 Removed sections: None
 
 Templates requiring updates:
-  ✅ plan-template.md - Updated Constitution Check to include item IX (soft delete requirements)
+  ✅ plan-template.md - Added item X to Constitution Check
   ✅ spec-template.md - No changes needed
   ✅ tasks-template.md - No changes needed
 
@@ -162,6 +162,22 @@ All database entities MUST implement soft delete patterns; physical deletion is 
 
 **Rationale**: Soft deletes preserve data integrity and audit trails while preventing accidental data loss. They enable data recovery, maintain referential integrity history, and support compliance requirements. Explicit hard delete operations with approval ensure intentional permanent removal when truly required.
 
+### X. Multi-Tenancy & Organization Isolation
+
+All business data MUST be scoped to an organization. The system implements multi-tenancy using better-auth's organization plugin with strict data isolation between tenants.
+
+- All business entity tables MUST include `organization_id` column (UUID, foreign key to organization.id, not null)
+- All database queries MUST filter by the current active organization context
+- Repository methods MUST accept organizationId as a required parameter for data access
+- Server Actions and API routes MUST validate active organization membership before data operations
+- Users can only access data from organizations where they are active members (verified via member table)
+- Organization context is stored in session (`active_organization_id`) and validated on protected routes
+- Users without an active organization MUST be redirected to organization selection page
+- Support organization switching without full re-authentication
+- Cross-organization access is prohibited; super-admin functionality (if needed) requires explicit design with audit logging
+
+**Rationale**: Multi-tenancy ensures data isolation between customers, enables SaaS business model, and prevents data leakage between tenants. Strict organization scoping maintains security boundaries and supports future scalability.
+
 ## Technology Standards
 
 **Framework**: Next.js 16.x with App Router
@@ -200,6 +216,7 @@ All database entities MUST implement soft delete patterns; physical deletion is 
 7. Database naming conventions followed: snake_case in DB, camelCase in code (VIII)
 8. All primary keys use UUID v7 auto-generation, never auto-increment integers (VIII)
 9. Soft delete patterns implemented with `deleted_at` column, no hard deletes without approval (IX)
+10. Multi-tenancy enforced: organization_id on all business entities, queries scoped to active org (X)
 
 ### File Organization
 
@@ -259,4 +276,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.7.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-23
+**Version**: 1.8.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-23
