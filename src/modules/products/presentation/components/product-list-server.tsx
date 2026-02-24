@@ -28,11 +28,6 @@ export function ProductListServer({ products, searchQuery }: ProductListServerPr
     setIsSearching(false);
   };
 
-  const handleEdit = (product: Product) => {
-    // TODO: Implement in Phase 5
-    console.log("Edit:", product);
-  };
-
   const handleDelete = (product: Product) => {
     // TODO: Implement in Phase 6
     console.log("Delete:", product);
@@ -49,7 +44,6 @@ export function ProductListServer({ products, searchQuery }: ProductListServerPr
       {products.length > 0 ? (
         <ProductList 
           products={products}
-          onEdit={handleEdit}
           onDelete={handleDelete}
         />
       ) : (

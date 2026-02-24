@@ -13,6 +13,15 @@ export const createProductFormOptions = formOptions({
   },
 });
 
+export const updateProductFormOptions = formOptions({
+  defaultValues: {
+    name: "",
+  },
+  validators: {
+    onSubmit: productSchema,
+  },
+});
+
 export type ProductFormValues = {
   name: string;
 };

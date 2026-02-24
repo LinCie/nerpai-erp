@@ -137,19 +137,19 @@
 
 ### Implementation
 
-- [ ] T024 [P] Extend product service with `updateProduct()` method in `src/modules/products/application/services/product.service.ts`
+- [X] T024 [P] Extend product service with `updateProduct()` method in `src/modules/products/application/services/product.service.ts`
   - Validates product exists and belongs to organization
   - Updates name and updated_at timestamp
   - Depends on: T011 (repository)
-- [ ] T025 [P] Implement `updateProduct` Server Action in `src/modules/products/presentation/actions/product.actions.ts`
+- [X] T025 [P] Implement `updateProduct` Server Action in `src/modules/products/presentation/actions/product.actions.ts`
   - Validates session and organization
   - Validates input with Zod schema (T012)
   - Calls service method (T024)
   - Revalidates `/products` path
-- [ ] T026 Create `EditProductDialog` component in `src/modules/products/presentation/components/product-edit-dialog.tsx`
+- [X] T026 Create `EditProductDialog` component in `src/modules/products/presentation/components/product-edit-dialog.tsx`
   - Reuses ProductForm component (T016) with pre-populated data
   - Submits to `updateProduct` Server Action (T025)
-- [ ] T027 Update `ProductList` component (T019) to include edit action
+- [X] T027 Update `ProductList` component (T019) to include edit action
   - Add edit button to each product row
   - Opens EditProductDialog (T026)
 
