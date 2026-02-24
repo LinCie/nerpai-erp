@@ -12,9 +12,9 @@
 
 **Purpose**: Project initialization and existing structure verification
 
-- [ ] T001 Verify existing project structure per plan.md at `src/modules/products/`
-- [ ] T002 [P] Verify Kysely CamelCasePlugin configuration in `src/shared/infrastructure/persistence/index.ts`
-- [ ] T003 [P] Verify better-auth organization plugin and session handling in `src/lib/auth.ts`
+- [X] T001 Verify existing project structure per plan.md at `src/modules/products/`
+- [X] T002 [P] Verify Kysely CamelCasePlugin configuration in `src/shared/infrastructure/persistence/index.ts`
+- [X] T003 [P] Verify better-auth organization plugin and session handling in `src/lib/auth.ts`
 
 ---
 
@@ -26,28 +26,28 @@
 
 ### Database Infrastructure
 
-- [ ] T004 Create database migration for product table using `bun db:migrate:create create_product_table`
-  - Location: `src/shared/infrastructure/persistence/migrations/XXXX_create_product_table.ts`
+- [X] T004 Create database migration for product table using `bun db:migrate:create create_product_table`
+  - Location: `src/shared/infrastructure/persistence/migrations/1771947520603_create_product_table.ts`
   - Include: `id UUID PRIMARY KEY DEFAULT uuidv7()`, `name VARCHAR(255) NOT NULL`, `organization_id UUID NOT NULL REFERENCES organization(id) ON DELETE CASCADE`, `created_at TIMESTAMPTZ`, `updated_at TIMESTAMPTZ`, `deleted_at TIMESTAMPTZ`
   - Include indexes: `product_organization_id_idx`, `product_organization_id_deleted_at_idx`
-- [ ] T005 Run migration using `bun db:migrate`
-- [ ] T006 Regenerate database types using `bun db:codegen`
+- [X] T005 Run migration using `bun db:migrate`
+- [X] T006 Regenerate database types using `bun db:codegen`
 
 ### Domain Layer (Shared Across All Stories)
 
-- [ ] T007 [P] Create Product entity type in `src/modules/products/domain/entities/product.ts`
-- [ ] T008 [P] Create domain types index in `src/modules/products/domain/types/index.ts`
+- [X] T007 [P] Create Product entity type in `src/modules/products/domain/entities/product.ts`
+- [X] T008 [P] Create domain types index in `src/modules/products/domain/types/index.ts`
 
 ### Application Layer (Shared Interfaces)
 
-- [ ] T009 Create repository interface in `src/modules/products/application/repositories/product.repository.interface.ts`
+- [X] T009 Create repository interface in `src/modules/products/application/repositories/product.repository.interface.ts`
   - Methods: `getMany()`, `getById()`, `create()`, `update()`, `softDelete()`, `restore()`
-- [ ] T010 [P] Create application DTOs in `src/modules/products/application/types/index.ts`
+- [X] T010 [P] Create application DTOs in `src/modules/products/application/types/index.ts`
   - Interfaces: `GetProductsParams`, `CreateProductParams`, `UpdateProductParams`, `SoftDeleteProductParams`, `RestoreProductParams`
 
 ### Infrastructure Layer
 
-- [ ] T011 Implement ProductRepository in `src/modules/products/infrastructure/repositories/product.repository.ts`
+- [X] T011 Implement ProductRepository in `src/modules/products/infrastructure/repositories/product.repository.ts`
   - Depends on: T009 (interface), T007 (entity)
   - Implements all repository interface methods with Kysely queries
   - Includes soft delete filtering (`deletedAt IS NULL` by default)
@@ -55,10 +55,10 @@
 
 ### Presentation Layer - Shared
 
-- [ ] T012 Create Zod validation schema in `src/modules/products/presentation/schemas/product.schema.ts`
+- [X] T012 Create Zod validation schema in `src/modules/products/presentation/schemas/product.schema.ts`
   - Validation: name required, min 1 char, max 255 chars, trimmed
   - Use Zod 4 syntax with `{ error: "..." }` parameter
-- [ ] T013 Create presentation types in `src/modules/products/presentation/types/index.ts`
+- [X] T013 Create presentation types in `src/modules/products/presentation/types/index.ts`
 
 **Checkpoint**: Foundation ready - database schema, repository, and shared types complete
 
