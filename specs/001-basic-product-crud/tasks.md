@@ -102,27 +102,27 @@
 
 ### Implementation
 
-- [ ] T018 [P] Extend product service with `getProducts()` method in `src/modules/products/application/services/product.service.ts`
+- [X] T018 [P] Extend product service with `getProducts()` method in `src/modules/products/application/services/product.service.ts`
   - Supports optional search parameter
   - Filters by organization and excludes deleted products
   - Depends on: T011 (repository)
-- [ ] T019 [P] Create `ProductList` component in `src/modules/products/presentation/components/product-list.tsx`
+- [X] T019 [P] Create `ProductList` component in `src/modules/products/presentation/components/product-list.tsx`
   - Displays products in a table format
   - Shows product name and action buttons (edit, delete)
   - Uses TanStack Table or simple HTML table
-- [ ] T020 Create `ProductEmptyState` component in `src/modules/products/presentation/components/product-empty-state.tsx`
+- [X] T020 Create `ProductEmptyState` component in `src/modules/products/presentation/components/product-empty-state.tsx`
   - Shows when no products exist
   - Includes CTA to add first product
-- [ ] T021 Create search/filter component in `src/modules/products/presentation/components/product-search.tsx`
+- [X] T021 Create search/filter component in `src/modules/products/presentation/components/product-search.tsx`
   - Input field for name search
   - Client-side or server-side filtering (server-side preferred for scale)
-- [ ] T022 Create products page in `src/app/(app)/products/page.tsx`
+- [X] T022 Create products page in `src/app/(app)/products/page.tsx`
   - Server Component
   - Fetches products using service (T018)
   - Renders ProductList (T019) or EmptyState (T020)
   - Includes AddProductDialog trigger (T017)
   - Includes search component (T021)
-- [ ] T023 Create loading state in `src/app/(app)/products/loading.tsx`
+- [X] T023 Create loading state in `src/app/(app)/products/loading.tsx`
   - Skeleton UI for product list
 
 **Checkpoint**: User Story 2 complete - can view and search products
