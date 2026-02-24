@@ -69,6 +69,8 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T007 Create base models/entities that all stories depend on
 - [ ] T008 Configure error handling and logging infrastructure
 - [ ] T009 Setup environment configuration management
+- [ ] T00X Define/confirm Server Action or API contracts for success + recoverable errors in `contracts/`
+- [ ] T00Y Add DB integrity constraints and required extension/index migrations for planned query patterns
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -168,6 +170,8 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX Performance optimization across all stories
 - [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
 - [ ] TXXX Security hardening
+- [ ] TXXX Contract parity audit (spec/contracts vs implementation behavior)
+- [ ] TXXX Capture performance evidence (benchmark note or EXPLAIN plan) for verified claims
 - [ ] TXXX Run quickstart.md validation
 
 ---

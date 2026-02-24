@@ -2,26 +2,38 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.9.1 → 1.9.2 (Patch - mandated bun db:migrate for running migrations)
+Version change: 1.9.2 → 1.10.0 (Minor - added contract fidelity principle and
+expanded database extension/integrity requirements)
 
 Modified principles:
-  - VIII. Database Naming Conventions (added migration execution requirement)
+  - III. Next.js App Router Standards (added documented contract parity rule)
+  - VIII. Database Naming Conventions → VIII. Database Naming, Extensions & Integrity
+
+Added principles:
+  - XI. Contract Fidelity & Verification Integrity
 
 Modified sections:
-  - Technology Standards (clarified migration commands)
-  - Quality Gates (added migration execution check)
+  - Technology Standards (added extension governance guidance)
+  - Development Workflow / Quality Gates (added contract/evidence/DB integrity gates)
 
 Added sections:
   - None
 
-Removed sections: None
+Removed sections:
+  - None
 
 Templates requiring updates:
-  ✅ plan-template.md - No changes needed
-  ✅ spec-template.md - No changes needed
-  ✅ tasks-template.md - No changes needed
+  ✅ .specify/templates/plan-template.md
+  ✅ .specify/templates/spec-template.md
+  ✅ .specify/templates/tasks-template.md
+  ⚠ .specify/templates/commands/*.md (directory not present; no command templates to validate)
 
-Follow-up TODOs: None
+Runtime docs requiring updates:
+  ✅ README.md
+  ✅ specs/001-basic-product-crud/quickstart.md
+
+Follow-up TODOs:
+  - None
 ================================================================================
 -->
 
@@ -31,82 +43,103 @@ Follow-up TODOs: None
 
 ### I. Type Safety First
 
-TypeScript strict mode MUST be enabled at all times. The `any` type is prohibited; use `unknown` with proper type guards instead.
+TypeScript strict mode MUST be enabled at all times. The `any` type is
+prohibited; use `unknown` with proper type guards instead.
 
 - Enable `strict: true` in tsconfig.json (non-negotiable)
 - Handle `null` and `undefined` explicitly with strictNullChecks
 - Use discriminated unions for state management
 - Prefer interfaces for public APIs, types for unions/intersections
-- Throw Error objects, never strings; consider Result/Option types for functional error handling
+- Throw Error objects, never strings; consider Result/Option types for
+  functional error handling
 
-**Rationale**: Type safety catches bugs at compile time, improves IDE support, and serves as living documentation.
+**Rationale**: Type safety catches bugs at compile time, improves IDE support,
+and serves as living documentation.
 
 ### II. React Component Discipline
 
-Follow React Hooks rules strictly. Components MUST be focused, testable, and performant. React Compiler handles automatic memoization.
+Follow React Hooks rules strictly. Components MUST be focused, testable, and
+performant. React Compiler handles automatic memoization.
 
 - Never call hooks inside loops or conditions
 - Use custom hooks to encapsulate reusable logic (prefix with `use`)
-- Minimize manual memoization (`useMemo`, `useCallback`, `useReducer`) - rely on React Compiler
+- Minimize manual memoization (`useMemo`, `useCallback`, `useReducer`) - rely on
+  React Compiler
 - Keep effects focused on a single concern with proper cleanup
 - Use ESLint plugin for React hooks
 
-**Rationale**: Predictable component behavior, better performance, easier testing and debugging. React Compiler eliminates the need for manual memoization in most cases.
+**Rationale**: Predictable component behavior, better performance, easier testing
+and debugging. React Compiler eliminates the need for manual memoization in most
+cases.
 
 ### III. Next.js App Router Standards
 
 Leverage Next.js 16 App Router capabilities for optimal performance and UX.
 
-- Server Components are the default; use `'use client'` directive only when necessary
+- Server Components are the default; use `'use client'` directive only when
+  necessary
 - Server Actions handle mutations; validate inputs with Zod or similar
+- Server Actions and route handlers MUST match documented contracts for success,
+  validation, authorization, and not-found outcomes
 - Use streaming and Suspense for progressive loading
-- Implement proper loading.tsx and error.tsx boundaries
+- Implement proper `loading.tsx` and `error.tsx` boundaries
 - Route handlers follow RESTful conventions
 - Internationalization via next-intl for multi-language support
 
-**Rationale**: Server Components reduce client bundle size; proper error boundaries improve UX; standards ensure consistency.
+**Rationale**: Server Components reduce client bundle size; proper error
+boundaries improve UX; standards ensure consistency between design docs and
+runtime behavior.
 
 ### IV. Accessibility & Performance
 
-All user-facing features MUST meet accessibility standards and performance budgets.
+All user-facing features MUST meet accessibility standards and performance
+budgets.
 
 - Use semantic HTML elements (`<button>`, `<nav>`, `<main>`, etc.)
 - ARIA attributes only when semantic HTML is insufficient
 - Tailwind CSS for styling; avoid arbitrary values when design tokens exist
 - Target Core Web Vitals: LCP < 2.5s, FID < 100ms, CLS < 0.1
-- Images use next/image with proper sizing and lazy loading
+- Images use `next/image` with proper sizing and lazy loading
 - Keyboard navigation MUST work for all interactive elements
 
-**Rationale**: Accessibility is a legal requirement and moral obligation; performance directly impacts user satisfaction and conversion.
+**Rationale**: Accessibility is a legal requirement and moral obligation;
+performance directly impacts user satisfaction and conversion.
 
 ### V. Code Quality & Security
 
-Code MUST be reviewed, tested where specified, and follow security best practices.
+Code MUST be reviewed, tested when specified, and follow security best
+practices.
 
 - All code changes require review before merge
-- Secrets and credentials NEVER committed to repository
+- Secrets and credentials MUST NEVER be committed
 - Sanitize and validate all user inputs
 - Use parameterized queries; never concatenate SQL
 - Authentication via better-auth; authorize on every protected route
 - Log security-relevant events without exposing sensitive data
 
-**Rationale**: Security breaches are costly; code review catches issues automation misses; consistent practices reduce cognitive load.
+**Rationale**: Security breaches are costly; code review catches issues
+automation misses; consistent practices reduce cognitive load.
 
 ### VI. Documentation-First Research
 
-All research MUST utilize Context7 when available as the authoritative source for library documentation. Previous knowledge of libraries is invalidated when Context7 documentation is accessible.
+All research MUST utilize Context7 when available as the authoritative source
+for library documentation. Previous knowledge of libraries is invalidated when
+Context7 documentation is accessible.
 
 - MUST resolve library IDs via Context7 before querying documentation
-- MUST use specific versions from Context7 (e.g., `/org/project/version`) when available
+- MUST use specific versions from Context7 (for example, `/org/project/version`)
+  when available
 - MUST prioritize Context7 code snippets and examples over external sources
-- MUST invalidate all prior library knowledge when Context7 data is retrieved
+- MUST invalidate prior library assumptions when Context7 data is retrieved
 - SHOULD document which Context7 library IDs were referenced in research artifacts
 
-**Rationale**: Context7 provides version-specific, authoritative documentation directly from official sources. This eliminates knowledge drift, ensures accurate version compatibility, and prevents decisions based on outdated or incorrect information.
+**Rationale**: Context7 provides version-specific, authoritative documentation
+from official sources. This prevents knowledge drift and version mismatch.
 
 ### VII. Vertical Slice Architecture with Clean Architecture
 
-Code MUST be organized by feature modules using vertical slices, with each module implementing Clean Architecture layers. This ensures high cohesion, low coupling, and clear separation of concerns.
+Code MUST be organized by feature modules using vertical slices, with each
+module implementing Clean Architecture layers.
 
 **Module Structure**:
 All feature code lives in `src/modules/[module-name]/` with four distinct layers:
@@ -116,69 +149,124 @@ All feature code lives in `src/modules/[module-name]/` with four distinct layers
   - Contains: Entity definitions, value objects, domain events
 
 - **Application Layer**: Business logic and repository interfaces
-  - Location: `application/services/`, `application/repositories/`, `application/types/`
-  - Contains: Services implementing business rules, repository interfaces (not implementations), DTOs for service/repository contracts
+  - Location: `application/services/`, `application/repositories/`,
+    `application/types/`
+  - Contains: Services implementing business rules, repository interfaces (not
+    implementations), DTOs for service/repository contracts
 
 - **Infrastructure Layer**: Repository implementations and external integrations
   - Location: `infrastructure/repositories/`, `infrastructure/external/`
-  - Contains: Concrete repository implementations using Kysely, external API clients, database mappers
+  - Contains: Concrete repository implementations using Kysely, external API
+    clients, database mappers
 
 - **Presentation Layer**: Outward-facing interfaces
-  - Location: `presentation/actions/`, `presentation/api/`, `presentation/components/`, `presentation/stores/`, `presentation/types/`, `presentation/schemas/`
-  - Contains: Server Actions, API route handlers, React components, state management (Zustand), Zod schemas, presentation types
+  - Location: `presentation/actions/`, `presentation/api/`,
+    `presentation/components/`, `presentation/stores/`, `presentation/types/`,
+    `presentation/schemas/`
+  - Contains: Server Actions, API route handlers, React components, state
+    management (Zustand), Zod schemas, presentation types
 
 **Cross-Cutting Concerns**:
 - Shared utilities: `src/lib/`
 - Cross-module types: `src/types/`
 - Global styles: `src/styles/`
 
-**Rationale**: Vertical slices group related code by feature rather than technical layer, improving discoverability and reducing merge conflicts. Clean Architecture enforces dependency direction (Domain ← Application ← Infrastructure ← Presentation), making business logic independent of frameworks and infrastructure. This structure scales with team size and enables parallel development on different features.
+**Rationale**: Vertical slices group related code by feature rather than
+technical layer, improving discoverability and reducing merge conflicts.
+Dependency direction remains explicit and framework-independent.
 
-### VIII. Database Naming Conventions
+### VIII. Database Naming, Extensions & Integrity
 
-Database schemas use snake_case; application code uses camelCase. Transformation is handled automatically by Kysely camelCase plugins.
+Database schemas use snake_case; application code uses camelCase; integrity rules
+MUST be enforced at both application and database layers.
 
-- Database tables and columns MUST use snake_case (e.g., `user_id`, `created_at`)
-- TypeScript interfaces and application code MUST use camelCase (e.g., `userId`, `createdAt`)
-- **All primary key columns MUST be UUID type and auto-generated using the `uuidv7()` SQL function**
-- NEVER use auto-incrementing integers, serial types, or any other ID generation method
-- Kysely camelCase plugins handle automatic case conversion between database and client
-- NEVER manually map column names; rely on the plugin transformation
-- Migrations MUST be created using `bun db:migrate:create` command
-- Migrations MUST be executed using `bun db:migrate` command; NEVER run migrations through other means
+- Database tables and columns MUST use snake_case (for example, `user_id`,
+  `created_at`)
+- TypeScript interfaces and application code MUST use camelCase (for example,
+  `userId`, `createdAt`)
+- All primary key columns MUST be UUID type and auto-generated using
+  `uuidv7()` SQL function
+- NEVER use auto-incrementing integers, serial types, or alternate ID
+  generation methods
+- Kysely camelCase plugins MUST handle case conversion; manual column mapping is
+  prohibited unless explicitly justified
+- Migrations MUST be created using `bun db:migrate:create`
+- Migrations MUST be executed using `bun db:migrate`; alternate execution paths
+  are prohibited
 - Database types MUST NOT be edited manually; regenerate using `bun db:codegen`
+- PostgreSQL extensions used by features MUST be declared in idempotent
+  migrations (`CREATE EXTENSION IF NOT EXISTS ...`)
+- Domain invariants validated in application code MUST also be enforced in DB
+  constraints where feasible (for example, non-empty trimmed names)
+- Query patterns introduced in features MUST have matching index strategies;
+  substring search (`ILIKE '%...%'`) MUST use `pg_trgm` indexes or documented
+  equivalent
 
-**Rationale**: Consistent naming conventions reduce cognitive load when switching between SQL and TypeScript. Automatic transformation eliminates boilerplate mapping code and prevents naming inconsistencies. UUID v7 provides time-ordered, globally unique identifiers that are sortable by creation time and suitable for distributed systems. Standardized commands ensure migration and type generation follow project conventions, and mandatory execution through `bun db:migrate` ensures proper environment setup and logging.
+**Rationale**: Consistent naming reduces cognitive load; DB-enforced integrity
+prevents bypass of application validation; explicit extension/index governance
+keeps performance and rollback behavior predictable.
 
 ### IX. Soft Delete Enforcement
 
-All database entities MUST implement soft delete patterns; physical deletion is prohibited except for explicit data purging operations.
+All database entities MUST implement soft delete patterns; physical deletion is
+prohibited except for explicit data purging operations.
 
-- All tables MUST include `deleted_at` timestamp column (nullable, null = not deleted)
-- Queries MUST filter out soft-deleted records by default using `deleted_at IS NULL`
-- Repository implementations MUST provide explicit `softDelete()` and `restore()` methods
+- All tables MUST include `deleted_at` timestamp column (nullable, null = not
+  deleted)
+- Queries MUST filter out soft-deleted records by default using
+  `deleted_at IS NULL`
+- Repository implementations MUST provide explicit `softDelete()` and
+  `restore()` methods
 - NEVER use SQL `DELETE` statements for normal entity removal
 - Hard delete operations MUST require explicit approval and audit logging
-- Soft-deleted records MUST remain accessible via explicit "include deleted" query options
+- Soft-deleted records MUST remain accessible via explicit include-deleted query
+  options
 - Foreign key constraints MUST handle soft-deleted references appropriately
 
-**Rationale**: Soft deletes preserve data integrity and audit trails while preventing accidental data loss. They enable data recovery, maintain referential integrity history, and support compliance requirements. Explicit hard delete operations with approval ensure intentional permanent removal when truly required.
+**Rationale**: Soft deletes preserve auditability, enable recovery, and reduce
+accidental data loss risk.
 
 ### X. Multi-Tenancy & Organization Isolation
 
-All business data MUST be scoped to an organization. The system implements multi-tenancy using better-auth's organization plugin with strict data isolation between tenants.
+All business data MUST be scoped to an organization. The system implements
+multi-tenancy using better-auth's organization plugin with strict data
+isolation.
 
-- All business entity tables MUST include `organization_id` column (UUID, foreign key to organization.id, not null)
-- All database queries MUST filter by the current active organization context
-- Repository methods MUST accept organizationId as a required parameter for data access
-- Server Actions and API routes MUST validate active organization membership before data operations
-- Users can only access data from organizations where they are active members (verified via member table)
-- Organization context is stored in session (`active_organization_id`) and validated on protected routes
-- Users without an active organization MUST be redirected to organization selection page
+- All business entity tables MUST include `organization_id` column (UUID,
+  foreign key to `organization.id`, not null)
+- All database queries MUST filter by current active organization context
+- Repository methods MUST accept `organizationId` as a required parameter
+- Server Actions and API routes MUST validate active organization membership
+  before data operations
+- Users can only access data from organizations where they are active members
+- Organization context is stored in session (`active_organization_id`) and
+  validated on protected routes
+- Users without an active organization MUST be redirected to organization
+  selection page
 - Support organization switching without full re-authentication
-- Cross-organization access is prohibited; super-admin functionality (if needed) requires explicit design with audit logging
+- Cross-organization access is prohibited; super-admin access requires explicit
+  design plus audit logging
 
-**Rationale**: Multi-tenancy ensures data isolation between customers, enables SaaS business model, and prevents data leakage between tenants. Strict organization scoping maintains security boundaries and supports future scalability.
+**Rationale**: Multi-tenancy prevents data leakage and supports secure,
+scalable SaaS operation.
+
+### XI. Contract Fidelity & Verification Integrity
+
+Specifications and contracts MUST remain truthful to implementation, and
+completion claims MUST be evidence-backed.
+
+- Server Action/API contracts in specs (for example, `contracts/*.md`) MUST
+  define success and recoverable error behavior (`validation`, `not found`,
+  `forbidden`) and implementation MUST match those shapes
+- Recoverable domain outcomes MUST return explicit, typed responses; generic
+  thrown errors are reserved for unexpected faults
+- Tasks and checklists MUST NOT be marked complete without execution evidence
+  (for example, command output, query plan, benchmark note, or linked artifact)
+- Performance claims MUST be reproducible and include concrete evidence before
+  being marked verified
+
+**Rationale**: Contract drift causes user-facing defects and wasted debugging.
+Evidence-based completion prevents false confidence in quality gates.
 
 ## Technology Standards
 
@@ -187,18 +275,21 @@ All business data MUST be scoped to an organization. The system implements multi
 **UI Library**: React 19.x with React Compiler
 **Styling**: Tailwind CSS 4.x
 **Database**: PostgreSQL 18.x with Kysely v0.28.x query builder
-**Migrations**: kysely-ctl v0.20.x CLI (create with `bun db:migrate:create`, run with `bun db:migrate`)
+**Database Extensions**: Extension usage (for example, `pg_trgm`) is permitted
+only via idempotent migrations
+**Migrations**: kysely-ctl v0.20.x CLI (create with `bun db:migrate:create`, run
+with `bun db:migrate`)
 **Type Generation**: `db:codegen` command for database types
 **Authentication**: better-auth 1.4.x
 **Forms**: TanStack Form 1.x (headless form management with Zod integration)
 **Testing**: Jest v30.x + React Testing Library (when tests requested)
 **Linting**: ESLint 9.x with next/core-web-vitals config
-**Package Manager**: Bun (exclusive - npm, yarn, pnpm, and deno are prohibited)
+**Package Manager**: Bun only (`npm`, `yarn`, `pnpm`, and `deno` are prohibited)
 
 **Versioning**: Semantic Versioning (MAJOR.MINOR.PATCH)
-- MAJOR: Breaking changes to public APIs or architecture
-- MINOR: New features, backwards-compatible
-- PATCH: Bug fixes, minor improvements
+- MAJOR: Backward incompatible governance changes
+- MINOR: New principle/section or materially expanded guidance
+- PATCH: Clarifications and non-semantic refinements
 
 ## Development Workflow
 
@@ -217,14 +308,21 @@ All business data MUST be scoped to an organization. The system implements multi
 5. Library research uses Context7 documentation (where available)
 6. New features use vertical slice module structure (VII)
 7. Database naming conventions followed: snake_case in DB, camelCase in code (VIII)
-8. All primary keys use UUID v7 auto-generation, never auto-increment integers (VIII)
-9. Migrations executed using `bun db:migrate` command only (VIII)
-10. Soft delete patterns implemented with `deleted_at` column, no hard deletes without approval (IX)
-11. Multi-tenancy enforced: organization_id on all business entities, queries scoped to active org (X)
+8. All primary keys use UUID v7 auto-generation (VIII)
+9. Migrations executed using `bun db:migrate` only (VIII)
+10. Soft delete patterns implemented with `deleted_at`; no hard deletes without
+    approval (IX)
+11. Multi-tenancy enforced: `organization_id` on all business entities, queries
+    scoped to active org (X)
+12. Server Action/API behavior matches documented contracts, including
+    recoverable error semantics (III, XI)
+13. DB constraints enforce critical domain invariants where feasible (VIII)
+14. Performance claims include reproducible evidence and matching
+    extension/index strategy where applicable (VIII, XI)
 
 ### File Organization
 
-```
+```text
 src/
 ├── modules/              # Feature modules (vertical slices)
 │   ├── products/         # Example: Products module
@@ -254,7 +352,7 @@ src/
 
 **Key Rules**:
 - Each module is self-contained; minimize cross-module imports
-- Domain layer has ZERO external dependencies (no React, no Kysely)
+- Domain layer has zero external dependencies (no React, no Kysely)
 - Application layer depends only on Domain layer
 - Infrastructure layer implements Application layer interfaces
 - Presentation layer can depend on Application and Infrastructure layers
@@ -262,11 +360,12 @@ src/
 
 ## Governance
 
-This constitution supersedes all other development practices within this project.
+This constitution supersedes all other development practices within this
+project.
 
 **Amendment Process**:
-1. Propose change via pull request to constitution.md
-2. Document rationale and impact on existing code
+1. Propose change via pull request to `constitution.md`
+2. Document rationale and impact on existing code/process
 3. Increment version per semantic versioning rules
 4. Update `LAST_AMENDED_DATE` on ratification
 5. Propagate changes to dependent templates and documentation
@@ -274,10 +373,10 @@ This constitution supersedes all other development practices within this project
 **Compliance Review**:
 - All PRs MUST verify compliance with constitution principles
 - Deviations require explicit justification documented in Complexity Tracking
-- Use AGENTS.md for runtime development guidance and rule references
+- Claimed completed validations MUST include evidence references in PR notes
 
 **Guidance Files**:
-- AGENTS.md: Primary development guidance with rule references
+- `AGENTS.md`: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.9.2 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-24
+**Version**: 1.10.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-24

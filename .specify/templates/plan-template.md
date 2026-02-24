@@ -40,15 +40,17 @@
 - [ ] **V. Code Quality**: Review process, security practices
 - [ ] **VI. Documentation-First Research**: Context7 verification for all library research (resolve IDs, use specific versions, document references)
 - [ ] **VII. Vertical Slice Architecture**: Code organized in `src/modules/[feature]/` with domain, application, infrastructure, presentation layers
-- [ ] **VIII. Database Naming Conventions**: Database uses snake_case, application uses camelCase, migrations use `db:migrate:create`, types regenerated with `db:codegen`
+- [ ] **VIII. Database Naming, Extensions & Integrity**: DB uses snake_case, app uses camelCase, migrations use `db:migrate:create`, extension changes are idempotent, and critical invariants have DB constraints
 - [ ] **UUID v7 Compliance**: All primary keys use UUID v7 auto-generation, never auto-increment integers (VIII)
 - [ ] **Soft Delete Enforcement**: All entities have `deleted_at` column, use soft delete methods, no hard deletes without approval (IX)
 - [ ] **X. Multi-Tenancy**: organization_id present on all business entities, queries scoped to active org (X)
+- [ ] **XI. Contract Fidelity**: Server Action/API behaviors match documented success + recoverable error contracts, and completion claims are evidence-backed
 
 **Research Phase Check:**
 - [ ] All library versions verified via Context7 (where available)
 - [ ] Context7 library IDs documented in research.md
 - [ ] Prior knowledge invalidated when Context7 data retrieved
+- [ ] Performance/index claims include reproducible evidence (benchmark note or query plan)
 
 ## Project Structure
 
