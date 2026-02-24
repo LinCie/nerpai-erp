@@ -66,7 +66,7 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
               <Input
                 id={field.name}
                 name={field.name}
-                value={field.state.value}
+                value={field.state.value ?? ""}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
                 placeholder="Enter product name"

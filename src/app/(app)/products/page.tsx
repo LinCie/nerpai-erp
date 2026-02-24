@@ -1,8 +1,43 @@
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/presentation/components/ui/card";
 import { Package } from "lucide-react";
+import { auth } from "@/shared/infrastructure/auth/auth";
+import { productRepository } from "@/modules/products/infrastructure/repositories/product.repository";
+import { ProductService } from "@/modules/products/application/services/product.service";
 import { AddProductDialog } from "@/modules/products/presentation/components/product-add-dialog";
+import { ProductListServer } from "@/modules/products/presentation/components/product-list-server";
 
-export default function ProductsPage() {
+interface ProductsPageProps {
+  searchParams: Promise<{ search?: string }>;
+}
+
+const productService = new ProductService(productRepository);
+
+async function getSessionAndOrg() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    redirect("/auth/sign-in");
+  }
+
+  const organizationId = session.session.activeOrganizationId;
+  if (!organizationId) {
+    redirect("/organizations");
+  }
+
+  return { session, organizationId };
+}
+
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const { organizationId } = await getSessionAndOrg();
+  const params = await searchParams;
+  const searchQuery = params.search || "";
+
+  const products = await productService.getProducts({
+    organizationId,
+    search: searchQuery || undefined,
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -25,10 +60,11 @@ export default function ProductsPage() {
             View and manage all products
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Product listing coming soon...
-          </p>
+        <CardContent className="space-y-4">
+          <ProductListServer 
+            products={products} 
+            searchQuery={searchQuery}
+          />
         </CardContent>
       </Card>
     </div>
