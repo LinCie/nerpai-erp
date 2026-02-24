@@ -2,13 +2,13 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.8.0 → 1.9.0 (Minor - added TanStack Form)
+Version change: 1.9.0 → 1.9.1 (Patch - specified PostgreSQL 18.x requirement)
 
 Modified principles:
   - None renamed
 
 Modified sections:
-  - Technology Standards (added TanStack Form)
+  - Technology Standards (specified PostgreSQL 18.x for UUIDv7 support)
 
 Added sections:
   - None
@@ -184,7 +184,7 @@ All business data MUST be scoped to an organization. The system implements multi
 **Language**: TypeScript 5.x (strict mode)
 **UI Library**: React 19.x with React Compiler
 **Styling**: Tailwind CSS 4.x
-**Database**: PostgreSQL with Kysely v0.28.x query builder
+**Database**: PostgreSQL 18.x with Kysely v0.28.x query builder
 **Migrations**: kysely-ctl v0.20.x CLI (use `db:migrate:create` command)
 **Type Generation**: `db:codegen` command for database types
 **Authentication**: better-auth 1.4.x
@@ -277,4 +277,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.9.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-24
+**Version**: 1.9.1 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-24
