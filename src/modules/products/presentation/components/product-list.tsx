@@ -1,17 +1,16 @@
 "use client";
 
-import { Package, Trash2 } from "lucide-react";
-import { Button } from "@/shared/presentation/components/ui/button";
+import { Package } from "lucide-react";
 import type { Product } from "../../domain/entities/product";
 import { EditProductDialog } from "./product-edit-dialog";
+import { ProductDeleteDialog } from "./product-delete-dialog";
 
 interface ProductListProps {
   products: Product[];
-  onEdit?: (product: Product) => void;
-  onDelete?: (product: Product) => void;
+  onSuccess?: () => void;
 }
 
-export function ProductList({ products, onDelete }: ProductListProps) {
+export function ProductList({ products, onSuccess }: ProductListProps) {
   if (products.length === 0) {
     return null;
   }
@@ -43,18 +42,8 @@ export function ProductList({ products, onDelete }: ProductListProps) {
               </td>
               <td className="p-4 align-middle">
                 <div className="flex items-center justify-end gap-2">
-                  <EditProductDialog product={product} />
-                  {onDelete && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onDelete(product)}
-                      aria-label={`Delete ${product.name}`}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <EditProductDialog product={product} onSuccess={onSuccess} />
+                  <ProductDeleteDialog product={product} onSuccess={onSuccess} />
                 </div>
               </td>
             </tr>
