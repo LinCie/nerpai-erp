@@ -37,4 +37,11 @@ export class ProductService {
   async restoreProduct(params: RestoreProductParams): Promise<void> {
     return this.repository.restore(params);
   }
+
+  async getDeletedProducts(params: { organizationId: string }): Promise<Product[]> {
+    return this.repository.getMany({
+      organizationId: params.organizationId,
+      includeDeleted: true,
+    });
+  }
 }

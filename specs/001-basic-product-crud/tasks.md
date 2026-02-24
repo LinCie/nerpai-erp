@@ -194,27 +194,27 @@
 
 ### Implementation
 
-- [ ] T032 [P] Extend product service with `restoreProduct()` method in `src/modules/products/application/services/product.service.ts`
+- [X] T032 [P] Extend product service with `restoreProduct()` method in `src/modules/products/application/services/product.service.ts`
   - Validates product exists and belongs to organization
   - Clears deleted_at timestamp (sets to null)
   - Depends on: T011 (repository)
-- [ ] T033 [P] Extend product service with `getDeletedProducts()` method in `src/modules/products/application/services/product.service.ts`
+- [X] T033 [P] Extend product service with `getDeletedProducts()` method in `src/modules/products/application/services/product.service.ts`
   - Returns only soft-deleted products for organization
   - Depends on: T011 (repository)
-- [ ] T034 [P] Implement `restoreProduct` Server Action in `src/modules/products/presentation/actions/product.actions.ts`
+- [X] T034 [P] Implement `restoreProduct` Server Action in `src/modules/products/presentation/actions/product.actions.ts`
   - Validates session and organization
   - Calls service method (T032)
   - Revalidates `/products` and `/products/trash` paths
-- [ ] T035 Create `ProductTrashList` component in `src/modules/products/presentation/components/product-trash-list.tsx`
+- [X] T035 Create `ProductTrashList` component in `src/modules/products/presentation/components/product-trash-list.tsx`
   - Displays deleted products in a table
   - Shows product name, deletion date, and restore action
   - Empty state when no deleted products
-- [ ] T036 Create Trash page in `src/app/(app)/products/trash/page.tsx`
+- [X] T036 Create Trash page in `src/app/(app)/products/trash/page.tsx`
   - Server Component
   - Fetches deleted products using service (T033)
   - Renders ProductTrashList (T035)
   - Link back to active products
-- [ ] T037 Create loading state in `src/app/(app)/products/trash/loading.tsx`
+- [X] T037 Create loading state in `src/app/(app)/products/trash/loading.tsx`
 
 **Checkpoint**: User Story 5 complete - can view and restore deleted products
 
