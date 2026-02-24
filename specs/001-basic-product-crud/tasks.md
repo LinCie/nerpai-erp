@@ -252,6 +252,12 @@
   - Confirm Server Actions extract `activeOrganizationId` from session before every data operation
   - Covers: FR-006 (organization isolation), SC-004 (100% correct isolation)
 
+### Deferred Follow-up (Per Review Decision)
+
+- [ ] T051 Add automated tests for product CRUD lifecycle (create, update, soft-delete, restore)
+- [ ] T052 Add automated tests for organization isolation and not-found responses on cross-org access
+- [ ] T053 Add automated tests for validation edge cases (whitespace-only names, 255+ chars, missing IDs)
+
 ---
 
 ## Dependencies & Execution Order
