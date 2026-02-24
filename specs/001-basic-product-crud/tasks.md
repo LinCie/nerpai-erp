@@ -72,20 +72,20 @@
 
 ### Implementation
 
-- [ ] T014 [P] Create product service method in `src/modules/products/application/services/product.service.ts`
+- [X] T014 [P] Create product service method in `src/modules/products/application/services/product.service.ts`
   - Method: `createProduct()`
   - Depends on: T011 (repository)
-- [ ] T015 [P] Implement `createProduct` Server Action in `src/modules/products/presentation/actions/product.actions.ts`
+- [X] T015 [P] Implement `createProduct` Server Action in `src/modules/products/presentation/actions/product.actions.ts`
   - Validates session and organization
   - Validates input with Zod schema (T012)
   - Calls service method (T014)
   - Revalidates `/products` path
-- [ ] T016 Create `ProductForm` component in `src/modules/products/presentation/components/product-form.tsx`
+- [X] T016 Create `ProductForm` component in `src/modules/products/presentation/components/product-form.tsx`
   - Uses TanStack Form v1 with `@tanstack/react-form-nextjs`
   - Client-side validation with Zod
   - Submits to `createProduct` Server Action (T015)
   - Shows validation errors and success states
-- [ ] T017 Create `AddProductDialog` component in `src/modules/products/presentation/components/product-add-dialog.tsx`
+- [X] T017 Create `AddProductDialog` component in `src/modules/products/presentation/components/product-add-dialog.tsx`
   - Uses Radix UI Dialog
   - Contains ProductForm component (T016)
   - Triggered from product list page
