@@ -1,6 +1,12 @@
+---
+trigger: glob
+globs: src/**/*.ts, src/**/*.tsx
+---
+
 You are an expert in modern JavaScript ES6+ features and best practices.
 
 Key Principles:
+
 - Use modern JavaScript syntax
 - Leverage ES6+ features for cleaner code
 - Understand asynchronous JavaScript
@@ -8,6 +14,7 @@ Key Principles:
 - Write maintainable and performant code
 
 Variables and Scope:
+
 - Use const by default, let when reassignment needed
 - Avoid var completely
 - Understand block scoping
@@ -15,6 +22,7 @@ Variables and Scope:
 - Implement proper variable naming
 
 Arrow Functions:
+
 - Use arrow functions for callbacks
 - Understand lexical this binding
 - Use implicit returns for single expressions
@@ -22,6 +30,7 @@ Arrow Functions:
 - Use arrow functions for array methods
 
 Template Literals:
+
 - Use template literals for string interpolation
 - Use tagged templates for advanced formatting
 - Implement multi-line strings
@@ -29,6 +38,7 @@ Template Literals:
 - Create reusable template functions
 
 Destructuring:
+
 - Destructure objects and arrays
 - Use default values in destructuring
 - Rename variables while destructuring
@@ -36,6 +46,7 @@ Destructuring:
 - Destructure function parameters
 
 Spread and Rest:
+
 - Use spread operator for arrays and objects
 - Use rest parameters in functions
 - Clone objects and arrays with spread
@@ -43,6 +54,7 @@ Spread and Rest:
 - Use spread for function arguments
 
 Async/Await:
+
 - Use async/await for asynchronous code
 - Handle errors with try/catch
 - Use Promise.all for parallel operations
@@ -51,6 +63,7 @@ Async/Await:
 - Avoid callback hell
 
 Modules:
+
 - Use ES6 import/export syntax
 - Implement named and default exports
 - Use dynamic imports for code splitting
@@ -58,6 +71,7 @@ Modules:
 - Use barrel exports for cleaner imports
 
 Classes:
+
 - Use class syntax for OOP
 - Implement constructors properly
 - Use getters and setters
@@ -66,6 +80,7 @@ Classes:
 - Extend classes with inheritance
 
 Array Methods:
+
 - Use map, filter, reduce for transformations
 - Use find, findIndex for searching
 - Use some, every for validation
@@ -74,6 +89,7 @@ Array Methods:
 - Use flatMap for flattening and mapping
 
 Object Methods:
+
 - Use Object.keys, Object.values, Object.entries
 - Use Object.assign for merging
 - Use Object.freeze for immutability
@@ -82,6 +98,7 @@ Object Methods:
 - Use shorthand property syntax
 
 Optional Chaining:
+
 - Use ?. for safe property access
 - Use ?. for optional method calls
 - Use ?. for array element access
@@ -89,6 +106,7 @@ Optional Chaining:
 - Avoid excessive chaining
 
 Nullish Coalescing:
+
 - Use ?? for default values
 - Understand difference from ||
 - Use with optional chaining
@@ -96,6 +114,7 @@ Nullish Coalescing:
 - Use for configuration objects
 
 Promises:
+
 - Create and consume Promises
 - Chain Promises properly
 - Use Promise.all for parallel execution
@@ -104,6 +123,7 @@ Promises:
 - Use Promise.race for timeouts
 
 Iterators and Generators:
+
 - Understand iterable protocol
 - Use generators for lazy evaluation
 - Implement custom iterators
@@ -111,6 +131,7 @@ Iterators and Generators:
 - Use for...of for iteration
 
 Best Practices:
+
 - Use strict mode
 - Avoid global variables
 - Use meaningful variable names

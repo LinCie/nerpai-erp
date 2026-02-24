@@ -1,6 +1,12 @@
+---
+trigger: model_decision
+description: when working with browser api
+---
+
 You are an expert in browser APIs and the modern web platform.
 
 Key Principles:
+
 - Use modern browser APIs
 - Implement progressive enhancement
 - Handle browser compatibility
@@ -8,6 +14,7 @@ Key Principles:
 - Follow web standards
 
 Storage APIs:
+
 - localStorage for persistent data
 - sessionStorage for session data
 - IndexedDB for large datasets
@@ -16,6 +23,7 @@ Storage APIs:
 - Implement storage quotas
 
 Fetch API:
+
 - Use fetch for HTTP requests
 - Handle responses properly
 - Implement error handling
@@ -24,6 +32,7 @@ Fetch API:
 - Handle CORS properly
 
 Intersection Observer:
+
 - Use for lazy loading
 - Implement infinite scroll
 - Track element visibility
@@ -32,6 +41,7 @@ Intersection Observer:
 - Handle cleanup properly
 
 Mutation Observer:
+
 - Watch DOM changes
 - Implement proper callbacks
 - Use for dynamic content
@@ -40,6 +50,7 @@ Mutation Observer:
 - Use specific observation targets
 
 Resize Observer:
+
 - Watch element size changes
 - Implement responsive components
 - Handle resize events efficiently
@@ -47,6 +58,7 @@ Resize Observer:
 - Implement proper cleanup
 
 Geolocation API:
+
 - Request user permission
 - Handle position data
 - Implement error handling
@@ -55,6 +67,7 @@ Geolocation API:
 - Implement fallbacks
 
 Notifications API:
+
 - Request permission properly
 - Create rich notifications
 - Handle notification clicks
@@ -63,6 +76,7 @@ Notifications API:
 - Respect user preferences
 
 Web Workers:
+
 - Offload heavy computation
 - Use for background tasks
 - Implement message passing
@@ -71,6 +85,7 @@ Web Workers:
 - Implement proper error handling
 
 WebRTC:
+
 - Implement peer-to-peer communication
 - Handle media streams
 - Use for video/audio calls
@@ -79,6 +94,7 @@ WebRTC:
 - Implement proper error handling
 
 WebSockets:
+
 - Implement real-time communication
 - Handle connection lifecycle
 - Implement reconnection logic
@@ -87,6 +103,7 @@ WebSockets:
 - Implement proper error handling
 
 Clipboard API:
+
 - Use for copy/paste functionality
 - Request permissions properly
 - Handle different data types
@@ -95,6 +112,7 @@ Clipboard API:
 - Handle security restrictions
 
 Payment Request API:
+
 - Implement web payments
 - Handle payment methods
 - Validate payment data
@@ -103,6 +121,7 @@ Payment Request API:
 - Handle payment completion
 
 Web Share API:
+
 - Implement native sharing
 - Check for API support
 - Handle share data
@@ -111,6 +130,7 @@ Web Share API:
 - Handle share targets
 
 Best Practices:
+
 - Use feature detection
 - Implement progressive enhancement
 - Handle errors gracefully

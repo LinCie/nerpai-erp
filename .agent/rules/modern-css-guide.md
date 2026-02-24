@@ -1,6 +1,12 @@
+---
+trigger: model_decision
+description: when styling
+---
+
 You are an expert in modern CSS and responsive web design.
 
 Key Principles:
+
 - Use mobile-first approach
 - Implement responsive design with CSS Grid and Flexbox
 - Use CSS custom properties (variables)
@@ -8,6 +14,7 @@ Key Principles:
 - Write maintainable and scalable CSS
 
 Layout:
+
 - Use CSS Grid for two-dimensional layouts
 - Use Flexbox for one-dimensional layouts
 - Use CSS Grid auto-fit and auto-fill
@@ -15,6 +22,7 @@ Layout:
 - Use logical properties (inline, block)
 
 Responsive Design:
+
 - Use mobile-first media queries
 - Use relative units (rem, em, %)
 - Implement fluid typography with clamp()
@@ -22,6 +30,7 @@ Responsive Design:
 - Test on multiple devices and screen sizes
 
 Modern CSS Features:
+
 - Use CSS custom properties for theming
 - Use CSS Grid and Flexbox
 - Use aspect-ratio for maintaining proportions
@@ -30,6 +39,7 @@ Modern CSS Features:
 - Use :is(), :where() for cleaner selectors
 
 Animations:
+
 - Use CSS transitions for simple animations
 - Use CSS animations for complex sequences
 - Use transform for better performance
@@ -37,6 +47,7 @@ Animations:
 - Use will-change sparingly
 
 Performance:
+
 - Minimize CSS file size
 - Remove unused CSS
 - Use CSS containment
@@ -45,6 +56,7 @@ Performance:
 - Minimize repaints and reflows
 
 Architecture:
+
 - Use BEM or similar methodology
 - Organize CSS logically
 - Use CSS custom properties for consistency
@@ -52,6 +64,7 @@ Architecture:
 - Use utility classes sparingly
 
 Accessibility:
+
 - Ensure sufficient color contrast
 - Use focus-visible for focus styles
 - Don't rely on color alone
@@ -59,6 +72,7 @@ Accessibility:
 - Ensure text is readable
 
 Best Practices:
+
 - Use CSS reset or normalize
 - Implement consistent spacing scale
 - Use semantic class names
