@@ -10,12 +10,21 @@ import {
 import { auth } from "@/shared/infrastructure/auth/auth";
 import { productRepository } from "../../infrastructure/repositories/product.repository";
 import { ProductService } from "../../application/services/product.service";
-import { createProductFormOptions } from "../lib/form-options";
+import { createProductFormOptions, updateProductFormOptions } from "../lib/form-options";
 
 const productService = new ProductService(productRepository);
 
 const validateCreateProductForm = createServerValidate({
   ...createProductFormOptions,
+  onServerValidate: () => {
+    // Additional server-side validation can be added here
+    // Zod validation is already handled by formOpts.validators
+    return undefined;
+  },
+});
+
+const validateUpdateProductForm = createServerValidate({
+  ...updateProductFormOptions,
   onServerValidate: () => {
     // Additional server-side validation can be added here
     // Zod validation is already handled by formOpts.validators
@@ -60,5 +69,38 @@ export async function createProduct(prev: unknown, formData: FormData) {
 
     console.error("Error creating product:", e);
     throw new Error("Failed to create product. Please try again.");
+  }
+}
+
+export async function updateProduct(prev: unknown, formData: FormData) {
+  try {
+    const { organizationId } = await getSessionAndOrg();
+
+    // Extract product ID from form data
+    const productId = formData.get("id") as string;
+    if (!productId) {
+      throw new Error("Product ID is required");
+    }
+
+    // Validate form data using TanStack Form's server validation
+    const validatedData = await validateUpdateProductForm(formData);
+
+    await productService.updateProduct({
+      id: productId,
+      name: validatedData.name,
+      organizationId,
+    });
+
+    revalidatePath("/products");
+
+    // Return undefined on success - form will reset naturally
+    return undefined;
+  } catch (e) {
+    if (e instanceof ServerValidateError) {
+      return e.formState;
+    }
+
+    console.error("Error updating product:", e);
+    throw new Error("Failed to update product. Please try again.");
   }
 }
