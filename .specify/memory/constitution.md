@@ -2,13 +2,14 @@
 ================================================================================
 SYNC IMPACT REPORT
 ================================================================================
-Version change: 1.9.0 → 1.9.1 (Patch - specified PostgreSQL 18.x requirement)
+Version change: 1.9.1 → 1.9.2 (Patch - mandated bun db:migrate for running migrations)
 
 Modified principles:
-  - None renamed
+  - VIII. Database Naming Conventions (added migration execution requirement)
 
 Modified sections:
-  - Technology Standards (specified PostgreSQL 18.x for UUIDv7 support)
+  - Technology Standards (clarified migration commands)
+  - Quality Gates (added migration execution check)
 
 Added sections:
   - None
@@ -143,10 +144,11 @@ Database schemas use snake_case; application code uses camelCase. Transformation
 - NEVER use auto-incrementing integers, serial types, or any other ID generation method
 - Kysely camelCase plugins handle automatic case conversion between database and client
 - NEVER manually map column names; rely on the plugin transformation
-- Migrations MUST be created using `db:migrate:create` command
-- Database types MUST NOT be edited manually; regenerate using `db:codegen`
+- Migrations MUST be created using `bun db:migrate:create` command
+- Migrations MUST be executed using `bun db:migrate` command; NEVER run migrations through other means
+- Database types MUST NOT be edited manually; regenerate using `bun db:codegen`
 
-**Rationale**: Consistent naming conventions reduce cognitive load when switching between SQL and TypeScript. Automatic transformation eliminates boilerplate mapping code and prevents naming inconsistencies. UUID v7 provides time-ordered, globally unique identifiers that are sortable by creation time and suitable for distributed systems. Standardized commands ensure migration and type generation follow project conventions.
+**Rationale**: Consistent naming conventions reduce cognitive load when switching between SQL and TypeScript. Automatic transformation eliminates boilerplate mapping code and prevents naming inconsistencies. UUID v7 provides time-ordered, globally unique identifiers that are sortable by creation time and suitable for distributed systems. Standardized commands ensure migration and type generation follow project conventions, and mandatory execution through `bun db:migrate` ensures proper environment setup and logging.
 
 ### IX. Soft Delete Enforcement
 
@@ -185,7 +187,7 @@ All business data MUST be scoped to an organization. The system implements multi
 **UI Library**: React 19.x with React Compiler
 **Styling**: Tailwind CSS 4.x
 **Database**: PostgreSQL 18.x with Kysely v0.28.x query builder
-**Migrations**: kysely-ctl v0.20.x CLI (use `db:migrate:create` command)
+**Migrations**: kysely-ctl v0.20.x CLI (create with `bun db:migrate:create`, run with `bun db:migrate`)
 **Type Generation**: `db:codegen` command for database types
 **Authentication**: better-auth 1.4.x
 **Forms**: TanStack Form 1.x (headless form management with Zod integration)
@@ -216,8 +218,9 @@ All business data MUST be scoped to an organization. The system implements multi
 6. New features use vertical slice module structure (VII)
 7. Database naming conventions followed: snake_case in DB, camelCase in code (VIII)
 8. All primary keys use UUID v7 auto-generation, never auto-increment integers (VIII)
-9. Soft delete patterns implemented with `deleted_at` column, no hard deletes without approval (IX)
-10. Multi-tenancy enforced: organization_id on all business entities, queries scoped to active org (X)
+9. Migrations executed using `bun db:migrate` command only (VIII)
+10. Soft delete patterns implemented with `deleted_at` column, no hard deletes without approval (IX)
+11. Multi-tenancy enforced: organization_id on all business entities, queries scoped to active org (X)
 
 ### File Organization
 
@@ -277,4 +280,4 @@ This constitution supersedes all other development practices within this project
 - AGENTS.md: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.9.1 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-24
+**Version**: 1.9.2 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-24
