@@ -104,3 +104,27 @@ export async function updateProduct(prev: unknown, formData: FormData) {
     throw new Error("Failed to update product. Please try again.");
   }
 }
+
+export async function softDeleteProduct(formData: FormData) {
+  try {
+    const { organizationId } = await getSessionAndOrg();
+
+    const productId = formData.get("id") as string;
+    if (!productId) {
+      throw new Error("Product ID is required");
+    }
+
+    await productService.softDeleteProduct({
+      id: productId,
+      organizationId,
+    });
+
+    revalidatePath("/products");
+    revalidatePath("/products/trash");
+
+    return { success: true };
+  } catch (e) {
+    console.error("Error soft-deleting product:", e);
+    throw new Error("Failed to delete product. Please try again.");
+  }
+}

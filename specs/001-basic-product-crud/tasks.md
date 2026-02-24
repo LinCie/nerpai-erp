@@ -165,20 +165,20 @@
 
 ### Implementation
 
-- [ ] T028 [P] Extend product service with `softDeleteProduct()` method in `src/modules/products/application/services/product.service.ts`
+- [X] T028 [P] Extend product service with `softDeleteProduct()` method in `src/modules/products/application/services/product.service.ts`
   - Validates product exists and belongs to organization
   - Sets deleted_at timestamp
   - Depends on: T011 (repository)
-- [ ] T029 [P] Implement `softDeleteProduct` Server Action in `src/modules/products/presentation/actions/product.actions.ts`
+- [X] T029 [P] Implement `softDeleteProduct` Server Action in `src/modules/products/presentation/actions/product.actions.ts`
   - Validates session and organization
   - Calls service method (T028)
   - Revalidates `/products` and `/products/trash` paths
-- [ ] T030 Create `ProductDeleteDialog` component in `src/modules/products/presentation/components/product-delete-dialog.tsx`
+- [X] T030 Create `ProductDeleteDialog` component in `src/modules/products/presentation/components/product-delete-dialog.tsx`
   - Confirmation dialog using Radix UI
   - Shows product name being deleted
   - Cancel and Confirm buttons
   - Submits to `softDeleteProduct` Server Action (T029)
-- [ ] T031 Update `ProductList` component (T019) to include delete action
+- [X] T031 Update `ProductList` component (T019) to include delete action
   - Add delete button to each product row
   - Opens ProductDeleteDialog (T030)
 
