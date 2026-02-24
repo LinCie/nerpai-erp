@@ -29,7 +29,7 @@ export function AddProductDialog({ onSuccess }: AddProductDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button id="add-product-trigger">
           <Plus className="w-4 h-4 mr-2" />
           Add Product
         </Button>

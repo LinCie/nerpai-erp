@@ -8,6 +8,13 @@ import type {
 } from "../types";
 import type { Product } from "../../domain/entities/product";
 
+export class ProductNotFoundError extends Error {
+  constructor() {
+    super("Product not found");
+    this.name = "ProductNotFoundError";
+  }
+}
+
 export class ProductService {
   constructor(private repository: IProductRepository) {}
 
@@ -27,14 +34,19 @@ export class ProductService {
   }
 
   async updateProduct(params: UpdateProductParams): Promise<Product> {
-    return this.repository.update(params);
+    const product = await this.repository.update(params);
+    if (!product) {
+      throw new ProductNotFoundError();
+    }
+
+    return product;
   }
 
-  async softDeleteProduct(params: SoftDeleteProductParams): Promise<void> {
+  async softDeleteProduct(params: SoftDeleteProductParams): Promise<boolean> {
     return this.repository.softDelete(params);
   }
 
-  async restoreProduct(params: RestoreProductParams): Promise<void> {
+  async restoreProduct(params: RestoreProductParams): Promise<boolean> {
     return this.repository.restore(params);
   }
 

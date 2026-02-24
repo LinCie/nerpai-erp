@@ -32,7 +32,11 @@ export function ProductTrashList({ products, onSuccess }: ProductTrashListProps)
         const formData = new FormData();
         formData.append("id", product.id);
 
-        await restoreProduct(formData);
+        const result = await restoreProduct(formData);
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
 
         toast.success(`"${product.name}" has been restored`);
         onSuccess?.();

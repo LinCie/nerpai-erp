@@ -21,15 +21,15 @@ export interface IProductRepository {
     id: string;
     name: string;
     organizationId: string;
-  }): Promise<Product>;
+  }): Promise<Product | null>;
 
   softDelete(params: {
     id: string;
     organizationId: string;
-  }): Promise<void>;
+  }): Promise<boolean>;
 
   restore(params: {
     id: string;
     organizationId: string;
-  }): Promise<void>;
+  }): Promise<boolean>;
 }

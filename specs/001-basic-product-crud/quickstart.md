@@ -33,6 +33,11 @@ bun db:codegen
 
 The migration creates the `product` table with columns: `id`, `name`, `organization_id`, `created_at`, `updated_at`, `deleted_at` and appropriate indexes.
 
+For substring name search (`ILIKE '%query%'`) and stronger integrity:
+- Enable `pg_trgm` via idempotent migration SQL (`CREATE EXTENSION IF NOT EXISTS pg_trgm`)
+- Add a trimmed non-empty name constraint (e.g., `CHECK (char_length(btrim(name)) > 0)`)
+- Add a trigram index for search (`USING gin (name gin_trgm_ops)`)
+
 ### Step 2: Domain Layer
 
 Create the product entity type definition:
@@ -97,7 +102,9 @@ After implementation, verify by:
 
 1. **Build check**: `bun run build` — TypeScript compilation passes with no errors
 2. **Lint check**: `bun run lint` — ESLint passes with no warnings
-3. **Manual smoke test**:
+3. **Contract check**: Server Actions return explicit recoverable errors (`validation`, `not found`) per `contracts/server-actions.md`
+4. **Performance evidence**: Capture query plan/benchmark for product search if claiming sub-second response at target scale
+5. **Manual smoke test**:
    - Navigate to Products page → empty state shown
    - Click "Add Product" → form appears
    - Enter a name and submit → product appears in list
