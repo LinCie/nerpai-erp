@@ -47,6 +47,10 @@ export const navItems: NavItem[] = [
         title: "Create New",
         url: "/products/new",
       },
+      {
+        title: "Trash",
+        url: "/products/trash",
+      },
     ],
   },
   {
