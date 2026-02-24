@@ -1,14 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/presentation/components/ui/card";
 import { Package } from "lucide-react";
+import { AddProductDialog } from "@/modules/products/presentation/components/product-add-dialog";
 
 export default function ProductsPage() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">All Products</h1>
-        <p className="text-muted-foreground">
-          Manage your product catalog
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">All Products</h1>
+          <p className="text-muted-foreground">
+            Manage your product catalog
+          </p>
+        </div>
+        <AddProductDialog />
       </div>
 
       <Card>
