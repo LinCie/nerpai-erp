@@ -9,7 +9,10 @@ import {
 } from "@tanstack/react-form-nextjs";
 import { auth } from "@/shared/infrastructure/auth/auth";
 import { productRepository } from "../../infrastructure/repositories/product.repository";
-import { ProductService } from "../../application/services/product.service";
+import {
+  ProductNotFoundError,
+  ProductService,
+} from "../../application/services/product.service";
 import { createProductFormOptions, updateProductFormOptions } from "../lib/form-options";
 
 const productService = new ProductService(productRepository);
@@ -46,6 +49,19 @@ async function getSessionAndOrg() {
   return { session, organizationId };
 }
 
+function buildServerFormErrorState(formData: FormData, message: string) {
+  const rawName = formData.get("name");
+  const name = typeof rawName === "string" ? rawName : "";
+
+  return {
+    errorMap: {
+      onServer: message,
+    },
+    values: { name },
+    errors: [message],
+  };
+}
+
 export async function createProduct(prev: unknown, formData: FormData) {
   try {
     const { organizationId } = await getSessionAndOrg();
@@ -77,9 +93,10 @@ export async function updateProduct(prev: unknown, formData: FormData) {
     const { organizationId } = await getSessionAndOrg();
 
     // Extract product ID from form data
-    const productId = formData.get("id") as string;
+    const rawProductId = formData.get("id");
+    const productId = typeof rawProductId === "string" ? rawProductId : "";
     if (!productId) {
-      throw new Error("Product ID is required");
+      return buildServerFormErrorState(formData, "Product ID is required");
     }
 
     // Validate form data using TanStack Form's server validation
@@ -99,6 +116,9 @@ export async function updateProduct(prev: unknown, formData: FormData) {
     if (e instanceof ServerValidateError) {
       return e.formState;
     }
+    if (e instanceof ProductNotFoundError) {
+      return buildServerFormErrorState(formData, e.message);
+    }
 
     console.error("Error updating product:", e);
     throw new Error("Failed to update product. Please try again.");
@@ -109,15 +129,20 @@ export async function softDeleteProduct(formData: FormData) {
   try {
     const { organizationId } = await getSessionAndOrg();
 
-    const productId = formData.get("id") as string;
+    const rawProductId = formData.get("id");
+    const productId = typeof rawProductId === "string" ? rawProductId : "";
     if (!productId) {
       throw new Error("Product ID is required");
     }
 
-    await productService.softDeleteProduct({
+    const deleted = await productService.softDeleteProduct({
       id: productId,
       organizationId,
     });
+
+    if (!deleted) {
+      return { success: false, error: "Product not found" };
+    }
 
     revalidatePath("/products");
     revalidatePath("/products/trash");
@@ -133,15 +158,20 @@ export async function restoreProduct(formData: FormData) {
   try {
     const { organizationId } = await getSessionAndOrg();
 
-    const productId = formData.get("id") as string;
+    const rawProductId = formData.get("id");
+    const productId = typeof rawProductId === "string" ? rawProductId : "";
     if (!productId) {
       throw new Error("Product ID is required");
     }
 
-    await productService.restoreProduct({
+    const restored = await productService.restoreProduct({
       id: productId,
       organizationId,
     });
+
+    if (!restored) {
+      return { success: false, error: "Product not found" };
+    }
 
     revalidatePath("/products");
     revalidatePath("/products/trash");

@@ -76,8 +76,8 @@ export class ProductRepository implements IProductRepository {
     id: string;
     name: string;
     organizationId: string;
-  }): Promise<Product> {
-    return await db
+  }): Promise<Product | null> {
+    const product = await db
       .updateTable("product")
       .set({
         name,
@@ -87,7 +87,9 @@ export class ProductRepository implements IProductRepository {
       .where("organizationId", "=", organizationId)
       .where("deletedAt", "is", null)
       .returningAll()
-      .executeTakeFirstOrThrow();
+      .executeTakeFirst();
+
+    return product ?? null;
   }
 
   async softDelete({
@@ -96,8 +98,8 @@ export class ProductRepository implements IProductRepository {
   }: {
     id: string;
     organizationId: string;
-  }): Promise<void> {
-    await db
+  }): Promise<boolean> {
+    const result = await db
       .updateTable("product")
       .set({
         deletedAt: sql`CURRENT_TIMESTAMP`,
@@ -105,7 +107,10 @@ export class ProductRepository implements IProductRepository {
       .where("id", "=", id)
       .where("organizationId", "=", organizationId)
       .where("deletedAt", "is", null)
-      .execute();
+      .returning("id")
+      .executeTakeFirst();
+
+    return Boolean(result);
   }
 
   async restore({
@@ -114,8 +119,8 @@ export class ProductRepository implements IProductRepository {
   }: {
     id: string;
     organizationId: string;
-  }): Promise<void> {
-    await db
+  }): Promise<boolean> {
+    const result = await db
       .updateTable("product")
       .set({
         deletedAt: null,
@@ -123,7 +128,10 @@ export class ProductRepository implements IProductRepository {
       .where("id", "=", id)
       .where("organizationId", "=", organizationId)
       .where("deletedAt", "is not", null)
-      .execute();
+      .returning("id")
+      .executeTakeFirst();
+
+    return Boolean(result);
   }
 }
 

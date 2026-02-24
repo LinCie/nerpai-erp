@@ -31,7 +31,11 @@ export function ProductDeleteDialog({ product, onSuccess }: ProductDeleteDialogP
         const formData = new FormData();
         formData.append("id", product.id);
 
-        await softDeleteProduct(formData);
+        const result = await softDeleteProduct(formData);
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
 
         toast.success(`"${product.name}" has been deleted`);
         setOpen(false);
