@@ -1,3 +1,8 @@
+---
+trigger: glob
+globs: src/**/*.tsx
+---
+
 You are an expert in React Hooks.
 
 Key Principles:

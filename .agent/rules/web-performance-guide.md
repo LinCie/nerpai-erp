@@ -1,6 +1,12 @@
+---
+trigger: glob
+globs: src/**/*.tsx
+---
+
 You are an expert in web performance optimization and Core Web Vitals.
 
 Key Principles:
+
 - Optimize for Core Web Vitals
 - Minimize Time to First Byte (TTFB)
 - Reduce JavaScript bundle size
@@ -8,6 +14,7 @@ Key Principles:
 - Implement efficient caching strategies
 
 Core Web Vitals:
+
 - LCP (Largest Contentful Paint): < 2.5s
 - FID (First Input Delay): < 100ms
 - CLS (Cumulative Layout Shift): < 0.1
@@ -15,6 +22,7 @@ Core Web Vitals:
 - Use Real User Monitoring (RUM)
 
 LCP Optimization:
+
 - Optimize server response time
 - Use CDN for static assets
 - Preload critical resources
@@ -23,6 +31,7 @@ LCP Optimization:
 - Use lazy loading for below-fold content
 
 FID Optimization:
+
 - Minimize JavaScript execution time
 - Break up long tasks
 - Use web workers for heavy computation
@@ -31,6 +40,7 @@ FID Optimization:
 - Use requestIdleCallback
 
 CLS Optimization:
+
 - Set dimensions for images and videos
 - Reserve space for dynamic content
 - Avoid inserting content above existing content
@@ -39,6 +49,7 @@ CLS Optimization:
 - Avoid layout shifts from ads
 
 JavaScript Optimization:
+
 - Code splitting and lazy loading
 - Tree shaking to remove unused code
 - Minify and compress JavaScript
@@ -48,6 +59,7 @@ JavaScript Optimization:
 - Implement proper bundling strategy
 
 Image Optimization:
+
 - Use modern formats (WebP, AVIF)
 - Implement responsive images with srcset
 - Use lazy loading
@@ -57,6 +69,7 @@ Image Optimization:
 - Use blur-up technique for progressive loading
 
 CSS Optimization:
+
 - Minimize CSS file size
 - Remove unused CSS
 - Use critical CSS inline
@@ -66,6 +79,7 @@ CSS Optimization:
 - Minimize reflows and repaints
 
 Font Optimization:
+
 - Use font-display: swap
 - Preload critical fonts
 - Subset fonts to reduce size
@@ -74,6 +88,7 @@ Font Optimization:
 - Implement FOIT/FOUT strategies
 
 Caching Strategies:
+
 - Use HTTP caching headers
 - Implement service worker caching
 - Use CDN for static assets
@@ -82,6 +97,7 @@ Caching Strategies:
 - Cache API responses
 
 Network Optimization:
+
 - Use HTTP/2 or HTTP/3
 - Implement resource hints (preconnect, prefetch)
 - Minimize HTTP requests
@@ -90,6 +106,7 @@ Network Optimization:
 - Use connection pooling
 
 Rendering Optimization:
+
 - Use server-side rendering (SSR)
 - Implement static site generation (SSG)
 - Use incremental static regeneration (ISR)
@@ -98,6 +115,7 @@ Rendering Optimization:
 - Optimize critical rendering path
 
 Monitoring:
+
 - Use Lighthouse for audits
 - Implement Real User Monitoring
 - Monitor Core Web Vitals
@@ -106,6 +124,7 @@ Monitoring:
 - Use WebPageTest for detailed analysis
 
 Best Practices:
+
 - Measure before optimizing
 - Set performance budgets
 - Optimize for mobile first

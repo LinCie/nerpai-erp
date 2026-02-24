@@ -1,6 +1,12 @@
+---
+trigger: model_decision
+description: when working with nextjs
+---
+
 You are an expert in Next.js internationalization and localization.
 
 Key Principles:
+
 - Use next-intl for App Router i18n
 - Implement locale-based routing
 - Support multiple languages
@@ -8,6 +14,7 @@ Key Principles:
 - Follow i18n best practices
 
 Setup with next-intl:
+
 - Install next-intl package
 - Create i18n/request.ts for configuration
 - Set up [locale] dynamic segment
@@ -15,6 +22,7 @@ Setup with next-intl:
 - Create translation files per locale
 
 Routing Strategy:
+
 - Use [locale] folder in app directory
 - Implement locale detection middleware
 - Support /en, /es, /fr URL patterns
@@ -22,6 +30,7 @@ Routing Strategy:
 - Handle locale switching
 
 Translation Files:
+
 - Create messages/{locale}.json
 - Organize by feature/page
 - Use nested keys for structure
@@ -29,6 +38,7 @@ Translation Files:
 - Handle interpolation
 
 Using Translations:
+
 - Use useTranslations hook in Client Components
 - Use getTranslations in Server Components
 - Access nested translations with dot notation
@@ -36,6 +46,7 @@ Using Translations:
 - Use t() function for translations
 
 Locale Detection:
+
 - Detect from URL path
 - Use Accept-Language header
 - Check user preferences/cookies
@@ -43,6 +54,7 @@ Locale Detection:
 - Persist user locale choice
 
 Date and Time Formatting:
+
 - Use Intl.DateTimeFormat
 - Format dates per locale
 - Handle timezones properly
@@ -50,6 +62,7 @@ Date and Time Formatting:
 - Support relative time formatting
 
 Number and Currency:
+
 - Use Intl.NumberFormat
 - Format numbers per locale
 - Handle currency formatting
@@ -57,6 +70,7 @@ Number and Currency:
 - Format percentages correctly
 
 Pluralization:
+
 - Use ICU MessageFormat
 - Handle plural rules per language
 - Support zero, one, few, many, other
@@ -64,6 +78,7 @@ Pluralization:
 - Use select for conditional text
 
 RTL Support:
+
 - Detect RTL languages (Arabic, Hebrew)
 - Set dir attribute on html
 - Use logical CSS properties
@@ -71,6 +86,7 @@ RTL Support:
 - Test with RTL languages
 
 SEO for i18n:
+
 - Use hreflang tags
 - Implement alternate language links
 - Set lang attribute on html
@@ -78,6 +94,7 @@ SEO for i18n:
 - Create locale-specific sitemaps
 
 Dynamic Content:
+
 - Fetch translations from CMS
 - Support user-generated content
 - Implement translation management
@@ -85,6 +102,7 @@ Dynamic Content:
 - Cache translations appropriately
 
 Locale Switcher:
+
 - Create language selector component
 - Preserve current path on switch
 - Show language names in native script
@@ -92,6 +110,7 @@ Locale Switcher:
 - Implement dropdown or modal UI
 
 Performance:
+
 - Load only needed translations
 - Use code splitting per locale
 - Implement lazy loading
@@ -99,6 +118,7 @@ Performance:
 - Use CDN for translation assets
 
 Best Practices:
+
 - Never hardcode text in components
 - Use translation keys consistently
 - Organize translations by feature

@@ -1,6 +1,12 @@
+---
+trigger: glob
+globs: src/**/*.tsx
+---
+
 You are an expert in React performance optimization.
 
 Key Principles:
+
 - Measure before optimizing
 - Minimize re-renders
 - Optimize bundle size
@@ -8,6 +14,7 @@ Key Principles:
 - Virtualize long lists
 
 Rendering Optimization:
+
 - Use React.memo for pure components
 - Stabilize props with useMemo/useCallback
 - Avoid inline functions in render
@@ -15,6 +22,7 @@ Rendering Optimization:
 - Split large components
 
 Code Splitting:
+
 - Use React.lazy and Suspense
 - Route-based code splitting
 - Component-based code splitting
@@ -22,6 +30,7 @@ Code Splitting:
 - Prefetch critical resources
 
 State Management:
+
 - Keep state local when possible
 - Avoid large context providers
 - Use atomic state libraries (Zustand, Jotai)
@@ -29,6 +38,7 @@ State Management:
 - Batch state updates
 
 Assets:
+
 - Optimize images (Next.js Image)
 - Lazy load images and videos
 - Use SVGs correctly
@@ -36,6 +46,7 @@ Assets:
 - Minimize third-party scripts
 
 Tools:
+
 - React DevTools Profiler
 - Chrome Performance Tab
 - Bundle Analyzer

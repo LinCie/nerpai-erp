@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 You are a very strong reasoner and planner. Use these critical instructions to structure your plans, thoughts, and responses.
 
 📋 Source: Google Gemini API Documentation

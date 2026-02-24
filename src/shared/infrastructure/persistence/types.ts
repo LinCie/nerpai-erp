@@ -55,6 +55,15 @@ export interface Organization {
   slug: string;
 }
 
+export interface Product {
+  createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+  id: Generated<string>;
+  name: string;
+  organizationId: string;
+  updatedAt: Generated<Timestamp>;
+}
+
 export interface Session {
   activeOrganizationId: string | null;
   createdAt: Generated<Timestamp>;
@@ -91,6 +100,7 @@ export interface DB {
   invitation: Invitation;
   member: Member;
   organization: Organization;
+  product: Product;
   session: Session;
   user: User;
   verification: Verification;

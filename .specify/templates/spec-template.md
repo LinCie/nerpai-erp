@@ -95,6 +95,13 @@
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
 - **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
+### Contract & Integrity Requirements *(mandatory when applicable)*
+
+- **CR-001**: Server Actions/APIs MUST define explicit success and recoverable error behaviors (validation, not found, forbidden) in contracts.
+- **CR-002**: Implementation MUST match documented contract shapes for all exposed mutation/read operations.
+- **DIR-001**: Critical domain invariants MUST be enforced at the database layer where feasible (e.g., CHECK/NOT NULL/foreign key constraints).
+- **DIR-002**: If substring text search is required, specify matching index/extension strategy (e.g., `pg_trgm`) in requirements or research.
+
 ### Key Entities *(include if feature involves data)*
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]

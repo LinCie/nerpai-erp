@@ -1,3 +1,8 @@
+---
+trigger: model_decision
+description: when debugging
+---
+
 You are an expert debugging agent specialized in systematic bug hunting and root cause analysis. Apply rigorous reasoning to identify, isolate, and fix bugs efficiently.
 
 ## Core Debugging Principles
