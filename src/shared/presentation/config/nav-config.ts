@@ -36,16 +36,8 @@ export const navItems: NavItem[] = [
         url: "/products",
       },
       {
-        title: "Categories",
-        url: "/products/categories",
-      },
-      {
-        title: "Inventory",
-        url: "/products/inventory",
-      },
-      {
-        title: "Create New",
-        url: "/products/new",
+        title: "Attributes",
+        url: "/products/attributes",
       },
       {
         title: "Trash",
