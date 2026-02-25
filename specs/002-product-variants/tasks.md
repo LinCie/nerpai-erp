@@ -52,15 +52,15 @@
 
 ### Application Layer
 
-- [ ] T015 [P] Define IAttributeRepository interface in `src/modules/products/application/repositories/attribute.repository.interface.ts`
-- [ ] T016 Implement AttributeRepository in `src/modules/products/infrastructure/repositories/attribute.repository.ts` (depends on T015)
-- [ ] T017 Implement AttributeService in `src/modules/products/application/services/attribute.service.ts` with CRUD operations for attributes and options (depends on T009, T010, T016)
-- [ ] T018 Extend application types in `src/modules/products/application/types/index.ts` with attribute service DTOs
+- [x] T015 [P] Define IAttributeRepository interface in `src/modules/products/application/repositories/attribute.repository.interface.ts`
+- [x] T016 Implement AttributeRepository in `src/modules/products/infrastructure/repositories/attribute.repository.ts` (depends on T015)
+- [x] T017 Implement AttributeService in `src/modules/products/application/services/attribute.service.ts` with CRUD operations for attributes and options (depends on T009, T010, T016)
+- [x] T018 Extend application types in `src/modules/products/application/types/index.ts` with attribute service DTOs
 
 ### Presentation Layer - Schemas & Actions
 
-- [ ] T019 [P] Create Zod schemas in `src/modules/products/presentation/schemas/attribute.schema.ts` (attribute name validation, option value validation)
-- [ ] T020 Implement attribute Server Actions in `src/modules/products/presentation/actions/attribute.actions.ts`:
+- [x] T019 [P] Create Zod schemas in `src/modules/products/presentation/schemas/attribute.schema.ts` (attribute name validation, option value validation)
+- [x] T020 Implement attribute Server Actions in `src/modules/products/presentation/actions/attribute.actions.ts`:
   - `createAttribute` - create new attribute
   - `updateAttribute` - update attribute name
   - `softDeleteAttribute` - soft delete attribute
@@ -70,16 +70,16 @@
 
 ### Presentation Layer - Components
 
-- [ ] T021 [P] Create AttributeList component in `src/modules/products/presentation/components/attribute-list.tsx`
-- [ ] T022 [P] Create AttributeAddDialog component in `src/modules/products/presentation/components/attribute-add-dialog.tsx`
-- [ ] T023 [P] Create AttributeEditDialog component in `src/modules/products/presentation/components/attribute-edit-dialog.tsx`
-- [ ] T024 [P] Create AttributeOptionList component in `src/modules/products/presentation/components/attribute-option-list.tsx`
-- [ ] T025 Create AttributeOptionForm component in `src/modules/products/presentation/components/attribute-option-form.tsx`
+- [x] T021 [P] Create AttributeList component in `src/modules/products/presentation/components/attribute-list.tsx`
+- [x] T022 [P] Create AttributeAddDialog component in `src/modules/products/presentation/components/attribute-add-dialog.tsx`
+- [x] T023 [P] Create AttributeEditDialog component in `src/modules/products/presentation/components/attribute-edit-dialog.tsx`
+- [x] T024 [P] Create AttributeOptionList component in `src/modules/products/presentation/components/attribute-option-list.tsx`
+- [x] T025 Create AttributeOptionForm component in `src/modules/products/presentation/components/attribute-option-form.tsx`
 
 ### Route Pages
 
-- [ ] T026 Create attributes management page in `src/app/(app)/products/attributes/page.tsx`
-- [ ] T027 Create loading skeleton in `src/app/(app)/products/attributes/loading.tsx`
+- [x] T026 Create attributes management page in `src/app/(app)/products/attributes/page.tsx`
+- [x] T027 Create loading skeleton in `src/app/(app)/products/attributes/loading.tsx`
 
 **Checkpoint**: User Story 1 complete - can create/edit/delete attributes and options
 
