@@ -146,7 +146,6 @@ export class VariantRepository implements IVariantRepository {
       .where("variantOption.productAttributeId", "=", productAttribute.id)
       .where("variantOption.organizationId", "=", organizationId)
       .where("productVariant.deletedAt", "is", null)
-      .where("productVariant.isActive", "=", true)
       .select((eb) => eb.fn.count<number>("variantOption.id").as("count"))
       .executeTakeFirst();
 
@@ -660,15 +659,25 @@ export class VariantRepository implements IVariantRepository {
       const usedSkus = new Set(existingSkus.map((v) => v.sku));
 
       for (const combination of combinations) {
-        const optionValues = await trx
+        const optionRows = await trx
           .selectFrom("attributeOption")
-          .select("value")
+          .select(["id", "value"])
           .where("id", "in", combination.attributeOptionIds)
           .where("organizationId", "=", organizationId)
           .where("deletedAt", "is", null)
           .execute();
 
-        const baseSku = skuGenerator(optionValues.map((ov) => ov.value));
+        const optionValueById = new Map(optionRows.map((row) => [row.id, row.value]));
+        const orderedOptionValues: string[] = [];
+        for (const optionId of combination.attributeOptionIds) {
+          const value = optionValueById.get(optionId);
+          if (value === undefined) {
+            throw new Error("One or more selected attribute options are missing.");
+          }
+          orderedOptionValues.push(value);
+        }
+
+        const baseSku = skuGenerator(orderedOptionValues);
         let finalSku = baseSku;
         let suffix = 2;
 
