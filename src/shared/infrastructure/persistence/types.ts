@@ -9,6 +9,8 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
 
+export type Numeric = ColumnType<string, number | string, number | string>;
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface Account {
@@ -25,6 +27,25 @@ export interface Account {
   scope: string | null;
   updatedAt: Timestamp;
   userId: string;
+}
+
+export interface Attribute {
+  createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+  id: Generated<string>;
+  name: string;
+  organizationId: string;
+  updatedAt: Generated<Timestamp>;
+}
+
+export interface AttributeOption {
+  attributeId: string;
+  createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+  id: Generated<string>;
+  organizationId: string;
+  updatedAt: Generated<Timestamp>;
+  value: string;
 }
 
 export interface Invitation {
@@ -64,6 +85,30 @@ export interface Product {
   updatedAt: Generated<Timestamp>;
 }
 
+export interface ProductAttribute {
+  attributeId: string;
+  createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+  displayOrder: number;
+  id: Generated<string>;
+  organizationId: string;
+  productId: string;
+  updatedAt: Generated<Timestamp>;
+}
+
+export interface ProductVariant {
+  createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+  id: Generated<string>;
+  isActive: Generated<boolean>;
+  organizationId: string;
+  price: Generated<Numeric>;
+  productId: string;
+  sku: string;
+  stockQuantity: Generated<number>;
+  updatedAt: Generated<Timestamp>;
+}
+
 export interface Session {
   activeOrganizationId: string | null;
   createdAt: Generated<Timestamp>;
@@ -86,6 +131,16 @@ export interface User {
   updatedAt: Generated<Timestamp>;
 }
 
+export interface VariantOption {
+  attributeOptionId: string;
+  createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+  id: Generated<string>;
+  organizationId: string;
+  productAttributeId: string;
+  productVariantId: string;
+}
+
 export interface Verification {
   createdAt: Generated<Timestamp>;
   expiresAt: Timestamp;
@@ -97,11 +152,16 @@ export interface Verification {
 
 export interface DB {
   account: Account;
+  attribute: Attribute;
+  attributeOption: AttributeOption;
   invitation: Invitation;
   member: Member;
   organization: Organization;
   product: Product;
+  productAttribute: ProductAttribute;
+  productVariant: ProductVariant;
   session: Session;
   user: User;
+  variantOption: VariantOption;
   verification: Verification;
 }

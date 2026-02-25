@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Package } from "lucide-react";
 import type { Product } from "../../domain/entities/product";
 import { EditProductDialog } from "./product-edit-dialog";
@@ -38,7 +39,12 @@ export function ProductList({ products, onSuccess }: ProductListProps) {
               className="border-b transition-colors hover:bg-muted/50"
             >
               <td className="p-4 align-middle">
-                <span className="font-medium">{product.name}</span>
+                <Link
+                  href={`/products/${product.id}`}
+                  className="font-medium hover:underline"
+                >
+                  {product.name}
+                </Link>
               </td>
               <td className="p-4 align-middle">
                 <div className="flex items-center justify-end gap-2">

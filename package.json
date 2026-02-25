@@ -15,8 +15,12 @@
   },
   "dependencies": {
     "@daveyplate/better-auth-ui": "^3.3.15",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@fontsource-variable/roboto": "^5.2.9",
     "@tanstack/react-form": "^1.28.3",
+    "@tanstack/react-form-nextjs": "^1.28.3",
     "argon2": "^0.44.0",
     "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",
