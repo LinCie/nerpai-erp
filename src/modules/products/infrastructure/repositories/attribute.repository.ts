@@ -297,6 +297,27 @@ export class AttributeRepository implements IAttributeRepository {
 
     return Number(result?.count ?? 0);
   }
+
+  async getOptionsByAttributeIds({
+    attributeIds,
+    organizationId,
+  }: {
+    attributeIds: string[];
+    organizationId: string;
+  }): Promise<AttributeOption[]> {
+    if (attributeIds.length === 0) {
+      return [];
+    }
+
+    return await db
+      .selectFrom("attributeOption")
+      .selectAll()
+      .where("attributeId", "in", attributeIds)
+      .where("organizationId", "=", organizationId)
+      .where("deletedAt", "is", null)
+      .orderBy("createdAt", "asc")
+      .execute();
+  }
 }
 
 export const attributeRepository = new AttributeRepository();

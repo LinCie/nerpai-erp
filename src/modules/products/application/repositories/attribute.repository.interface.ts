@@ -71,4 +71,9 @@ export interface IAttributeRepository {
     optionId: string;
     organizationId: string;
   }): Promise<number>;
+
+  getOptionsByAttributeIds(params: {
+    attributeIds: string[];
+    organizationId: string;
+  }): Promise<AttributeOption[]>;
 }

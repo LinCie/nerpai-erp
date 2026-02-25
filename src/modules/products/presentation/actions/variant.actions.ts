@@ -172,10 +172,12 @@ export async function generateVariants(formData: FormData): Promise<GenerateVari
 
     const rawProductId = formData.get("productId");
     const rawSelections = formData.get("selections");
+    const rawOnlyNew = formData.get("onlyNew");
 
     const productId = typeof rawProductId === "string" ? rawProductId : "";
     const selectionsJson = typeof rawSelections === "string" ? rawSelections : "{}";
     const selections = JSON.parse(selectionsJson) as Record<string, string[]>;
+    const onlyNew = rawOnlyNew === "true";
 
     if (!productId) {
       return { success: false, created: 0, variants: [], error: "Product ID is required" };
@@ -185,10 +187,11 @@ export async function generateVariants(formData: FormData): Promise<GenerateVari
       return { success: false, created: 0, variants: [], error: "No selections provided" };
     }
 
-    const result = await variantService.generateVariants({
+    const result = await variantService.generateVariantsSelective({
       productId,
       selections,
       organizationId,
+      onlyNew,
     });
 
     revalidatePath("/products");
@@ -198,6 +201,7 @@ export async function generateVariants(formData: FormData): Promise<GenerateVari
       success: true,
       created: result.created,
       variants: result.variants.map((v) => ({ id: v.id, sku: v.sku })),
+      skipped: result.skipped,
     };
   } catch (e) {
     if (e instanceof ProductNotFoundError) {
@@ -332,5 +336,31 @@ export async function softDeleteVariant(formData: FormData): Promise<{ success: 
 
     console.error("Error soft-deleting variant:", e);
     throw new Error("Failed to delete variant. Please try again.");
+  }
+}
+
+export async function getExistingVariantCombinationKeys(productId: string): Promise<{
+  success: boolean;
+  keys?: string[];
+  error?: string;
+}> {
+  try {
+    const { organizationId } = await getSessionAndOrg();
+
+    const existingKeys = await variantService.getExistingVariantCombinationKeys({
+      productId,
+      organizationId,
+    });
+
+    return {
+      success: true,
+      keys: Array.from(existingKeys),
+    };
+  } catch (e) {
+    console.error("Error getting existing variant combinations:", e);
+    return {
+      success: false,
+      error: "Failed to get existing combinations",
+    };
   }
 }

@@ -152,6 +152,7 @@ export interface GenerateVariantsResult {
   success: boolean;
   created: number;
   variants: Array<{ id: string; sku: string }>;
+  skipped?: number;
   error?: string;
 }
 

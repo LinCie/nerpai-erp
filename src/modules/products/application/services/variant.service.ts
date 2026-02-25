@@ -372,4 +372,250 @@ export class VariantService {
   }): Promise<boolean> {
     return this.variantRepository.checkSkuExists(params);
   }
+
+  async getNewVariantCombinations(params: {
+    productId: string;
+    organizationId: string;
+  }): Promise<{
+    allCombinations: Array<{
+      attributeOptionIds: string[];
+      productAttributeIds: string[];
+      optionValues: string[];
+    }>;
+    existingCombinations: Set<string>;
+    newCombinations: Array<{
+      attributeOptionIds: string[];
+      productAttributeIds: string[];
+      optionValues: string[];
+    }>;
+  }> {
+    const product = await this.productRepository.getById({
+      id: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    if (!product) {
+      throw new ProductNotFoundError();
+    }
+
+    const productAttributes = await this.variantRepository.getProductAttributes({
+      productId: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    if (productAttributes.length === 0) {
+      return {
+        allCombinations: [],
+        existingCombinations: new Set(),
+        newCombinations: [],
+      };
+    }
+
+    const sortedProductAttributes = [...productAttributes].sort(
+      (a, b) => a.displayOrder - b.displayOrder
+    );
+
+    const attributeIds = sortedProductAttributes.map((pa) => pa.attributeId);
+
+    const attributeOptions = await this.attributeRepository.getOptionsByAttributeIds({
+      attributeIds,
+      organizationId: params.organizationId,
+    });
+
+    const optionsByAttributeId = new Map<string, typeof attributeOptions>();
+    for (const option of attributeOptions) {
+      const existing = optionsByAttributeId.get(option.attributeId) ?? [];
+      existing.push(option);
+      optionsByAttributeId.set(option.attributeId, existing);
+    }
+
+    const orderedOptionIds = sortedProductAttributes.map(
+      (pa) => (optionsByAttributeId.get(pa.attributeId) ?? []).map((o) => o.id)
+    );
+
+    const orderedOptionValues = sortedProductAttributes.map(
+      (pa) => (optionsByAttributeId.get(pa.attributeId) ?? []).map((o) => o.value)
+    );
+
+    const combinations = cartesian(orderedOptionIds);
+    const valueCombinations = cartesian(orderedOptionValues);
+
+    const allCombinations = combinations.map((optionIds, idx) => ({
+      attributeOptionIds: optionIds,
+      productAttributeIds: sortedProductAttributes.map((pa) => pa.id),
+      optionValues: valueCombinations[idx],
+    }));
+
+    const existingVariants = await this.variantRepository.getVariantsByProduct({
+      productId: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    const existingCombinations = new Set<string>();
+    for (const vwOpts of existingVariants) {
+      const combinationKey = sortedProductAttributes
+        .map((pa) => {
+          const opt = vwOpts.options.find((o) => o.productAttribute.id === pa.id);
+          return opt?.option.id ?? "";
+        })
+        .sort()
+        .join("|");
+      existingCombinations.add(combinationKey);
+    }
+
+    const newCombinations = allCombinations.filter((combo) => {
+      const key = [...combo.attributeOptionIds].sort().join("|");
+      return !existingCombinations.has(key);
+    });
+
+    return {
+      allCombinations,
+      existingCombinations,
+      newCombinations,
+    };
+  }
+
+  async getExistingVariantCombinationKeys(params: {
+    productId: string;
+    organizationId: string;
+  }): Promise<Set<string>> {
+    const productAttributes = await this.variantRepository.getProductAttributes({
+      productId: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    if (productAttributes.length === 0) {
+      return new Set();
+    }
+
+    const sortedProductAttributes = [...productAttributes].sort(
+      (a, b) => a.displayOrder - b.displayOrder
+    );
+
+    const existingVariants = await this.variantRepository.getVariantsByProduct({
+      productId: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    const existingCombinations = new Set<string>();
+    for (const vwOpts of existingVariants) {
+      const combinationKey = sortedProductAttributes
+        .map((pa) => {
+          const opt = vwOpts.options.find((o) => o.productAttribute.id === pa.id);
+          return opt?.option.id ?? "";
+        })
+        .sort()
+        .join("|");
+      existingCombinations.add(combinationKey);
+    }
+
+    return existingCombinations;
+  }
+
+  async generateVariantsSelective(params: {
+    productId: string;
+    selections: Record<string, string[]>;
+    organizationId: string;
+    onlyNew: boolean;
+  }): Promise<{ created: number; variants: ProductVariant[]; skipped: number }> {
+    const product = await this.productRepository.getById({
+      id: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    if (!product) {
+      throw new ProductNotFoundError();
+    }
+
+    const productAttributes = await this.variantRepository.getProductAttributes({
+      productId: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    const sortedProductAttributes = [...productAttributes].sort(
+      (a, b) => a.displayOrder - b.displayOrder
+    );
+
+    const attributeIds = Object.keys(params.selections);
+    if (attributeIds.length === 0) {
+      return { created: 0, variants: [], skipped: 0 };
+    }
+
+    const optionIdsByAttributeId = new Map<string, string[]>();
+    const productAttributeIdsByAttributeId = new Map<string, string>();
+
+    for (const attributeId of attributeIds) {
+      const optionIds = params.selections[attributeId];
+      if (optionIds.length === 0) {
+        return { created: 0, variants: [], skipped: 0 };
+      }
+      optionIdsByAttributeId.set(attributeId, optionIds);
+
+      const pa = productAttributes.find((p) => p.attributeId === attributeId);
+      if (pa) {
+        productAttributeIdsByAttributeId.set(attributeId, pa.id);
+      }
+    }
+
+    const orderedAttributeIds = sortedProductAttributes
+      .filter((pa) => attributeIds.includes(pa.attributeId))
+      .map((pa) => pa.attributeId);
+
+    const orderedOptionIds = orderedAttributeIds.map(
+      (attrId) => optionIdsByAttributeId.get(attrId) ?? []
+    );
+
+    const combinations = cartesian(orderedOptionIds);
+
+    const combinationData = combinations.map((optionIds) => {
+      const productAttributeIds = orderedAttributeIds.map((attrId) =>
+        productAttributeIdsByAttributeId.get(attrId)!
+      );
+      return {
+        attributeOptionIds: optionIds,
+        productAttributeIds,
+      };
+    });
+
+    let combinationsToGenerate = combinationData;
+    let skipped = 0;
+
+    if (params.onlyNew) {
+      const existingCombinations = await this.getExistingVariantCombinationKeys({
+        productId: params.productId,
+        organizationId: params.organizationId,
+      });
+
+      const filtered = combinationData.filter((combo) => {
+        const key = [...combo.attributeOptionIds].sort().join("|");
+        const exists = existingCombinations.has(key);
+        if (exists) skipped++;
+        return !exists;
+      });
+      combinationsToGenerate = filtered;
+    }
+
+    if (combinationsToGenerate.length === 0) {
+      return { created: 0, variants: [], skipped };
+    }
+
+    const skuGenerator = (optionValues: string[]): string => {
+      const productCode = generateCodeFromName(product.name);
+      const optionCodes = optionValues.map((v) => generateCodeFromName(v));
+      return [productCode, ...optionCodes].join("-");
+    };
+
+    const variants = await this.variantRepository.generateVariants({
+      productId: params.productId,
+      combinations: combinationsToGenerate,
+      skuGenerator,
+      organizationId: params.organizationId,
+    });
+
+    return {
+      created: variants.length,
+      variants,
+      skipped,
+    };
+  }
 }

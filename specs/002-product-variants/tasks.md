@@ -177,12 +177,12 @@
 
 ### Application Layer
 
-- [ ] T047 Extend VariantService with `getNewVariantCombinations` method to compute diff against existing variants (depends on T030)
+- [x] T047 Extend VariantService with `getNewVariantCombinations` method to compute diff against existing variants (depends on T030)
 
 ### Presentation Layer - Updates
 
-- [ ] T048 Extend VariantCombinationMatrix to highlight new combinations vs existing (visual distinction for FR-011)
-- [ ] T049 Update generateVariants action to support selective generation of only new combinations
+- [x] T048 Extend VariantCombinationMatrix to highlight new combinations vs existing (visual distinction for FR-011)
+- [x] T049 Update generateVariants action to support selective generation of only new combinations
 
 **Checkpoint**: User Story 5 complete - can expand variant sets incrementally
 
