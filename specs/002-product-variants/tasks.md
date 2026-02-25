@@ -192,21 +192,21 @@
 
 **Purpose**: Quality assurance, validation, and documentation
 
-- [ ] T050 [P] Build check: `bun run build` — verify TypeScript compilation passes
-- [ ] T051 [P] Lint check: `bun run lint` — verify ESLint passes with no warnings
-- [ ] T052 Contract parity audit: verify all Server Actions match `contracts/server-actions.md` behavior
-- [ ] T053 DB constraint validation: test CHECK constraints (negative price, negative stock) and UNIQUE constraints (duplicate SKU)
+- [x] T050 [P] Build check: `bun run build` — verify TypeScript compilation passes
+- [x] T051 [P] Lint check: `bun run lint` — verify ESLint passes with no warnings
+- [x] T052 Contract parity audit: verify all Server Actions match `contracts/server-actions.md` behavior
+- [x] T053 DB constraint validation: test CHECK constraints (negative price, negative stock) and UNIQUE constraints (duplicate SKU)
 - [ ] T054 Manual smoke test per `quickstart.md` verification section
 - [ ] T055 Performance validation: verify variant list loads <1s for 100 variants (SC-003)
-- [ ] T056 Update documentation: add variant feature notes to README.md
-- [ ] T057 Add active-organization membership guard utility usage to all variant/attribute Server Actions (`attribute.actions.ts`, `variant.actions.ts`) and return explicit `forbidden` contract responses
-- [ ] T058 Add organization-membership validation in new route pages (`/products/attributes`, `/products/[productId]`, `/products/[productId]/variants`) with redirect behavior for missing active org
-- [ ] T059 Create route error boundary in `src/app/(app)/products/attributes/error.tsx`
-- [ ] T060 Create route error boundary in `src/app/(app)/products/[productId]/error.tsx`
-- [ ] T061 Create route error boundary in `src/app/(app)/products/[productId]/variants/error.tsx`
-- [ ] T062 Add keyboard drag-drop support (dnd-kit KeyboardSensor) and ARIA announcements in `src/modules/products/presentation/components/product-attribute-config.tsx`
+- [x] T056 Update documentation: add variant feature notes to README.md
+- [x] T057 Add active-organization membership guard utility usage to all variant/attribute Server Actions (`attribute.actions.ts`, `variant.actions.ts`) and return explicit `forbidden` contract responses
+- [x] T058 Add organization-membership validation in new route pages (`/products/attributes`, `/products/[productId]`, `/products/[productId]/variants`) with redirect behavior for missing active org
+- [x] T059 Create route error boundary in `src/app/(app)/products/attributes/error.tsx`
+- [x] T060 Create route error boundary in `src/app/(app)/products/[productId]/error.tsx`
+- [x] T061 Create route error boundary in `src/app/(app)/products/[productId]/variants/error.tsx`
+- [x] T062 Add keyboard drag-drop support (dnd-kit KeyboardSensor) and ARIA announcements in `src/modules/products/presentation/components/product-attribute-config.tsx`
 - [ ] T063 Add accessibility verification checklist for reorder flow (keyboard-only + screen reader smoke test)
-- [ ] T064 Extend DB constraint validation to include `display_order > 0` and uniqueness on (`product_id`, `display_order`)
+- [x] T064 Extend DB constraint validation to include `display_order > 0` and uniqueness on (`product_id`, `display_order`)
 - [ ] T065 Validate SC-001: timed task for creating attribute + options from blank state (<60s)
 - [ ] T066 Validate SC-002: timed task for configuring 3x3 variants (<3m)
 - [ ] T067 Validate SC-004: org-isolation negative test (cross-org access blocked for reads/writes)

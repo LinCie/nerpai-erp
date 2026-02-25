@@ -38,6 +38,26 @@ Notes:
 - Keep database schema in snake_case; app code remains camelCase through Kysely plugins.
 - Add required PostgreSQL extensions through idempotent migrations (`CREATE EXTENSION IF NOT EXISTS ...`).
 
+## Features
+
+### Product Variants (002-product-variants)
+
+- **Attributes**: Define reusable variant dimensions (Color, Size, Material)
+- **Options**: Add values to attributes (Red, Blue, Small, Large)
+- **Variant Generation**: Create product variants from attribute combinations
+- **SKU Management**: Auto-generate SKUs with collision resolution
+- **Multi-tenancy**: All data scoped to organization
+
+**Key Routes**:
+- `/products/attributes` - Manage attributes and options
+- `/products/[id]` - Product detail with variant list
+- `/products/[id]/variants` - Configure variants for a product
+
+**Key Components**:
+- Drag-and-drop attribute reorder (keyboard accessible via dnd-kit)
+- Variant combination matrix for selection
+- Inline variant editing (SKU, price, stock)
+
 ## References
 
 - Constitution: `.specify/memory/constitution.md`
