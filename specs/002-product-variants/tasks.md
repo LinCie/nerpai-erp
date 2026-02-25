@@ -133,16 +133,16 @@
 
 ### Presentation Layer - Actions
 
-- [ ] T038 Extend variant.actions.ts with:
+- [x] T038 Extend variant.actions.ts with:
   - `updateVariant` - update price, stock, SKU
   - `toggleVariantActive` - activate/deactivate variant (FR-010)
   - `softDeleteVariant` - soft delete variant
 
 ### Presentation Layer - Components
 
-- [ ] T039 [P] Create VariantList component in `src/modules/products/presentation/components/variant-list.tsx` (table display)
-- [ ] T040 Create VariantEditRow component in `src/modules/products/presentation/components/variant-edit-row.tsx` (inline editing)
-- [ ] T041 [P] Create VariantEmptyState component in `src/modules/products/presentation/components/variant-empty-state.tsx`
+- [x] T039 [P] Create VariantList component in `src/modules/products/presentation/components/variant-list.tsx` (table display)
+- [x] T040 Create VariantEditRow component in `src/modules/products/presentation/components/variant-edit-row.tsx` (inline editing)
+- [x] T041 [P] Create VariantEmptyState component in `src/modules/products/presentation/components/variant-empty-state.tsx`
 
 **Checkpoint**: User Story 3 complete - can manage variant details individually
 
