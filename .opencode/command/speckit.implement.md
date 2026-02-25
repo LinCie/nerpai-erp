@@ -1,5 +1,10 @@
 ---
 description: Execute the implementation plan by processing and executing all tasks defined in tasks.md
+handoffs: 
+  - label: Review Spec Compliance
+    agent: speckit.review
+    prompt: Run a post-implementation specification compliance review
+    send: true
 ---
 
 ## User Input
