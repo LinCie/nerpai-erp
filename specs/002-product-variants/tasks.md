@@ -93,19 +93,19 @@
 
 ### Application Layer
 
-- [ ] T028 [P] Define IVariantRepository interface in `src/modules/products/application/repositories/variant.repository.interface.ts`
-- [ ] T029 Implement VariantRepository in `src/modules/products/infrastructure/repositories/variant.repository.ts` (depends on T028)
-- [ ] T030 Implement VariantService in `src/modules/products/application/services/variant.service.ts` with:
+- [x] T028 [P] Define IVariantRepository interface in `src/modules/products/application/repositories/variant.repository.interface.ts`
+- [x] T029 Implement VariantRepository in `src/modules/products/infrastructure/repositories/variant.repository.ts` (depends on T028)
+- [x] T030 Implement VariantService in `src/modules/products/application/services/variant.service.ts` with:
   - SKU generation with collision resolution (FR-005)
   - Cartesian product for variant generation
   - Attribute assignment/removal logic
   - (depends on T011, T012, T013, T029)
-- [ ] T031 Extend application types in `src/modules/products/application/types/index.ts` with variant service DTOs
+- [x] T031 Extend application types in `src/modules/products/application/types/index.ts` with variant service DTOs
 
 ### Presentation Layer - Schemas & Actions
 
-- [ ] T032 [P] Create Zod schemas in `src/modules/products/presentation/schemas/variant.schema.ts` (variant selection, SKU override, price/stock validation)
-- [ ] T033 Implement variant Server Actions in `src/modules/products/presentation/actions/variant.actions.ts`:
+- [x] T032 [P] Create Zod schemas in `src/modules/products/presentation/schemas/variant.schema.ts` (variant selection, SKU override, price/stock validation)
+- [x] T033 Implement variant Server Actions in `src/modules/products/presentation/actions/variant.actions.ts`:
   - `assignAttributeToProduct` - associate attribute with product
   - `removeAttributeFromProduct` - remove attribute with confirmation (FR-016)
   - `reorderProductAttributes` - drag-drop reorder (FR-017)
@@ -113,13 +113,13 @@
 
 ### Presentation Layer - Components
 
-- [ ] T034 [P] Create ProductAttributeConfig component in `src/modules/products/presentation/components/product-attribute-config.tsx` (attribute selection + drag-drop reorder)
-- [ ] T035 Create VariantCombinationMatrix component in `src/modules/products/presentation/components/variant-combination-matrix.tsx` (checkbox grid for selecting combinations)
+- [x] T034 [P] Create ProductAttributeConfig component in `src/modules/products/presentation/components/product-attribute-config.tsx` (attribute selection + drag-drop reorder)
+- [x] T035 Create VariantCombinationMatrix component in `src/modules/products/presentation/components/variant-combination-matrix.tsx` (checkbox grid for selecting combinations)
 
 ### Route Pages
 
-- [ ] T036 Create variant configuration page in `src/app/(app)/products/[productId]/variants/page.tsx`
-- [ ] T037 Create loading skeleton in `src/app/(app)/products/[productId]/variants/loading.tsx`
+- [x] T036 Create variant configuration page in `src/app/(app)/products/[productId]/variants/page.tsx`
+- [x] T037 Create loading skeleton in `src/app/(app)/products/[productId]/variants/loading.tsx`
 
 **Checkpoint**: User Story 2 complete - can configure attributes and generate variants
 
