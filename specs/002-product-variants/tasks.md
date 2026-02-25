@@ -156,14 +156,14 @@
 
 ### Route Pages
 
-- [ ] T042 Create product detail page in `src/app/(app)/products/[productId]/page.tsx` (displays product info + variant list)
-- [ ] T043 Create loading skeleton in `src/app/(app)/products/[productId]/loading.tsx`
+- [x] T042 Create product detail page in `src/app/(app)/products/[productId]/page.tsx` (displays product info + variant list)
+- [x] T043 Create loading skeleton in `src/app/(app)/products/[productId]/loading.tsx`
 
 ### Presentation Layer - Updates
 
-- [ ] T044 Modify product list in `src/app/(app)/products/page.tsx` to link to product detail (click row → /products/[id])
-- [ ] T045 Extend form options in `src/modules/products/presentation/lib/form-options.ts` with attribute/variant form options
-- [ ] T046 Extend presentation types in `src/modules/products/presentation/types/index.ts` with variant presentation types
+- [x] T044 Modify product list in `src/app/(app)/products/page.tsx` to link to product detail (click row → /products/[id])
+- [x] T045 Extend form options in `src/modules/products/presentation/lib/form-options.ts` with attribute/variant form options
+- [x] T046 Extend presentation types in `src/modules/products/presentation/types/index.ts` with variant presentation types
 
 **Checkpoint**: User Story 4 complete - can view variants on product detail page
 
