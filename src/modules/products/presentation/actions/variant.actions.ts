@@ -17,9 +17,39 @@ import {
   SKUConflictError,
   VariantService,
 } from "../../application/services/variant.service";
-import type { AssignAttributeResult, GenerateVariantsResult, RemoveAttributeResult, UpdateVariantResult } from "../../application/types";
+import type {
+  AssignAttributeResult,
+  GenerateVariantsResult,
+  RemoveAttributeResult,
+  UpdateVariantResult,
+} from "../../application/types";
+import {
+  assignAttributeSchema,
+  removeAttributeSchema,
+  reorderAttributesSchema,
+  generateVariantsSchema,
+  updateVariantSchema,
+  toggleVariantActiveSchema,
+  softDeleteVariantSchema,
+} from "../schemas/variant.schema";
 
-const variantService = new VariantService(variantRepository, productRepository, attributeRepository);
+const variantService = new VariantService(
+  variantRepository,
+  productRepository,
+  attributeRepository,
+);
+
+function firstIssueMessage(issues: Array<{ message: string }>): string {
+  return issues[0]?.message ?? "Invalid input";
+}
+
+function parseJson<T>(value: string, fallback: T): T {
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 async function getSessionAndOrg() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -35,7 +65,9 @@ async function getSessionAndOrg() {
   return { session, organizationId };
 }
 
-export async function assignAttributeToProduct(formData: FormData): Promise<AssignAttributeResult> {
+export async function assignAttributeToProduct(
+  formData: FormData,
+): Promise<AssignAttributeResult> {
   try {
     const { organizationId } = await getSessionAndOrg();
 
@@ -43,10 +75,12 @@ export async function assignAttributeToProduct(formData: FormData): Promise<Assi
     const rawAttributeId = formData.get("attributeId");
 
     const productId = typeof rawProductId === "string" ? rawProductId : "";
-    const attributeId = typeof rawAttributeId === "string" ? rawAttributeId : "";
+    const attributeId =
+      typeof rawAttributeId === "string" ? rawAttributeId : "";
 
-    if (!productId || !attributeId) {
-      return { success: false, error: "Product ID and Attribute ID are required" };
+    const parsed = assignAttributeSchema.safeParse({ productId, attributeId });
+    if (!parsed.success) {
+      return { success: false, error: firstIssueMessage(parsed.error.issues) };
     }
 
     const productAttribute = await variantService.assignAttributeToProduct({
@@ -81,7 +115,9 @@ export async function assignAttributeToProduct(formData: FormData): Promise<Assi
   }
 }
 
-export async function removeAttributeFromProduct(formData: FormData): Promise<RemoveAttributeResult> {
+export async function removeAttributeFromProduct(
+  formData: FormData,
+): Promise<RemoveAttributeResult> {
   try {
     const { organizationId } = await getSessionAndOrg();
 
@@ -90,11 +126,21 @@ export async function removeAttributeFromProduct(formData: FormData): Promise<Re
     const rawConfirmed = formData.get("confirmed");
 
     const productId = typeof rawProductId === "string" ? rawProductId : "";
-    const attributeId = typeof rawAttributeId === "string" ? rawAttributeId : "";
+    const attributeId =
+      typeof rawAttributeId === "string" ? rawAttributeId : "";
     const confirmed = rawConfirmed === "true";
 
-    if (!productId || !attributeId) {
-      return { success: false, deactivatedCount: 0, error: "Product ID and Attribute ID are required" };
+    const parsed = removeAttributeSchema.safeParse({
+      productId,
+      attributeId,
+      confirmed,
+    });
+    if (!parsed.success) {
+      return {
+        success: false,
+        deactivatedCount: 0,
+        error: firstIssueMessage(parsed.error.issues),
+      };
     }
 
     const result = await variantService.removeAttributeFromProduct({
@@ -131,7 +177,9 @@ export async function removeAttributeFromProduct(formData: FormData): Promise<Re
   }
 }
 
-export async function reorderProductAttributes(formData: FormData): Promise<{ success: boolean; error?: string }> {
+export async function reorderProductAttributes(
+  formData: FormData,
+): Promise<{ success: boolean; error?: string }> {
   try {
     const { organizationId } = await getSessionAndOrg();
 
@@ -139,11 +187,23 @@ export async function reorderProductAttributes(formData: FormData): Promise<{ su
     const rawOrderedIds = formData.get("orderedAttributeIds");
 
     const productId = typeof rawProductId === "string" ? rawProductId : "";
-    const orderedIdsJson = typeof rawOrderedIds === "string" ? rawOrderedIds : "[]";
-    const orderedAttributeIds = JSON.parse(orderedIdsJson) as string[];
+    if (typeof rawOrderedIds !== "string") {
+      return { success: false, error: "orderedAttributeIds is required" };
+    }
+    const orderedAttributeIds = parseJson<unknown>(rawOrderedIds, []);
+    if (!Array.isArray(orderedAttributeIds)) {
+      return {
+        success: false,
+        error: "orderedAttributeIds must be a JSON array",
+      };
+    }
 
-    if (!productId) {
-      return { success: false, error: "Product ID is required" };
+    const parsed = reorderAttributesSchema.safeParse({
+      productId,
+      orderedAttributeIds,
+    });
+    if (!parsed.success) {
+      return { success: false, error: firstIssueMessage(parsed.error.issues) };
     }
 
     await variantService.reorderProductAttributes({
@@ -166,7 +226,9 @@ export async function reorderProductAttributes(formData: FormData): Promise<{ su
   }
 }
 
-export async function generateVariants(formData: FormData): Promise<GenerateVariantsResult> {
+export async function generateVariants(
+  formData: FormData,
+): Promise<GenerateVariantsResult> {
   try {
     const { organizationId } = await getSessionAndOrg();
 
@@ -175,21 +237,41 @@ export async function generateVariants(formData: FormData): Promise<GenerateVari
     const rawOnlyNew = formData.get("onlyNew");
 
     const productId = typeof rawProductId === "string" ? rawProductId : "";
-    const selectionsJson = typeof rawSelections === "string" ? rawSelections : "{}";
-    const selections = JSON.parse(selectionsJson) as Record<string, string[]>;
+    if (typeof rawSelections !== "string") {
+      return {
+        success: false,
+        created: 0,
+        variants: [],
+        error: "selections is required",
+      };
+    }
+    const selections = parseJson<unknown>(rawSelections, {});
     const onlyNew = rawOnlyNew === "true";
 
-    if (!productId) {
-      return { success: false, created: 0, variants: [], error: "Product ID is required" };
+    const parsed = generateVariantsSchema.safeParse({
+      productId,
+      selections,
+    });
+    if (!parsed.success) {
+      return {
+        success: false,
+        created: 0,
+        variants: [],
+        error: firstIssueMessage(parsed.error.issues),
+      };
     }
-
-    if (Object.keys(selections).length === 0) {
-      return { success: false, created: 0, variants: [], error: "No selections provided" };
+    if (Object.keys(parsed.data.selections).length === 0) {
+      return {
+        success: false,
+        created: 0,
+        variants: [],
+        error: "No selections provided",
+      };
     }
 
     const result = await variantService.generateVariantsSelective({
       productId,
-      selections,
+      selections: selections as Record<string, string[]>,
       organizationId,
       onlyNew,
     });
@@ -213,7 +295,9 @@ export async function generateVariants(formData: FormData): Promise<GenerateVari
   }
 }
 
-export async function updateVariant(formData: FormData): Promise<UpdateVariantResult> {
+export async function updateVariant(
+  formData: FormData,
+): Promise<UpdateVariantResult> {
   try {
     const { organizationId } = await getSessionAndOrg();
 
@@ -223,32 +307,62 @@ export async function updateVariant(formData: FormData): Promise<UpdateVariantRe
     const rawStockQuantity = formData.get("stockQuantity");
 
     const id = typeof rawId === "string" ? rawId : "";
-    if (!id) {
-      return { success: false, error: "Variant ID is required" };
+    const parsedId = softDeleteVariantSchema.safeParse({ id });
+    if (!parsedId.success) {
+      return {
+        success: false,
+        error: firstIssueMessage(parsedId.error.issues),
+      };
     }
 
-    const updateData: { id: string; organizationId: string; sku?: string; price?: number; stockQuantity?: number } = {
-      id,
-      organizationId,
-    };
+    const updateInput: {
+      sku?: string;
+      price?: number;
+      stockQuantity?: number;
+    } = {};
 
-    if (typeof rawSku === "string" && rawSku.trim() !== "") {
-      updateData.sku = rawSku.trim();
+    if (typeof rawSku === "string") {
+      updateInput.sku = rawSku.trim();
     }
 
     if (typeof rawPrice === "string" && rawPrice.trim() !== "") {
-      const price = parseFloat(rawPrice);
-      if (!isNaN(price)) {
-        updateData.price = price;
+      const price = Number(rawPrice);
+      if (Number.isNaN(price)) {
+        return { success: false, error: "Price must be a number" };
       }
+      updateInput.price = price;
     }
 
-    if (typeof rawStockQuantity === "string" && rawStockQuantity.trim() !== "") {
-      const stockQuantity = parseInt(rawStockQuantity, 10);
-      if (!isNaN(stockQuantity)) {
-        updateData.stockQuantity = stockQuantity;
+    if (
+      typeof rawStockQuantity === "string" &&
+      rawStockQuantity.trim() !== ""
+    ) {
+      const stockQuantity = Number(rawStockQuantity);
+      if (Number.isNaN(stockQuantity)) {
+        return { success: false, error: "Stock quantity must be a number" };
       }
+      updateInput.stockQuantity = stockQuantity;
     }
+
+    const parsedUpdate = updateVariantSchema.safeParse(updateInput);
+    if (!parsedUpdate.success) {
+      return {
+        success: false,
+        error: firstIssueMessage(parsedUpdate.error.issues),
+      };
+    }
+
+    const updateData: {
+      id: string;
+      organizationId: string;
+      sku?: string;
+      price?: number;
+      stockQuantity?: number;
+    } = {
+      id,
+      organizationId,
+      ...parsedUpdate.data,
+    };
 
     const variant = await variantService.updateVariant(updateData);
 
@@ -277,7 +391,9 @@ export async function updateVariant(formData: FormData): Promise<UpdateVariantRe
   }
 }
 
-export async function toggleVariantActive(formData: FormData): Promise<{ success: boolean; error?: string }> {
+export async function toggleVariantActive(
+  formData: FormData,
+): Promise<{ success: boolean; error?: string }> {
   try {
     const { organizationId } = await getSessionAndOrg();
 
@@ -287,8 +403,9 @@ export async function toggleVariantActive(formData: FormData): Promise<{ success
     const id = typeof rawId === "string" ? rawId : "";
     const isActive = rawIsActive === "true";
 
-    if (!id) {
-      return { success: false, error: "Variant ID is required" };
+    const parsed = toggleVariantActiveSchema.safeParse({ id, isActive });
+    if (!parsed.success) {
+      return { success: false, error: firstIssueMessage(parsed.error.issues) };
     }
 
     await variantService.toggleVariantActive({
@@ -310,15 +427,18 @@ export async function toggleVariantActive(formData: FormData): Promise<{ success
   }
 }
 
-export async function softDeleteVariant(formData: FormData): Promise<{ success: boolean; error?: string }> {
+export async function softDeleteVariant(
+  formData: FormData,
+): Promise<{ success: boolean; error?: string }> {
   try {
     const { organizationId } = await getSessionAndOrg();
 
     const rawId = formData.get("id");
     const id = typeof rawId === "string" ? rawId : "";
 
-    if (!id) {
-      return { success: false, error: "Variant ID is required" };
+    const parsed = softDeleteVariantSchema.safeParse({ id });
+    if (!parsed.success) {
+      return { success: false, error: firstIssueMessage(parsed.error.issues) };
     }
 
     await variantService.softDeleteVariant({
@@ -339,18 +459,29 @@ export async function softDeleteVariant(formData: FormData): Promise<{ success: 
   }
 }
 
-export async function getExistingVariantCombinationKeys(productId: string): Promise<{
+export async function getExistingVariantCombinationKeys(
+  productId: string,
+): Promise<{
   success: boolean;
   keys?: string[];
   error?: string;
 }> {
   try {
     const { organizationId } = await getSessionAndOrg();
+    const parsed = softDeleteVariantSchema.safeParse({ id: productId });
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: firstIssueMessage(parsed.error.issues),
+      };
+    }
 
-    const existingKeys = await variantService.getExistingVariantCombinationKeys({
-      productId,
-      organizationId,
-    });
+    const existingKeys = await variantService.getExistingVariantCombinationKeys(
+      {
+        productId,
+        organizationId,
+      },
+    );
 
     return {
       success: true,
@@ -361,6 +492,55 @@ export async function getExistingVariantCombinationKeys(productId: string): Prom
     return {
       success: false,
       error: "Failed to get existing combinations",
+    };
+  }
+}
+
+export async function checkSkuAvailability(formData: FormData): Promise<{
+  success: boolean;
+  available?: boolean;
+  error?: string;
+}> {
+  try {
+    const { organizationId } = await getSessionAndOrg();
+
+    const rawId = formData.get("id");
+    const rawSku = formData.get("sku");
+
+    const id = typeof rawId === "string" ? rawId : "";
+    const sku = typeof rawSku === "string" ? rawSku.trim() : "";
+
+    const parsedId = softDeleteVariantSchema.safeParse({ id });
+    if (!parsedId.success) {
+      return {
+        success: false,
+        error: firstIssueMessage(parsedId.error.issues),
+      };
+    }
+
+    const parsedSku = updateVariantSchema.safeParse({ sku });
+    if (!parsedSku.success) {
+      return {
+        success: false,
+        error: firstIssueMessage(parsedSku.error.issues),
+      };
+    }
+
+    const exists = await variantService.checkSkuExists({
+      sku,
+      organizationId,
+      excludeVariantId: id,
+    });
+
+    return {
+      success: true,
+      available: !exists,
+    };
+  } catch (e) {
+    console.error("Error checking SKU availability:", e);
+    return {
+      success: false,
+      error: "Failed to check SKU availability",
     };
   }
 }
