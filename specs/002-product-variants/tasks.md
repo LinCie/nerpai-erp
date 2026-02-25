@@ -11,8 +11,8 @@
 
 **Purpose**: Install new dependencies required for the variant feature
 
-- [ ] T001 Install drag-and-drop dependencies for attribute reorder: `bun add @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities`
-- [ ] T002 [P] Add shadcn/ui components: `bunx --bun shadcn@latest add table checkbox alert-dialog`
+- [x] T001 Install drag-and-drop dependencies for attribute reorder: `bun add @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities`
+- [x] T002 [P] Add shadcn/ui components: `bunx --bun shadcn@latest add table checkbox alert-dialog`
 
 ---
 
@@ -24,21 +24,21 @@
 
 ### Database Migrations
 
-- [ ] T003 Create migration for attribute table: `bun db:migrate:create create_attribute_table` → edit `src/shared/infrastructure/persistence/migrations/XXXX_create_attribute_table.ts`
-- [ ] T004 [P] Create migration for attribute_option table: `bun db:migrate:create create_attribute_option_table` → edit `src/shared/infrastructure/persistence/migrations/XXXX_create_attribute_option_table.ts`
-- [ ] T005 [P] Create migration for product_attribute table: `bun db:migrate:create create_product_attribute_table` → edit `src/shared/infrastructure/persistence/migrations/XXXX_create_product_attribute_table.ts`
-- [ ] T006 Create migration for product_variant and variant_option tables: `bun db:migrate:create create_product_variant_and_variant_option_tables` → edit `src/shared/infrastructure/persistence/migrations/XXXX_create_product_variant_and_variant_option_tables.ts`
-- [ ] T007 Execute all migrations: `bun db:migrate`
-- [ ] T008 Regenerate TypeScript types from database: `bun db:codegen`
+- [x] T003 Create migration for attribute table: `bun db:migrate:make create_attribute_table` → edit `src/shared/infrastructure/persistence/migrations/XXXX_create_attribute_table.ts`
+- [x] T004 [P] Create migration for attribute_option table: `bun db:migrate:make create_attribute_option_table` → edit `src/shared/infrastructure/persistence/migrations/XXXX_create_attribute_option_table.ts`
+- [x] T005 [P] Create migration for product_attribute table: `bun db:migrate:make create_product_attribute_table` → edit `src/shared/infrastructure/persistence/migrations/XXXX_create_product_attribute_table.ts`
+- [x] T006 Create migration for product_variant and variant_option tables: `bun db:migrate:make create_product_variant_and_variant_option_tables` → edit `src/shared/infrastructure/persistence/migrations/XXXX_create_product_variant_and_variant_option_tables.ts`
+- [x] T007 Execute all migrations: `bun db:migrate`
+- [x] T008 Regenerate TypeScript types from database: `bun db:codegen`
 
 ### Domain Layer
 
-- [ ] T009 [P] Create Attribute entity type in `src/modules/products/domain/entities/attribute.ts`
-- [ ] T010 [P] Create AttributeOption entity type in `src/modules/products/domain/entities/attribute-option.ts`
-- [ ] T011 [P] Create ProductAttribute entity type in `src/modules/products/domain/entities/product-attribute.ts`
-- [ ] T012 [P] Create ProductVariant entity type in `src/modules/products/domain/entities/product-variant.ts`
-- [ ] T013 [P] Create VariantOption entity type in `src/modules/products/domain/entities/variant-option.ts`
-- [ ] T014 Extend domain types in `src/modules/products/domain/types/index.ts` with variant-related types (VariantWithOptions, AttributeWithOptions, etc.)
+- [x] T009 [P] Create Attribute entity type in `src/modules/products/domain/entities/attribute.ts`
+- [x] T010 [P] Create AttributeOption entity type in `src/modules/products/domain/entities/attribute-option.ts`
+- [x] T011 [P] Create ProductAttribute entity type in `src/modules/products/domain/entities/product-attribute.ts`
+- [x] T012 [P] Create ProductVariant entity type in `src/modules/products/domain/entities/product-variant.ts`
+- [x] T013 [P] Create VariantOption entity type in `src/modules/products/domain/entities/variant-option.ts`
+- [x] T014 Extend domain types in `src/modules/products/domain/types/index.ts` with variant-related types (VariantWithOptions, AttributeWithOptions, etc.)
 
 **Checkpoint**: Foundation ready - database tables exist, types generated, domain entities defined
 
@@ -236,6 +236,7 @@ Phase 1 (Setup) → Phase 2 (Foundational) → Phase 3+ (User Stories) → Phase
 ### Suggested Execution Order
 
 **MVP Path (Sequential)**:
+
 1. Phase 1 → Phase 2 (Foundation)
 2. Phase 3 (US1 - Attributes) → STOP, validate
 3. Phase 4 (US2 - Variant Config) → STOP, validate
@@ -245,6 +246,7 @@ Phase 1 (Setup) → Phase 2 (Foundational) → Phase 3+ (User Stories) → Phase
 7. Phase 8 (Polish)
 
 **Parallel Path (Team)**:
+
 - Developer A: Phase 1 + Phase 2 (Foundation)
 - Developer B: Phase 3 (US1) - starts after Phase 2
 - Developer C: Phase 4 (US2) - starts after US1
