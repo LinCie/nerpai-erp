@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Package,
   ShoppingCart,
+  Warehouse,
   type LucideIcon,
 } from "lucide-react";
 
@@ -42,6 +43,22 @@ export const navItems: NavItem[] = [
       {
         title: "Trash",
         url: "/products/trash",
+      },
+    ],
+  },
+  {
+    title: "Warehouses",
+    url: "/warehouses",
+    icon: Warehouse,
+    isActive: false,
+    items: [
+      {
+        title: "All Warehouses",
+        url: "/warehouses",
+      },
+      {
+        title: "Trash",
+        url: "/warehouses/trash",
       },
     ],
   },

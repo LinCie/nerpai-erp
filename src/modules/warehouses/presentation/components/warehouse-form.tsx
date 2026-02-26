@@ -46,7 +46,7 @@ export function WarehouseForm({ onSuccess }: WarehouseFormProps) {
   const formErrors = useStore(form.store, (formState) => formState.errors);
   const notesLength = useStore(
     form.store,
-    (formState) => formState.values.notes?.length || 0,
+    (formState) => formState.values?.notes?.length || 0,
   );
 
   useEffect(() => {
@@ -476,7 +476,7 @@ export function WarehouseForm({ onSuccess }: WarehouseFormProps) {
                     onBlur={field.handleBlur}
                     placeholder="Any other relevant details about this warehouse (ops capacity, guidelines, etc.)"
                     disabled={form.state.isSubmitting}
-                    className="min-h-[100px] resize-y"
+                    className="min-h-25 resize-y"
                     aria-invalid={
                       hasErrors || notesLength > 1000 ? "true" : "false"
                     }
