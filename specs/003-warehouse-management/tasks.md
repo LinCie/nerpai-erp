@@ -239,7 +239,7 @@
 
 ### Implementation for User Story 5
 
-- [ ] T037 Create warehouse detail page in `src/app/(app)/warehouses/[warehouseId]/page.tsx`:
+- [x] T037 Create warehouse detail page in `src/app/(app)/warehouses/[warehouseId]/page.tsx`:
   - Dynamic route with `warehouseId` parameter
   - Server Component fetching warehouse by ID
   - Display all fields: name, code, full address, contact info, notes
@@ -247,9 +247,9 @@
   - Metadata: created_at, updated_at
   - Edit button → opens edit dialog or navigates to edit page
   - Delete button → opens delete confirmation dialog
-- [ ] T038 [P] Create loading skeleton in `src/app/(app)/warehouses/[warehouseId]/loading.tsx`:
+- [x] T038 [P] Create loading skeleton in `src/app/(app)/warehouses/[warehouseId]/loading.tsx`:
   - shadcn `Skeleton` for header, address card, contact card, notes section
-- [ ] T039 Update `warehouse-list.tsx` to link rows to detail page:
+- [x] T039 Update `warehouse-list.tsx` to link rows to detail page:
   - Click on warehouse name → navigate to `/warehouses/[warehouseId]`
   - Maintain edit/delete actions in row
 
