@@ -103,19 +103,30 @@ export class VariantRepository implements IVariantRepository {
     organizationId: string;
   }): Promise<boolean> {
     await db.transaction().execute(async (trx) => {
-      for (let i = 0; i < orderedAttributeIds.length; i++) {
-        await trx
-          .updateTable("productAttribute")
-          .set({
-            displayOrder: i + 1,
-            updatedAt: sql`CURRENT_TIMESTAMP`,
-          })
-          .where("productId", "=", productId)
-          .where("attributeId", "=", orderedAttributeIds[i])
-          .where("organizationId", "=", organizationId)
-          .where("deletedAt", "is", null)
-          .execute();
+      // Build CASE expression to set displayOrder in a single atomic update
+      // This avoids unique constraint violations during reordering
+      let displayOrderCase = db
+        .case()
+        .when("attributeId", "=", orderedAttributeIds[0]!)
+        .then(1);
+
+      for (let i = 1; i < orderedAttributeIds.length; i++) {
+        displayOrderCase = displayOrderCase
+          .when("attributeId", "=", orderedAttributeIds[i]!)
+          .then(i + 1);
       }
+
+      await trx
+        .updateTable("productAttribute")
+        .set({
+          displayOrder: displayOrderCase.end().$castTo<number>(),
+          updatedAt: sql`CURRENT_TIMESTAMP`,
+        })
+        .where("productId", "=", productId)
+        .where("attributeId", "in", orderedAttributeIds)
+        .where("organizationId", "=", organizationId)
+        .where("deletedAt", "is", null)
+        .execute();
     });
 
     return true;
