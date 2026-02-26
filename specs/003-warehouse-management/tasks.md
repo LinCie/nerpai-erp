@@ -165,7 +165,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T028 Create `updateWarehouse` Server Action in `src/modules/warehouses/presentation/actions/warehouse.actions.ts`:
+- [x] T028 Create `updateWarehouse` Server Action in `src/modules/warehouses/presentation/actions/warehouse.actions.ts`:
   - Validate with `createServerValidate` using `updateWarehouseFormOptions`
   - Validate authenticated user has active organization before operation; redirect to organization selection when missing, return typed `FORBIDDEN` only for unauthorized access
   - Ignore any `code` value in FormData (FR-018 - immutable)
@@ -173,13 +173,13 @@
   - Call `warehouseService.update()`
   - Return typed outcomes: success, validation, not-found, forbidden (+ redirect for no active organization)
   - Revalidate `/warehouses` path on success
-- [ ] T029 Create `warehouse-edit-form.tsx` component in `src/modules/warehouses/presentation/components/warehouse-edit-form.tsx`:
+- [x] T029 Create `warehouse-edit-form.tsx` component in `src/modules/warehouses/presentation/components/warehouse-edit-form.tsx`:
   - TanStack Form with `updateWarehouseFormOptions`
   - Same 4 fieldsets as create form: Basic Info, Address, Contact, Notes
   - **Code field**: Rendered as read-only/disabled `<Input>` NOT managed by TanStack Form
   - Pre-populated with existing warehouse data via props
   - Full accessibility: `aria-required`, `aria-invalid`, `aria-describedby`
-- [ ] T030 Create `warehouse-edit-dialog.tsx` component in `src/modules/warehouses/presentation/components/warehouse-edit-dialog.tsx`:
+- [x] T030 Create `warehouse-edit-dialog.tsx` component in `src/modules/warehouses/presentation/components/warehouse-edit-dialog.tsx`:
   - Dialog wrapper using shadcn `Dialog` component
   - Contains `WarehouseEditForm` component
   - Passes warehouse data to form
