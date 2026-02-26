@@ -10,11 +10,11 @@
 
 **Purpose**: Project initialization and module structure
 
-- [X] T001 Create warehouse module directory structure at `src/modules/warehouses/`
-- [X] T002 [P] Create domain layer directories: `src/modules/warehouses/domain/entities/` and `src/modules/warehouses/domain/types/`
-- [X] T003 [P] Create application layer directories: `src/modules/warehouses/application/repositories/`, `src/modules/warehouses/application/services/`, `src/modules/warehouses/application/types/`
-- [X] T004 [P] Create infrastructure layer directory: `src/modules/warehouses/infrastructure/repositories/`
-- [X] T005 [P] Create presentation layer directories: `src/modules/warehouses/presentation/actions/`, `src/modules/warehouses/presentation/schemas/`, `src/modules/warehouses/presentation/components/`, `src/modules/warehouses/presentation/lib/`, `src/modules/warehouses/presentation/types/`
+- [x] T001 Create warehouse module directory structure at `src/modules/warehouses/`
+- [x] T002 [P] Create domain layer directories: `src/modules/warehouses/domain/entities/` and `src/modules/warehouses/domain/types/`
+- [x] T003 [P] Create application layer directories: `src/modules/warehouses/application/repositories/`, `src/modules/warehouses/application/services/`, `src/modules/warehouses/application/types/`
+- [x] T004 [P] Create infrastructure layer directory: `src/modules/warehouses/infrastructure/repositories/`
+- [x] T005 [P] Create presentation layer directories: `src/modules/warehouses/presentation/actions/`, `src/modules/warehouses/presentation/schemas/`, `src/modules/warehouses/presentation/components/`, `src/modules/warehouses/presentation/lib/`, `src/modules/warehouses/presentation/types/`
 
 ---
 
@@ -26,31 +26,31 @@
 
 ### Database Layer
 
-- [X] T006 Create migration `create_warehouse_table` using `bun db:migrate:create create_warehouse_table`
-- [X] T007 [P] Write migration Up in `src/shared/infrastructure/persistence/migrations/XXXX_create_warehouse_table.ts`:
+- [x] T006 Create migration `create_warehouse_table` using `bun db:migrate:create create_warehouse_table`
+- [x] T007 [P] Write migration Up in `src/shared/infrastructure/persistence/migrations/XXXX_create_warehouse_table.ts`:
   - Create `warehouse` table with all 15 columns per data-model.md
   - Add `organization_id` FK with `ON DELETE CASCADE`
   - Add indexes: `warehouse_organization_id_idx`, `warehouse_org_deleted_at_idx`, `warehouse_name_search_idx`, `warehouse_city_idx`, `warehouse_province_idx`
   - Add unique index across all records: `warehouse_org_code_unique` on normalized (`organization_id`, `lower(btrim(code))`) to block code reuse even when soft-deleted (FR-012)
   - Add CHECK constraints: `warehouse_name_not_empty`, `warehouse_code_not_empty`
-- [X] T008 Write migration Down: `DROP TABLE IF EXISTS warehouse`
-- [X] T009 Run migration: `bun db:migrate`
-- [X] T010 Regenerate database types: `bun db:codegen`
+- [x] T008 Write migration Down: `DROP TABLE IF EXISTS warehouse`
+- [x] T009 Run migration: `bun db:migrate`
+- [x] T010 Regenerate database types: `bun db:codegen`
 
 ### Domain Layer
 
-- [X] T011 [P] Create `Warehouse` entity interface in `src/modules/warehouses/domain/entities/warehouse.ts` with all fields per data-model.md
-- [X] T012 [P] Create domain types in `src/modules/warehouses/domain/types/index.ts`
+- [x] T011 [P] Create `Warehouse` entity interface in `src/modules/warehouses/domain/entities/warehouse.ts` with all fields per data-model.md
+- [x] T012 [P] Create domain types in `src/modules/warehouses/domain/types/index.ts`
 
 ### Application Layer
 
-- [X] T013 [P] Create repository interface `IWarehouseRepository` in `src/modules/warehouses/application/repositories/warehouse.repository.interface.ts` with methods: `findById`, `findByCode`, `findMany`, `create`, `update`, `softDelete`, `restore`
-- [X] T014 [P] Create application DTOs in `src/modules/warehouses/application/types/index.ts`: `GetWarehousesParams`, `GetWarehouseParams`, `CreateWarehouseParams`, `UpdateWarehouseParams`, `SoftDeleteWarehouseParams`, `RestoreWarehouseParams`
-- [X] T015 Implement `WarehouseService` in `src/modules/warehouses/application/services/warehouse.service.ts` with business logic for CRUD operations, code uniqueness validation (including soft-deleted warehouses for FR-012), empty string to null conversion
+- [x] T013 [P] Create repository interface `IWarehouseRepository` in `src/modules/warehouses/application/repositories/warehouse.repository.interface.ts` with methods: `findById`, `findByCode`, `findMany`, `create`, `update`, `softDelete`, `restore`
+- [x] T014 [P] Create application DTOs in `src/modules/warehouses/application/types/index.ts`: `GetWarehousesParams`, `GetWarehouseParams`, `CreateWarehouseParams`, `UpdateWarehouseParams`, `SoftDeleteWarehouseParams`, `RestoreWarehouseParams`
+- [x] T015 Implement `WarehouseService` in `src/modules/warehouses/application/services/warehouse.service.ts` with business logic for CRUD operations, code uniqueness validation (including soft-deleted warehouses for FR-012), empty string to null conversion
 
 ### Infrastructure Layer
 
-- [X] T016 Implement `WarehouseRepository` in `src/modules/warehouses/infrastructure/repositories/warehouse.repository.ts`:
+- [x] T016 Implement `WarehouseRepository` in `src/modules/warehouses/infrastructure/repositories/warehouse.repository.ts`:
   - Implement all `IWarehouseRepository` methods using Kysely
   - Filter all queries by `organization_id` (Constitution X)
   - Apply soft-delete filtering (`deleted_at IS NULL`) by default
@@ -58,17 +58,17 @@
 
 ### Presentation Layer - Schemas & Form Options
 
-- [X] T017 [P] Create Zod schemas in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts`:
+- [x] T017 [P] Create Zod schemas in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts`:
   - `warehouseBaseSchema` — common fields (name, address, contact, notes)
   - `warehouseCreateSchema` — extends base with `code` field (alphanumeric/hyphen/underscore only)
   - `warehouseUpdateSchema` — same as base (no code field)
-- [X] T017A Define postal code validation rules in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts` (DIR-004):
+- [x] T017A Define postal code validation rules in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts` (DIR-004):
   - Country = Indonesia (default): postal code must be exactly 5 digits when provided
   - Country != Indonesia: postal code allows 1-20 alphanumeric characters, spaces, and hyphens
-- [X] T017B Define country field normalization + validation in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts` (DIR-004):
+- [x] T017B Define country field normalization + validation in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts` (DIR-004):
   - Trim and normalize input before validation/storage
   - Enforce non-empty when provided and max length constraint aligned with schema
-- [X] T018 Create form options in `src/modules/warehouses/presentation/lib/form-options.ts`:
+- [x] T018 Create form options in `src/modules/warehouses/presentation/lib/form-options.ts`:
   - `createWarehouseFormOptions` — default values with code field, country defaults to "Indonesia"
   - `updateWarehouseFormOptions` — default values without code field
 
@@ -84,7 +84,7 @@
 
 ### Implementation for User Story 1
 
-- [ ] T019 Create `createWarehouse` Server Action in `src/modules/warehouses/presentation/actions/warehouse.actions.ts`:
+- [x] T019 Create `createWarehouse` Server Action in `src/modules/warehouses/presentation/actions/warehouse.actions.ts`:
   - Validate with `createServerValidate` using `createWarehouseFormOptions`
   - Validate authenticated user has active organization before operation; redirect to organization selection when missing, return typed `FORBIDDEN` only for unauthorized access
   - Check code uniqueness (including soft-deleted warehouses per FR-012)
@@ -92,7 +92,7 @@
   - Call `warehouseService.create()`
   - Return typed outcomes: success, validation, not-found, forbidden (+ redirect for no active organization)
   - Revalidate `/warehouses` path on success
-- [ ] T020 Create `warehouse-form.tsx` component in `src/modules/warehouses/presentation/components/warehouse-form.tsx`:
+- [x] T020 Create `warehouse-form.tsx` component in `src/modules/warehouses/presentation/components/warehouse-form.tsx`:
   - TanStack Form with `createWarehouseFormOptions`
   - Fields grouped in 4 fieldsets: Basic Info (name, code), Address (streetAddress, city, province, postalCode, country), Contact (contactName, contactPhone, contactEmail), Notes (notes)
   - Add immediate duplicate-code feedback on code input with 300ms debounce and on-blur fallback to satisfy SC-005
@@ -100,7 +100,7 @@
   - Character counter for notes field (max 1000)
   - `noValidate` on form element
   - Loading state with spinner during submission
-- [ ] T021 Create `warehouse-add-dialog.tsx` component in `src/modules/warehouses/presentation/components/warehouse-add-dialog.tsx`:
+- [x] T021 Create `warehouse-add-dialog.tsx` component in `src/modules/warehouses/presentation/components/warehouse-add-dialog.tsx`:
   - Dialog wrapper using shadcn `Dialog` component
   - Contains `WarehouseForm` component
   - Success closes dialog and shows toast notification
@@ -118,38 +118,38 @@
 
 ### Implementation for User Story 2
 
-- [ ] T022 [P] Create `warehouse-list.tsx` component in `src/modules/warehouses/presentation/components/warehouse-list.tsx`:
+- [x] T022 [P] Create `warehouse-list.tsx` component in `src/modules/warehouses/presentation/components/warehouse-list.tsx`:
   - Client component displaying warehouse data table
   - Columns: Name, Code, City, Province, Actions (Edit, Delete)
   - Responsive design with horizontal scroll on mobile
   - Empty state handling (delegates to `WarehouseEmptyState`)
-- [ ] T023 [P] Create `warehouse-list-server.tsx` component in `src/modules/warehouses/presentation/components/warehouse-list-server.tsx`:
+- [x] T023 [P] Create `warehouse-list-server.tsx` component in `src/modules/warehouses/presentation/components/warehouse-list-server.tsx`:
   - Server component that fetches warehouse data
   - Validate authenticated user has active organization membership before query; handle forbidden path
   - Calls `warehouseService.findMany()` with organization filter
   - Passes data to client `WarehouseList` component
-- [ ] T024 Create `warehouse-search.tsx` component in `src/modules/warehouses/presentation/components/warehouse-search.tsx`:
+- [x] T024 Create `warehouse-search.tsx` component in `src/modules/warehouses/presentation/components/warehouse-search.tsx`:
   - Search input with debounce (300ms)
   - Syncs with URL query params (`?search=...`)
   - Search across name, code, city, province using `ILIKE`
-- [ ] T024A Add province filter support:
+- [x] T024A Add province filter support:
   - Add province select/filter UI and URL param (`?province=...`)
   - Combine with text search in repository query
   - Preserve filter state across navigation and reload
-- [ ] T025 Create `warehouse-empty-state.tsx` component in `src/modules/warehouses/presentation/components/warehouse-empty-state.tsx`:
+- [x] T025 Create `warehouse-empty-state.tsx` component in `src/modules/warehouses/presentation/components/warehouse-empty-state.tsx`:
   - Illustrated empty state with icon/illustration
   - Message: "No warehouses yet"
   - Prominent "Create Your First Warehouse" CTA button
   - Navigates to create form on click (FR-019)
-- [ ] T026 Create warehouse list page in `src/app/(app)/warehouses/page.tsx`:
+- [x] T026 Create warehouse list page in `src/app/(app)/warehouses/page.tsx`:
   - Server Component
   - Combines `WarehouseSearch`, `WarehouseListServer`, and `WarehouseAddDialog`
   - Reads search params and passes to list server component
-- [ ] T026A Add pagination support on list page:
+- [x] T026A Add pagination support on list page:
   - Support `page` and `limit` query params with sane defaults
   - Render pagination controls and total count metadata
   - Ensure pagination works with search and province filters
-- [ ] T027 [P] Create loading skeleton in `src/app/(app)/warehouses/loading.tsx`:
+- [x] T027 [P] Create loading skeleton in `src/app/(app)/warehouses/loading.tsx`:
   - shadcn `Skeleton` components for table rows
   - 5 skeleton rows matching table structure
 
@@ -369,7 +369,7 @@ With multiple developers:
 1. Team completes Setup + Foundational together
 2. Once Foundational is done:
    - Developer A: User Story 1 (Create)
-   - Developer B: User Story 2 (List/Search) 
+   - Developer B: User Story 2 (List/Search)
    - Developers can work independently due to vertical slice isolation
 3. Once P1 stories complete:
    - Developer A: User Story 3 (Update)
@@ -381,22 +381,23 @@ With multiple developers:
 
 ## Summary
 
-| Phase | User Story | Tasks | Priority | Parallelizable |
-|-------|-----------|-------|----------|----------------|
-| Phase 1 | Setup | T001-T005 | - | Yes |
-| Phase 2 | Foundational | T006-T018 + T017A + T017B | - | After T010 |
-| Phase 3 | US1: Create Warehouse | T019-T021 | P1 | No (sequential) |
-| Phase 4 | US2: List/Search | T022-T027 + T024A + T026A | P1 | Partial |
-| Phase 5 | US3: Update | T028-T030 | P2 | Partial |
-| Phase 6 | US4: Soft-Delete/Restore | T031-T036 | P2 | Partial |
-| Phase 7 | US5: Detail View | T037-T039 | P2 | Partial |
-| Phase 8 | Polish | T040-T048 + T048A | - | Yes |
+| Phase   | User Story               | Tasks                     | Priority | Parallelizable  |
+| ------- | ------------------------ | ------------------------- | -------- | --------------- |
+| Phase 1 | Setup                    | T001-T005                 | -        | Yes             |
+| Phase 2 | Foundational             | T006-T018 + T017A + T017B | -        | After T010      |
+| Phase 3 | US1: Create Warehouse    | T019-T021                 | P1       | No (sequential) |
+| Phase 4 | US2: List/Search         | T022-T027 + T024A + T026A | P1       | Partial         |
+| Phase 5 | US3: Update              | T028-T030                 | P2       | Partial         |
+| Phase 6 | US4: Soft-Delete/Restore | T031-T036                 | P2       | Partial         |
+| Phase 7 | US5: Detail View         | T037-T039                 | P2       | Partial         |
+| Phase 8 | Polish                   | T040-T048 + T048A         | -        | Yes             |
 
 **Total Tasks**: 53
 **MVP Scope**: T001-T027 + T024A + T026A (User Stories 1 & 2) = 29 tasks
 **Full Feature**: All 53 tasks
 
 **Key Constraints**:
+
 - Code field is immutable after creation (FR-018)
 - Soft-deleted warehouses block code reuse (FR-012)
 - All queries scoped by organization_id (Constitution X)

@@ -22,6 +22,13 @@ export interface IWarehouseRepository {
     offset?: number;
   }): Promise<Warehouse[]>;
 
+  count(params: {
+    organizationId: string;
+    search?: string;
+    province?: string;
+    includeDeleted?: boolean;
+  }): Promise<number>;
+
   create(params: {
     name: string;
     code: string;

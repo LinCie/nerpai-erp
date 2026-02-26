@@ -99,6 +99,64 @@ export class WarehouseRepository implements IWarehouseRepository {
     return await query.execute();
   }
 
+  async count({
+    organizationId,
+    search,
+    province,
+    includeDeleted = false,
+  }: {
+    organizationId: string;
+    search?: string;
+    province?: string;
+    includeDeleted?: boolean;
+  }): Promise<number> {
+    let query = db
+      .selectFrom("warehouse")
+      .select(db.fn.countAll().as("count"))
+      .where("organizationId", "=", organizationId);
+
+    if (includeDeleted) {
+      query = query.where("deletedAt", "is not", null);
+    } else {
+      query = query.where("deletedAt", "is", null);
+    }
+
+    if (search) {
+      const pattern = `%${search}%`;
+      query = query.where((eb) =>
+        eb.or([
+          eb("name", "ilike", pattern),
+          eb("code", "ilike", pattern),
+          eb("city", "ilike", pattern),
+          eb("province", "ilike", pattern),
+        ]),
+      );
+    }
+
+    if (province) {
+      query = query.where("province", "ilike", `%${province}%`);
+    }
+
+    const result = await query.executeTakeFirst();
+    return Number(result?.count ?? 0);
+  }
+
+  async getUniqueProvinces(organizationId: string): Promise<string[]> {
+    const results = await db
+      .selectFrom("warehouse")
+      .select("province")
+      .where("organizationId", "=", organizationId)
+      .where("deletedAt", "is", null)
+      .where("province", "is not", null)
+      .distinct()
+      .orderBy("province", "asc")
+      .execute();
+
+    return results
+      .map((r) => r.province)
+      .filter((p): p is string => p !== null);
+  }
+
   async create({
     name,
     code,
