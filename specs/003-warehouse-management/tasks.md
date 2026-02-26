@@ -198,34 +198,34 @@
 
 ### Implementation for User Story 4
 
-- [ ] T031 Create `softDeleteWarehouse` Server Action in `src/modules/warehouses/presentation/actions/warehouse.actions.ts`:
+- [x] T031 Create `softDeleteWarehouse` Server Action in `src/modules/warehouses/presentation/actions/warehouse.actions.ts`:
   - Non-form action accepting `id` via FormData hidden field
   - Validate authenticated user has active organization before operation; redirect to organization selection when missing, return typed `FORBIDDEN` only for unauthorized access
   - Call `warehouseService.softDelete()`
   - Return typed outcomes: success, validation, not-found, forbidden (+ redirect for no active organization)
   - Revalidate `/warehouses` path on success
-- [ ] T032 Create `restoreWarehouse` Server Action in `src/modules/warehouses/presentation/actions/warehouse.actions.ts`:
+- [x] T032 Create `restoreWarehouse` Server Action in `src/modules/warehouses/presentation/actions/warehouse.actions.ts`:
   - Non-form action accepting `id` via FormData hidden field
   - Validate authenticated user has active organization before operation; redirect to organization selection when missing, return typed `FORBIDDEN` only for unauthorized access
   - Call `warehouseService.restore()`
   - Return typed outcomes: success, validation, not-found, forbidden (+ redirect for no active organization)
   - Revalidate `/warehouses` path on success
-- [ ] T033 Create `warehouse-delete-dialog.tsx` component in `src/modules/warehouses/presentation/components/warehouse-delete-dialog.tsx`:
+- [x] T033 Create `warehouse-delete-dialog.tsx` component in `src/modules/warehouses/presentation/components/warehouse-delete-dialog.tsx`:
   - Confirmation dialog using shadcn `AlertDialog`
   - Warning message about soft-delete (data preserved)
   - Cancel and Confirm buttons
   - Calls `softDeleteWarehouse` action on confirm
-- [ ] T034 Create `warehouse-trash-list.tsx` component in `src/modules/warehouses/presentation/components/warehouse-trash-list.tsx`:
+- [x] T034 Create `warehouse-trash-list.tsx` component in `src/modules/warehouses/presentation/components/warehouse-trash-list.tsx`:
   - Displays soft-deleted warehouses
   - Shows deletion date
   - Restore action for each warehouse
   - No permanent delete option in this feature (Constitution IX soft-delete enforcement)
-- [ ] T035 Create trash page in `src/app/(app)/warehouses/trash/page.tsx`:
+- [x] T035 Create trash page in `src/app/(app)/warehouses/trash/page.tsx`:
   - Server Component
   - Validate authenticated user has active organization before query; redirect to organization selection when missing, handle forbidden path only for unauthorized access
   - Fetches soft-deleted warehouses via `warehouseService.findMany({ includeDeleted: true })`
   - Renders `WarehouseTrashList` component
-- [ ] T036 [P] Create loading skeleton in `src/app/(app)/warehouses/trash/loading.tsx`
+- [x] T036 [P] Create loading skeleton in `src/app/(app)/warehouses/trash/loading.tsx`
 
 **Checkpoint**: User Story 4 complete - can soft-delete and restore warehouses
 
