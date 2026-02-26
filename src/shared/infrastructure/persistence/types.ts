@@ -150,6 +150,25 @@ export interface Verification {
   value: string;
 }
 
+export interface Warehouse {
+  city: string | null;
+  code: string;
+  contactEmail: string | null;
+  contactName: string | null;
+  contactPhone: string | null;
+  country: Generated<string>;
+  createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+  id: Generated<string>;
+  name: string;
+  notes: string | null;
+  organizationId: string;
+  postalCode: string | null;
+  province: string | null;
+  streetAddress: string | null;
+  updatedAt: Generated<Timestamp>;
+}
+
 export interface DB {
   account: Account;
   attribute: Attribute;
@@ -164,4 +183,5 @@ export interface DB {
   user: User;
   variantOption: VariantOption;
   verification: Verification;
+  warehouse: Warehouse;
 }

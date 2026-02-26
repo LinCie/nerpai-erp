@@ -10,11 +10,11 @@
 
 **Purpose**: Project initialization and module structure
 
-- [ ] T001 Create warehouse module directory structure at `src/modules/warehouses/`
-- [ ] T002 [P] Create domain layer directories: `src/modules/warehouses/domain/entities/` and `src/modules/warehouses/domain/types/`
-- [ ] T003 [P] Create application layer directories: `src/modules/warehouses/application/repositories/`, `src/modules/warehouses/application/services/`, `src/modules/warehouses/application/types/`
-- [ ] T004 [P] Create infrastructure layer directory: `src/modules/warehouses/infrastructure/repositories/`
-- [ ] T005 [P] Create presentation layer directories: `src/modules/warehouses/presentation/actions/`, `src/modules/warehouses/presentation/schemas/`, `src/modules/warehouses/presentation/components/`, `src/modules/warehouses/presentation/lib/`, `src/modules/warehouses/presentation/types/`
+- [X] T001 Create warehouse module directory structure at `src/modules/warehouses/`
+- [X] T002 [P] Create domain layer directories: `src/modules/warehouses/domain/entities/` and `src/modules/warehouses/domain/types/`
+- [X] T003 [P] Create application layer directories: `src/modules/warehouses/application/repositories/`, `src/modules/warehouses/application/services/`, `src/modules/warehouses/application/types/`
+- [X] T004 [P] Create infrastructure layer directory: `src/modules/warehouses/infrastructure/repositories/`
+- [X] T005 [P] Create presentation layer directories: `src/modules/warehouses/presentation/actions/`, `src/modules/warehouses/presentation/schemas/`, `src/modules/warehouses/presentation/components/`, `src/modules/warehouses/presentation/lib/`, `src/modules/warehouses/presentation/types/`
 
 ---
 
@@ -26,31 +26,31 @@
 
 ### Database Layer
 
-- [ ] T006 Create migration `create_warehouse_table` using `bun db:migrate:create create_warehouse_table`
-- [ ] T007 [P] Write migration Up in `src/shared/infrastructure/persistence/migrations/XXXX_create_warehouse_table.ts`:
+- [X] T006 Create migration `create_warehouse_table` using `bun db:migrate:create create_warehouse_table`
+- [X] T007 [P] Write migration Up in `src/shared/infrastructure/persistence/migrations/XXXX_create_warehouse_table.ts`:
   - Create `warehouse` table with all 15 columns per data-model.md
   - Add `organization_id` FK with `ON DELETE CASCADE`
   - Add indexes: `warehouse_organization_id_idx`, `warehouse_org_deleted_at_idx`, `warehouse_name_search_idx`, `warehouse_city_idx`, `warehouse_province_idx`
   - Add unique index across all records: `warehouse_org_code_unique` on normalized (`organization_id`, `lower(btrim(code))`) to block code reuse even when soft-deleted (FR-012)
   - Add CHECK constraints: `warehouse_name_not_empty`, `warehouse_code_not_empty`
-- [ ] T008 Write migration Down: `DROP TABLE IF EXISTS warehouse`
-- [ ] T009 Run migration: `bun db:migrate`
-- [ ] T010 Regenerate database types: `bun db:codegen`
+- [X] T008 Write migration Down: `DROP TABLE IF EXISTS warehouse`
+- [X] T009 Run migration: `bun db:migrate`
+- [X] T010 Regenerate database types: `bun db:codegen`
 
 ### Domain Layer
 
-- [ ] T011 [P] Create `Warehouse` entity interface in `src/modules/warehouses/domain/entities/warehouse.ts` with all fields per data-model.md
-- [ ] T012 [P] Create domain types in `src/modules/warehouses/domain/types/index.ts`
+- [X] T011 [P] Create `Warehouse` entity interface in `src/modules/warehouses/domain/entities/warehouse.ts` with all fields per data-model.md
+- [X] T012 [P] Create domain types in `src/modules/warehouses/domain/types/index.ts`
 
 ### Application Layer
 
-- [ ] T013 [P] Create repository interface `IWarehouseRepository` in `src/modules/warehouses/application/repositories/warehouse.repository.interface.ts` with methods: `findById`, `findByCode`, `findMany`, `create`, `update`, `softDelete`, `restore`
-- [ ] T014 [P] Create application DTOs in `src/modules/warehouses/application/types/index.ts`: `GetWarehousesParams`, `GetWarehouseParams`, `CreateWarehouseParams`, `UpdateWarehouseParams`, `SoftDeleteWarehouseParams`, `RestoreWarehouseParams`
-- [ ] T015 Implement `WarehouseService` in `src/modules/warehouses/application/services/warehouse.service.ts` with business logic for CRUD operations, code uniqueness validation (including soft-deleted warehouses for FR-012), empty string to null conversion
+- [X] T013 [P] Create repository interface `IWarehouseRepository` in `src/modules/warehouses/application/repositories/warehouse.repository.interface.ts` with methods: `findById`, `findByCode`, `findMany`, `create`, `update`, `softDelete`, `restore`
+- [X] T014 [P] Create application DTOs in `src/modules/warehouses/application/types/index.ts`: `GetWarehousesParams`, `GetWarehouseParams`, `CreateWarehouseParams`, `UpdateWarehouseParams`, `SoftDeleteWarehouseParams`, `RestoreWarehouseParams`
+- [X] T015 Implement `WarehouseService` in `src/modules/warehouses/application/services/warehouse.service.ts` with business logic for CRUD operations, code uniqueness validation (including soft-deleted warehouses for FR-012), empty string to null conversion
 
 ### Infrastructure Layer
 
-- [ ] T016 Implement `WarehouseRepository` in `src/modules/warehouses/infrastructure/repositories/warehouse.repository.ts`:
+- [X] T016 Implement `WarehouseRepository` in `src/modules/warehouses/infrastructure/repositories/warehouse.repository.ts`:
   - Implement all `IWarehouseRepository` methods using Kysely
   - Filter all queries by `organization_id` (Constitution X)
   - Apply soft-delete filtering (`deleted_at IS NULL`) by default
@@ -58,17 +58,17 @@
 
 ### Presentation Layer - Schemas & Form Options
 
-- [ ] T017 [P] Create Zod schemas in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts`:
+- [X] T017 [P] Create Zod schemas in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts`:
   - `warehouseBaseSchema` — common fields (name, address, contact, notes)
   - `warehouseCreateSchema` — extends base with `code` field (alphanumeric/hyphen/underscore only)
   - `warehouseUpdateSchema` — same as base (no code field)
-- [ ] T017A Define postal code validation rules in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts` (DIR-004):
+- [X] T017A Define postal code validation rules in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts` (DIR-004):
   - Country = Indonesia (default): postal code must be exactly 5 digits when provided
   - Country != Indonesia: postal code allows 1-20 alphanumeric characters, spaces, and hyphens
-- [ ] T017B Define country field normalization + validation in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts` (DIR-004):
+- [X] T017B Define country field normalization + validation in `src/modules/warehouses/presentation/schemas/warehouse.schema.ts` (DIR-004):
   - Trim and normalize input before validation/storage
   - Enforce non-empty when provided and max length constraint aligned with schema
-- [ ] T018 Create form options in `src/modules/warehouses/presentation/lib/form-options.ts`:
+- [X] T018 Create form options in `src/modules/warehouses/presentation/lib/form-options.ts`:
   - `createWarehouseFormOptions` — default values with code field, country defaults to "Indonesia"
   - `updateWarehouseFormOptions` — default values without code field
 
