@@ -61,11 +61,9 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .column("province")
     .execute();
 
-  // Unique partial index: code must be unique within organization across ALL rows
-  // (including soft-deleted) to block code reuse (FR-012)
-  // Note: We use a full unique index (not partial) so soft-deleted warehouses also
-  // block reuse. Code uniqueness is enforced at application layer for soft-deleted records.
-  // The partial index (WHERE deleted_at IS NULL) only enforces uniqueness for active records.
+  // Partial unique index: code uniqueness for active records only.
+  // NOTE: This was later fixed by migration 1772185695594_fix_warehouse_code_unique_index
+  // to remove the WHERE clause and cover ALL rows (including soft-deleted) per FR-012.
   await sql`
 		CREATE UNIQUE INDEX warehouse_org_code_unique
 		ON warehouse (organization_id, lower(btrim(code)))

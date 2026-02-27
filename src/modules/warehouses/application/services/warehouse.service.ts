@@ -34,13 +34,13 @@ export class WarehouseService {
   constructor(private repository: IWarehouseRepository) {}
 
   async getWarehouses(params: GetWarehousesParams): Promise<Warehouse[]> {
-    return this.repository.findMany(params);
+    return this.repository.getMany(params);
   }
 
   async getWarehouseById(
     params: GetWarehouseParams,
   ): Promise<Warehouse | null> {
-    return this.repository.findById(params);
+    return this.repository.getById(params);
   }
 
   /**
@@ -49,7 +49,7 @@ export class WarehouseService {
    */
   async createWarehouse(params: CreateWarehouseParams): Promise<Warehouse> {
     // Check code uniqueness including soft-deleted warehouses (FR-012)
-    const existing = await this.repository.findByCode({
+    const existing = await this.repository.getByCode({
       code: params.code,
       organizationId: params.organizationId,
       includeDeleted: true, // FR-012: block reuse even for deleted warehouses
@@ -115,7 +115,7 @@ export class WarehouseService {
   async getDeletedWarehouses(params: {
     organizationId: string;
   }): Promise<Warehouse[]> {
-    return this.repository.findMany({
+    return this.repository.getMany({
       organizationId: params.organizationId,
       includeDeleted: true,
     });

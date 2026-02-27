@@ -37,7 +37,7 @@ const validateUpdateWarehouseForm = createServerValidate({
 export async function checkWarehouseCode(code: string) {
   try {
     const { organizationId } = await getSessionAndOrg();
-    const existing = await warehouseRepository.findByCode({
+    const existing = await warehouseRepository.getByCode({
       code,
       organizationId,
       includeDeleted: true,

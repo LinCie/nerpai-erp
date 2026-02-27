@@ -44,7 +44,7 @@
 
 ### Application Layer
 
-- [x] T013 [P] Create repository interface `IWarehouseRepository` in `src/modules/warehouses/application/repositories/warehouse.repository.interface.ts` with methods: `findById`, `findByCode`, `findMany`, `create`, `update`, `softDelete`, `restore`
+- [x] T013 [P] Create repository interface `IWarehouseRepository` in `src/modules/warehouses/application/repositories/warehouse.repository.interface.ts` with methods: `getById`, `getByCode`, `getMany`, `create`, `update`, `softDelete`, `restore`
 - [x] T014 [P] Create application DTOs in `src/modules/warehouses/application/types/index.ts`: `GetWarehousesParams`, `GetWarehouseParams`, `CreateWarehouseParams`, `UpdateWarehouseParams`, `SoftDeleteWarehouseParams`, `RestoreWarehouseParams`
 - [x] T015 Implement `WarehouseService` in `src/modules/warehouses/application/services/warehouse.service.ts` with business logic for CRUD operations, code uniqueness validation (including soft-deleted warehouses for FR-012), empty string to null conversion
 

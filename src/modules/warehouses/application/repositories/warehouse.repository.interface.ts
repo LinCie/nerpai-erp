@@ -1,19 +1,19 @@
 import type { Warehouse } from "../../domain/entities/warehouse";
 
 export interface IWarehouseRepository {
-  findById(params: {
+  getById(params: {
     id: string;
     organizationId: string;
     includeDeleted?: boolean;
   }): Promise<Warehouse | null>;
 
-  findByCode(params: {
+  getByCode(params: {
     code: string;
     organizationId: string;
     includeDeleted?: boolean;
   }): Promise<Warehouse | null>;
 
-  findMany(params: {
+  getMany(params: {
     organizationId: string;
     search?: string;
     province?: string;

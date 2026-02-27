@@ -2,7 +2,7 @@
 
 **Feature Branch**: `003-warehouse-management`  
 **Date**: 2026-02-26  
-**Status**: Draft  
+**Status**: Draft
 
 ## Entities
 
@@ -10,24 +10,24 @@
 
 The core entity representing a physical storage location within an organization. Designed for multi-tenancy with strict organization isolation and soft-delete support.
 
-| Column | DB Name (snake_case) | App Name (camelCase) | Type | Nullable | Default | Notes |
-|--------|---------------------|---------------------|------|----------|---------|-------|
-| Primary Key | `id` | `id` | `UUID` | No | `uuidv7()` | UUID v7, auto-generated |
-| Name | `name` | `name` | `VARCHAR(255)` | No | — | 1-255 characters, trimmed |
-| Code | `code` | `code` | `VARCHAR(50)` | No | — | 1-50 chars, unique per org |
-| Street Address | `street_address` | `streetAddress` | `VARCHAR(500)` | Yes | `NULL` | Full street address |
-| City | `city` | `city` | `VARCHAR(100)` | Yes | `NULL` | City/municipality |
-| Province/State | `province` | `province` | `VARCHAR(100)` | Yes | `NULL` | Province or state |
-| Postal Code | `postal_code` | `postalCode` | `VARCHAR(20)` | Yes | `NULL` | Postal/ZIP code |
-| Country | `country` | `country` | `VARCHAR(100)` | No | `'Indonesia'` | Country name |
-| Contact Name | `contact_name` | `contactName` | `VARCHAR(255)` | Yes | `NULL` | Primary contact person |
-| Contact Phone | `contact_phone` | `contactPhone` | `VARCHAR(50)` | Yes | `NULL` | Contact phone number |
-| Contact Email | `contact_email` | `contactEmail` | `VARCHAR(255)` | Yes | `NULL` | Contact email address |
-| Notes | `notes` | `notes` | `TEXT` | Yes | `NULL` | Up to 1000 chars metadata |
-| Organization | `organization_id` | `organizationId` | `UUID` | No | — | FK → `organization.id` |
-| Created At | `created_at` | `createdAt` | `TIMESTAMPTZ` | No | `CURRENT_TIMESTAMP` | Record creation time |
-| Updated At | `updated_at` | `updatedAt` | `TIMESTAMPTZ` | No | `CURRENT_TIMESTAMP` | Last modification time |
-| Deleted At | `deleted_at` | `deletedAt` | `TIMESTAMPTZ` | Yes | `NULL` | Soft delete marker; NULL = active |
+| Column         | DB Name (snake_case) | App Name (camelCase) | Type           | Nullable | Default             | Notes                             |
+| -------------- | -------------------- | -------------------- | -------------- | -------- | ------------------- | --------------------------------- |
+| Primary Key    | `id`                 | `id`                 | `UUID`         | No       | `uuidv7()`          | UUID v7, auto-generated           |
+| Name           | `name`               | `name`               | `VARCHAR(255)` | No       | —                   | 1-255 characters, trimmed         |
+| Code           | `code`               | `code`               | `VARCHAR(50)`  | No       | —                   | 1-50 chars, unique per org        |
+| Street Address | `street_address`     | `streetAddress`      | `VARCHAR(500)` | Yes      | `NULL`              | Full street address               |
+| City           | `city`               | `city`               | `VARCHAR(100)` | Yes      | `NULL`              | City/municipality                 |
+| Province/State | `province`           | `province`           | `VARCHAR(100)` | Yes      | `NULL`              | Province or state                 |
+| Postal Code    | `postal_code`        | `postalCode`         | `VARCHAR(20)`  | Yes      | `NULL`              | Postal/ZIP code                   |
+| Country        | `country`            | `country`            | `VARCHAR(100)` | No       | `'Indonesia'`       | Country name                      |
+| Contact Name   | `contact_name`       | `contactName`        | `VARCHAR(255)` | Yes      | `NULL`              | Primary contact person            |
+| Contact Phone  | `contact_phone`      | `contactPhone`       | `VARCHAR(50)`  | Yes      | `NULL`              | Contact phone number              |
+| Contact Email  | `contact_email`      | `contactEmail`       | `VARCHAR(255)` | Yes      | `NULL`              | Contact email address             |
+| Notes          | `notes`              | `notes`              | `TEXT`         | Yes      | `NULL`              | Up to 1000 chars metadata         |
+| Organization   | `organization_id`    | `organizationId`     | `UUID`         | No       | —                   | FK → `organization.id`            |
+| Created At     | `created_at`         | `createdAt`          | `TIMESTAMPTZ`  | No       | `CURRENT_TIMESTAMP` | Record creation time              |
+| Updated At     | `updated_at`         | `updatedAt`          | `TIMESTAMPTZ`  | No       | `CURRENT_TIMESTAMP` | Last modification time            |
+| Deleted At     | `deleted_at`         | `deletedAt`          | `TIMESTAMPTZ`  | Yes      | `NULL`              | Soft delete marker; NULL = active |
 
 ## Relationships
 
@@ -45,40 +45,41 @@ organization (1) ──────< warehouse (many)
 
 ### CHECK Constraints
 
-| Constraint Name | Table | Expression | Spec Reference |
-|----------------|-------|------------|----------------|
-| `warehouse_name_not_empty` | `warehouse` | `CHECK (LENGTH(TRIM(name)) > 0)` | DIR-003 |
-| `warehouse_code_not_empty` | `warehouse` | `CHECK (LENGTH(TRIM(code)) > 0)` | FR-015 |
+| Constraint Name            | Table       | Expression                       | Spec Reference |
+| -------------------------- | ----------- | -------------------------------- | -------------- |
+| `warehouse_name_not_empty` | `warehouse` | `CHECK (LENGTH(TRIM(name)) > 0)` | DIR-003        |
+| `warehouse_code_not_empty` | `warehouse` | `CHECK (LENGTH(TRIM(code)) > 0)` | FR-015         |
 
 ### UNIQUE Constraints
 
-| Constraint Name | Table | Columns | Scope | Spec Reference |
-|----------------|-------|---------|-------|----------------|
-| `warehouse_code_org_unique` | `warehouse` | `(code, organization_id)` WHERE `deleted_at IS NULL` | Org-wide active code uniqueness | DIR-001 |
+| Constraint Name             | Table       | Columns                                 | Scope                                                             | Spec Reference  |
+| --------------------------- | ----------- | --------------------------------------- | ----------------------------------------------------------------- | --------------- |
+| `warehouse_org_code_unique` | `warehouse` | `(organization_id, lower(btrim(code)))` | Org-wide code uniqueness across ALL rows (including soft-deleted) | DIR-001, FR-012 |
 
-**Note**: The unique constraint includes `WHERE deleted_at IS NULL` to allow restoring a soft-deleted warehouse or creating a new warehouse with the same code as a deleted one (FR-012 business rule).
+**Note**: The unique constraint covers **all rows** (no partial filter). Soft-deleted warehouses block code reuse to ensure safe restore without conflicts (FR-012, spec clarification 2026-02-26).
 
 ### Foreign Key Delete Rules
 
-| From Table | To Table | On Delete | Rationale |
-|------------|----------|-----------|-----------|
-| `warehouse` | `organization` | CASCADE | Organization deletion removes all its warehouses |
+| From Table  | To Table       | On Delete | Rationale                                        |
+| ----------- | -------------- | --------- | ------------------------------------------------ |
+| `warehouse` | `organization` | CASCADE   | Organization deletion removes all its warehouses |
 
 ## Indexes
 
-| Index Name | Table | Column(s) | Type | Purpose |
-|------------|-------|-----------|------|---------|
-| `warehouse_pkey` | `warehouse` | `id` | PK (B-tree) | Primary key |
-| `warehouse_organization_id_idx` | `warehouse` | `organization_id` | B-tree | List warehouses by org |
-| `warehouse_org_deleted_at_idx` | `warehouse` | `(organization_id, deleted_at)` | B-tree | Active warehouses for org |
-| `warehouse_code_org_idx` | `warehouse` | `(code, organization_id)` | Unique B-tree | Code uniqueness enforcement |
-| `warehouse_name_search_idx` | `warehouse` | `name` | B-tree | Name search/sort |
-| `warehouse_city_idx` | `warehouse` | `city` | B-tree | City-based filtering |
-| `warehouse_province_idx` | `warehouse` | `province` | B-tree | Province-based filtering |
+| Index Name                      | Table       | Column(s)                               | Type          | Purpose                                                   |
+| ------------------------------- | ----------- | --------------------------------------- | ------------- | --------------------------------------------------------- |
+| `warehouse_pkey`                | `warehouse` | `id`                                    | PK (B-tree)   | Primary key                                               |
+| `warehouse_organization_id_idx` | `warehouse` | `organization_id`                       | B-tree        | List warehouses by org                                    |
+| `warehouse_org_deleted_at_idx`  | `warehouse` | `(organization_id, deleted_at)`         | B-tree        | Active warehouses for org                                 |
+| `warehouse_org_code_unique`     | `warehouse` | `(organization_id, lower(btrim(code)))` | Unique B-tree | Code uniqueness enforcement (all rows incl. soft-deleted) |
+| `warehouse_name_search_idx`     | `warehouse` | `name`                                  | B-tree        | Name search/sort                                          |
+| `warehouse_city_idx`            | `warehouse` | `city`                                  | B-tree        | City-based filtering                                      |
+| `warehouse_province_idx`        | `warehouse` | `province`                              | B-tree        | Province-based filtering                                  |
 
 ### Query Optimization Notes
 
 1. **Multi-tenancy Filter**: All queries should use `(organization_id, deleted_at)` compound index:
+
    ```sql
    WHERE organization_id = ? AND deleted_at IS NULL
    ```
@@ -89,6 +90,7 @@ organization (1) ──────< warehouse (many)
    - Alternative: Create functional index on lowercase fields for case-insensitive exact match
 
 3. **Code Lookup**: Warehouse code lookups are case-insensitive; store normalized (uppercase) in DB or use ILIKE:
+
    ```sql
    WHERE UPPER(code) = UPPER(?) AND organization_id = ?
    ```
@@ -106,19 +108,19 @@ organization (1) ──────< warehouse (many)
 
 ## Validation Rules
 
-| Entity | Field | Rule | Error Message |
-|--------|-------|------|---------------|
-| Warehouse | `name` | Required, 1-255 chars, trimmed | "Warehouse name is required" / "Name must be 255 characters or less" |
-| Warehouse | `code` | Required, 1-50 chars, alphanumeric/hyphen/underscore only, trimmed, unique per org | "Warehouse code is required" / "Code must be 50 characters or less" / "Code can only contain letters, numbers, hyphens, and underscores" / "Warehouse code already exists" |
-| Warehouse | `streetAddress` | Optional, max 500 chars | "Street address must be 500 characters or less" |
-| Warehouse | `city` | Optional, max 100 chars | "City must be 100 characters or less" |
-| Warehouse | `province` | Optional, max 100 chars | "Province must be 100 characters or less" |
-| Warehouse | `postalCode` | Optional, max 20 chars | "Postal code must be 20 characters or less" |
-| Warehouse | `country` | Required, max 100 chars, defaults to "Indonesia" | "Country is required" |
-| Warehouse | `contactName` | Optional, max 255 chars | "Contact name must be 255 characters or less" |
-| Warehouse | `contactPhone` | Optional, max 50 chars | "Contact phone must be 50 characters or less" |
-| Warehouse | `contactEmail` | Optional, valid email format, max 255 chars | "Invalid email format" / "Email must be 255 characters or less" |
-| Warehouse | `notes` | Optional, max 1000 chars | "Notes must be 1000 characters or less" |
+| Entity    | Field           | Rule                                                                               | Error Message                                                                                                                                                              |
+| --------- | --------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Warehouse | `name`          | Required, 1-255 chars, trimmed                                                     | "Warehouse name is required" / "Name must be 255 characters or less"                                                                                                       |
+| Warehouse | `code`          | Required, 1-50 chars, alphanumeric/hyphen/underscore only, trimmed, unique per org | "Warehouse code is required" / "Code must be 50 characters or less" / "Code can only contain letters, numbers, hyphens, and underscores" / "Warehouse code already exists" |
+| Warehouse | `streetAddress` | Optional, max 500 chars                                                            | "Street address must be 500 characters or less"                                                                                                                            |
+| Warehouse | `city`          | Optional, max 100 chars                                                            | "City must be 100 characters or less"                                                                                                                                      |
+| Warehouse | `province`      | Optional, max 100 chars                                                            | "Province must be 100 characters or less"                                                                                                                                  |
+| Warehouse | `postalCode`    | Optional, max 20 chars                                                             | "Postal code must be 20 characters or less"                                                                                                                                |
+| Warehouse | `country`       | Required, max 100 chars, defaults to "Indonesia"                                   | "Country is required"                                                                                                                                                      |
+| Warehouse | `contactName`   | Optional, max 255 chars                                                            | "Contact name must be 255 characters or less"                                                                                                                              |
+| Warehouse | `contactPhone`  | Optional, max 50 chars                                                             | "Contact phone must be 50 characters or less"                                                                                                                              |
+| Warehouse | `contactEmail`  | Optional, valid email format, max 255 chars                                        | "Invalid email format" / "Email must be 255 characters or less"                                                                                                            |
+| Warehouse | `notes`         | Optional, max 1000 chars                                                           | "Notes must be 1000 characters or less"                                                                                                                                    |
 
 ## Domain Types
 
@@ -187,11 +189,11 @@ export interface CreateWarehouseParams {
   organizationId: string;
 }
 
-/** Params for updating a warehouse */
+/** Params for updating a warehouse (code is immutable — excluded per FR-018) */
 export interface UpdateWarehouseParams {
   id: string;
   name: string;
-  code: string; // Can validate but typically immutable
+  // code: EXCLUDED — immutable after creation (FR-018)
   streetAddress?: string | null;
   city?: string | null;
   province?: string | null;
@@ -270,16 +272,16 @@ CREATE INDEX warehouse_name_search_idx ON warehouse (name);
 CREATE INDEX warehouse_city_idx ON warehouse (city);
 CREATE INDEX warehouse_province_idx ON warehouse (province);
 
--- Unique constraint: code must be unique within an organization for active warehouses
-CREATE UNIQUE INDEX warehouse_code_org_unique 
-  ON warehouse (code, organization_id) 
-  WHERE deleted_at IS NULL;
+-- Unique constraint: code must be unique within an organization across ALL rows
+-- including soft-deleted (FR-012: soft-deleted warehouses block code reuse)
+CREATE UNIQUE INDEX warehouse_org_code_unique
+  ON warehouse (organization_id, lower(btrim(code)));
 
 -- CHECK constraints for data integrity
-ALTER TABLE warehouse ADD CONSTRAINT warehouse_name_not_empty 
+ALTER TABLE warehouse ADD CONSTRAINT warehouse_name_not_empty
   CHECK (LENGTH(TRIM(name)) > 0);
-  
-ALTER TABLE warehouse ADD CONSTRAINT warehouse_code_not_empty 
+
+ALTER TABLE warehouse ADD CONSTRAINT warehouse_code_not_empty
   CHECK (LENGTH(TRIM(code)) > 0);
 
 -- Down Migration
@@ -430,50 +432,56 @@ INSERT INTO warehouse (
 ### 1. Primary Query Patterns
 
 **List Active Warehouses for Organization** (Most Common):
+
 ```sql
-SELECT * FROM warehouse 
-WHERE organization_id = $1 
-  AND deleted_at IS NULL 
-ORDER BY created_at DESC 
+SELECT * FROM warehouse
+WHERE organization_id = $1
+  AND deleted_at IS NULL
+ORDER BY created_at DESC
 LIMIT $2 OFFSET $3;
 ```
+
 **Index Used**: `warehouse_org_deleted_at_idx`
 
 **Search Warehouses**:
+
 ```sql
-SELECT * FROM warehouse 
-WHERE organization_id = $1 
-  AND deleted_at IS NULL 
+SELECT * FROM warehouse
+WHERE organization_id = $1
+  AND deleted_at IS NULL
   AND (
-    name ILIKE $2 OR 
-    code ILIKE $2 OR 
-    city ILIKE $2 OR 
+    name ILIKE $2 OR
+    code ILIKE $2 OR
+    city ILIKE $2 OR
     province ILIKE $2
   )
-ORDER BY name ASC 
+ORDER BY name ASC
 LIMIT $3 OFFSET $4;
 ```
+
 **Indexes Used**: `warehouse_org_deleted_at_idx` + sequential scan on text fields
 **Optimization**: Consider adding `pg_trgm` extension with GIN indexes for heavy search use
 
 **Get Warehouse by Code**:
+
 ```sql
-SELECT * FROM warehouse 
-WHERE UPPER(code) = UPPER($1) 
-  AND organization_id = $2 
+SELECT * FROM warehouse
+WHERE UPPER(code) = UPPER($1)
+  AND organization_id = $2
   AND deleted_at IS NULL;
 ```
+
 **Index Used**: `warehouse_code_org_unique` (partial index, very efficient)
 
 ### 2. Index Strategy Summary
 
-| Query Pattern | Recommended Index | Notes |
-|--------------|-------------------|-------|
+| Query Pattern             | Recommended Index              | Notes                              |
+| ------------------------- | ------------------------------ | ---------------------------------- |
 | List by org (active only) | `warehouse_org_deleted_at_idx` | Compound index covers both filters |
-| Code lookup | `warehouse_code_org_unique` | Unique partial index, very fast |
-| Name search/sort | `warehouse_name_search_idx` | Supports LIKE and ORDER BY |
-| City filter | `warehouse_city_idx` | For geographic filtering |
-| Province filter | `warehouse_province_idx` | For geographic filtering |
+| Code lookup               | `warehouse_code_org_unique`    | Unique partial index, very fast    |
+| Name search/sort          | `warehouse_name_search_idx`    | Supports LIKE and ORDER BY         |
+| City filter               | `warehouse_city_idx`           | For geographic filtering           |
+| Province filter           | `warehouse_province_idx`       | For geographic filtering           |
 
 ### 3. Performance Considerations
 
@@ -489,27 +497,27 @@ WHERE UPPER(code) = UPPER($1)
 
 ### Application-Level Errors
 
-| Error Scenario | HTTP Status | Error Code | User Message | Resolution |
-|----------------|-------------|------------|--------------|------------|
-| Validation - Name required | 400 | `VALIDATION_ERROR` | "Warehouse name is required" | Provide a name |
-| Validation - Name too long | 400 | `VALIDATION_ERROR` | "Name must be 255 characters or less" | Shorten the name |
-| Validation - Code required | 400 | `VALIDATION_ERROR` | "Warehouse code is required" | Provide a code |
-| Validation - Code format invalid | 400 | `VALIDATION_ERROR` | "Code can only contain letters, numbers, hyphens, and underscores" | Use valid characters |
-| Validation - Code exists | 409 | `DUPLICATE_CODE` | "Warehouse code already exists in your organization" | Use a unique code |
-| Validation - Email format | 400 | `VALIDATION_ERROR` | "Invalid email format" | Provide valid email |
-| Not Found | 404 | `NOT_FOUND` | "Warehouse not found" | Check ID/permissions |
-| Forbidden | 403 | `FORBIDDEN` | "You don't have permission to access this warehouse" | Check organization access |
-| Database Connection | 500 | `DATABASE_ERROR` | "Unable to save warehouse. Please try again." | Retry or contact support |
-| Unique Violation (race condition) | 409 | `DUPLICATE_CODE` | "Warehouse code already exists. Please choose another." | Retry with different code |
+| Error Scenario                    | HTTP Status | Error Code         | User Message                                                       | Resolution                |
+| --------------------------------- | ----------- | ------------------ | ------------------------------------------------------------------ | ------------------------- |
+| Validation - Name required        | 400         | `VALIDATION_ERROR` | "Warehouse name is required"                                       | Provide a name            |
+| Validation - Name too long        | 400         | `VALIDATION_ERROR` | "Name must be 255 characters or less"                              | Shorten the name          |
+| Validation - Code required        | 400         | `VALIDATION_ERROR` | "Warehouse code is required"                                       | Provide a code            |
+| Validation - Code format invalid  | 400         | `VALIDATION_ERROR` | "Code can only contain letters, numbers, hyphens, and underscores" | Use valid characters      |
+| Validation - Code exists          | 409         | `DUPLICATE_CODE`   | "Warehouse code already exists in your organization"               | Use a unique code         |
+| Validation - Email format         | 400         | `VALIDATION_ERROR` | "Invalid email format"                                             | Provide valid email       |
+| Not Found                         | 404         | `NOT_FOUND`        | "Warehouse not found"                                              | Check ID/permissions      |
+| Forbidden                         | 403         | `FORBIDDEN`        | "You don't have permission to access this warehouse"               | Check organization access |
+| Database Connection               | 500         | `DATABASE_ERROR`   | "Unable to save warehouse. Please try again."                      | Retry or contact support  |
+| Unique Violation (race condition) | 409         | `DUPLICATE_CODE`   | "Warehouse code already exists. Please choose another."            | Retry with different code |
 
 ### Database-Level Errors
 
-| Error | Cause | Handling |
-|-------|-------|----------|
-| `unique_violation` (23505) | Concurrent insert with same code | Catch and convert to 409 Conflict with user-friendly message |
-| `not_null_violation` (23502) | Missing required field | Should be caught by application validation before reaching DB |
-| `check_violation` (23514) | CHECK constraint failed (empty name/code) | Should be caught by application validation |
-| `foreign_key_violation` (23503) | Invalid organization_id | Should be caught by checking organization context first |
+| Error                           | Cause                                     | Handling                                                      |
+| ------------------------------- | ----------------------------------------- | ------------------------------------------------------------- |
+| `unique_violation` (23505)      | Concurrent insert with same code          | Catch and convert to 409 Conflict with user-friendly message  |
+| `not_null_violation` (23502)    | Missing required field                    | Should be caught by application validation before reaching DB |
+| `check_violation` (23514)       | CHECK constraint failed (empty name/code) | Should be caught by application validation                    |
+| `foreign_key_violation` (23503) | Invalid organization_id                   | Should be caught by checking organization context first       |
 
 ### Error Response Format (API/Server Actions)
 
@@ -557,20 +565,25 @@ WHERE UPPER(code) = UPPER($1)
 ### 1. Organization Isolation
 
 **Database Level**:
+
 - All queries MUST include `WHERE organization_id = ?`
 - Foreign key constraint ensures referential integrity to `organization.id`
 - `ON DELETE CASCADE` ensures data cleanup when organization is deleted
 
 **Application Level**:
+
 ```typescript
 // Repository layer - ALWAYS filter by organization
-async function findById(id: string, organizationId: string): Promise<Warehouse | null> {
+async function findById(
+  id: string,
+  organizationId: string,
+): Promise<Warehouse | null> {
   return db
-    .selectFrom('warehouse')
+    .selectFrom("warehouse")
     .selectAll()
-    .where('id', '=', id)
-    .where('organization_id', '=', organizationId) // REQUIRED
-    .where('deleted_at', 'is', null)
+    .where("id", "=", id)
+    .where("organization_id", "=", organizationId) // REQUIRED
+    .where("deleted_at", "is", null)
     .executeTakeFirst();
 }
 
@@ -578,14 +591,20 @@ async function findById(id: string, organizationId: string): Promise<Warehouse |
 export async function getWarehouse(params: GetWarehouseParams) {
   const session = await auth();
   if (!session?.activeOrganizationId) {
-    return { success: false, error: { code: 'UNAUTHORIZED', message: 'No active organization' } };
+    return {
+      success: false,
+      error: { code: "UNAUTHORIZED", message: "No active organization" },
+    };
   }
-  
+
   // Ensure params.organizationId matches session
   if (params.organizationId !== session.activeOrganizationId) {
-    return { success: false, error: { code: 'FORBIDDEN', message: 'Invalid organization' } };
+    return {
+      success: false,
+      error: { code: "FORBIDDEN", message: "Invalid organization" },
+    };
   }
-  
+
   return warehouseRepository.findById(params.id, params.organizationId);
 }
 ```
@@ -593,23 +612,25 @@ export async function getWarehouse(params: GetWarehouseParams) {
 ### 2. Preventing Cross-Organization Access
 
 **Critical Checks**:
+
 1. **Every read query** must filter by `organization_id`
 2. **Every write operation** must verify the user has access to the specified organization
 3. **URL parameters** for IDs should not be trusted alone; always validate against organization
 4. **Cascade considerations**: When organization is deleted, all warehouses are automatically deleted (DB-level CASCADE)
 
 **Testing Strategy**:
+
 ```typescript
 // Test case: Cross-organization access should fail
-test('should not return warehouse from different organization', async () => {
+test("should not return warehouse from different organization", async () => {
   const org1Warehouse = await createWarehouse({ organizationId: org1Id });
-  
+
   // Attempt to access with org2 context
-  const result = await getWarehouse({ 
-    id: org1Warehouse.id, 
-    organizationId: org2Id 
+  const result = await getWarehouse({
+    id: org1Warehouse.id,
+    organizationId: org2Id,
   });
-  
+
   expect(result).toBeNull(); // Or return 404
 });
 ```
@@ -632,7 +653,7 @@ CREATE TABLE inventory (
   organization_id UUID NOT NULL REFERENCES organization(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  
+
   -- Unique constraint: one inventory record per warehouse per variant
   UNIQUE (warehouse_id, product_variant_id, organization_id)
 );
@@ -653,6 +674,7 @@ warehouse (1) ──────< inventory (many) >────── product_v
 ```
 
 **Design Decisions**:
+
 - `ON DELETE CASCADE` on `warehouse_id`: If warehouse is deleted, all inventory records for that warehouse are removed
 - `ON DELETE CASCADE` on `product_variant_id`: If variant is deleted, inventory records are cleaned up
 - Organization denormalized to `inventory` for query efficiency (avoids joins for tenant filtering)
@@ -671,20 +693,17 @@ interface WarehouseInventorySummary {
 interface WarehouseService {
   // Future method: Get inventory summary for a warehouse
   getInventorySummary(
-    warehouseId: string, 
-    organizationId: string
+    warehouseId: string,
+    organizationId: string,
   ): Promise<WarehouseInventorySummary>;
-  
+
   // Future method: Check if warehouse has any inventory before soft-delete
-  hasInventory(
-    warehouseId: string, 
-    organizationId: string
-  ): Promise<boolean>;
-  
+  hasInventory(warehouseId: string, organizationId: string): Promise<boolean>;
+
   // Future method: Validate warehouse can be deleted (no inventory or gated)
   validateCanDelete(
-    warehouseId: string, 
-    organizationId: string
+    warehouseId: string,
+    organizationId: string,
   ): Promise<{ canDelete: boolean; reason?: string }>;
 }
 ```
@@ -695,30 +714,33 @@ When implementing inventory, the soft-delete behavior for warehouses should cons
 
 ```typescript
 // Pseudo-code for future delete warehouse with inventory
-type DeleteResult = 
+type DeleteResult =
   | { success: true }
-  | { success: false; error: 'HAS_INVENTORY'; inventoryCount: number }
-  | { success: false; error: 'TRANSFER_REQUIRED' };
+  | { success: false; error: "HAS_INVENTORY"; inventoryCount: number }
+  | { success: false; error: "TRANSFER_REQUIRED" };
 
 async function softDeleteWarehouse(
-  id: string, 
-  organizationId: string
+  id: string,
+  organizationId: string,
 ): Promise<DeleteResult> {
   // Check if warehouse has inventory
   const hasStock = await inventoryRepository.hasStock(id, organizationId);
-  
+
   if (hasStock) {
     // Option A: Block deletion
-    return { 
-      success: false, 
-      error: 'HAS_INVENTORY',
-      inventoryCount: await inventoryRepository.getStockCount(id, organizationId)
+    return {
+      success: false,
+      error: "HAS_INVENTORY",
+      inventoryCount: await inventoryRepository.getStockCount(
+        id,
+        organizationId,
+      ),
     };
-    
+
     // Option B: Allow with warning (user must transfer inventory first)
     // Option C: Archive mode (keep records but mark warehouse as archived)
   }
-  
+
   // Proceed with soft-delete
   await warehouseRepository.softDelete(id, organizationId);
   return { success: true };
@@ -728,8 +750,9 @@ async function softDeleteWarehouse(
 ### 5. Query Patterns for Future Integration
 
 **Get warehouses with inventory summary**:
+
 ```sql
-SELECT 
+SELECT
   w.*,
   COUNT(i.id) as sku_count,
   COALESCE(SUM(i.quantity), 0) as total_quantity
@@ -741,8 +764,9 @@ GROUP BY w.id;
 ```
 
 **Get low stock items per warehouse**:
+
 ```sql
-SELECT 
+SELECT
   w.name as warehouse_name,
   pv.sku,
   i.quantity,

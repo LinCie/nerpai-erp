@@ -4,7 +4,7 @@ import type { Warehouse } from "../../domain/entities/warehouse";
 import type { IWarehouseRepository } from "../../application/repositories/warehouse.repository.interface";
 
 export class WarehouseRepository implements IWarehouseRepository {
-  async findById({
+  async getById({
     id,
     organizationId,
     includeDeleted = false,
@@ -27,7 +27,7 @@ export class WarehouseRepository implements IWarehouseRepository {
     return warehouse ?? null;
   }
 
-  async findByCode({
+  async getByCode({
     code,
     organizationId,
     includeDeleted = false,
@@ -51,7 +51,7 @@ export class WarehouseRepository implements IWarehouseRepository {
     return warehouse ?? null;
   }
 
-  async findMany({
+  async getMany({
     organizationId,
     search,
     province,
