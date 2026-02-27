@@ -10,6 +10,7 @@ import {
   Monitor,
   ChevronRight,
   Building2,
+  Warehouse,
   type LucideIcon,
 } from "lucide-react";
 
@@ -19,6 +20,7 @@ export const Icons = {
   dashboard: LayoutDashboard,
   products: Package,
   orders: ShoppingCart,
+  warehouse: Warehouse,
   settings: Settings,
   logout: LogOut,
   user: User,

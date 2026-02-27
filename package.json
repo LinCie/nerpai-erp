@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "kysely migrate latest",
-    "db:migrate:make": "kysely migrate make",
+    "db:migrate:create": "kysely migrate make",
     "db:rollback": "kysely migrate rollback",
     "db:status": "kysely migrate list",
     "db:codegen": "kysely-codegen --out-file src/shared/infrastructure/persistence/types.ts --camel-case"
