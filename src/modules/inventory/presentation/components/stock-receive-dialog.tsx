@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Package } from "lucide-react";
+import { Icons } from "@/shared/presentation/components/icons";
 import { Button } from "@/shared/presentation/components/ui/button";
 import {
   Dialog,
@@ -14,16 +14,19 @@ import { StockReceiveForm } from "./stock-receive-form";
 import { toast } from "sonner";
 import type { Product } from "@/modules/products/domain/entities/product";
 import type { Warehouse } from "@/modules/warehouses/domain/entities/warehouse";
+import type { InventoryVariantOption } from "../types";
 
 interface StockReceiveDialogProps {
   products: Product[];
   warehouses: Warehouse[];
+  variants: InventoryVariantOption[];
   onSuccess?: () => void;
 }
 
 export function StockReceiveDialog({
   products,
   warehouses,
+  variants,
   onSuccess,
 }: StockReceiveDialogProps) {
   const [open, setOpen] = useState(false);
@@ -38,7 +41,7 @@ export function StockReceiveDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button id="receive-stock-trigger">
-          <Package className="w-4 h-4 mr-2" />
+          <Icons.package className="w-4 h-4 mr-2" />
           Receive Stock
         </Button>
       </DialogTrigger>
@@ -50,6 +53,7 @@ export function StockReceiveDialog({
           <StockReceiveForm
             products={products}
             warehouses={warehouses}
+            variants={variants}
             onSuccess={handleSuccess}
           />
         )}

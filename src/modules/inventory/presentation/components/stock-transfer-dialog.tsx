@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { ArrowLeftRight } from "lucide-react";
+import { Icons } from "@/shared/presentation/components/icons";
 import { Button } from "@/shared/presentation/components/ui/button";
 import {
   Dialog,
@@ -14,16 +14,19 @@ import { StockTransferForm } from "./stock-transfer-form";
 import { toast } from "sonner";
 import type { Product } from "@/modules/products/domain/entities/product";
 import type { Warehouse } from "@/modules/warehouses/domain/entities/warehouse";
+import type { InventoryVariantOption } from "../types";
 
 interface StockTransferDialogProps {
   products: Product[];
   warehouses: Warehouse[];
+  variants: InventoryVariantOption[];
   onSuccess?: () => void;
 }
 
 export function StockTransferDialog({
   products,
   warehouses,
+  variants,
   onSuccess,
 }: StockTransferDialogProps) {
   const [open, setOpen] = useState(false);
@@ -38,7 +41,7 @@ export function StockTransferDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button id="transfer-stock-trigger" variant="outline">
-          <ArrowLeftRight className="w-4 h-4 mr-2" />
+          <Icons.arrowLeftRight className="w-4 h-4 mr-2" />
           Transfer Stock
         </Button>
       </DialogTrigger>
@@ -50,6 +53,7 @@ export function StockTransferDialog({
           <StockTransferForm
             products={products}
             warehouses={warehouses}
+            variants={variants}
             onSuccess={handleSuccess}
           />
         )}

@@ -1,5 +1,42 @@
 import type { MovementType } from "@/modules/inventory/domain/types";
 
+export interface StockMovementWithDetails {
+  id: string;
+  productId: string;
+  productName: string;
+  productVariantId: string | null;
+  variantSku: string | null;
+  warehouseId: string;
+  warehouseName: string;
+  warehouseCode: string;
+  movementType: MovementType;
+  delta: number;
+  referenceId: string | null;
+  notes: string | null;
+  createdBy: string;
+  createdByName: string;
+  organizationId: string;
+  createdAt: Date;
+}
+
+export interface InventoryVariantOption {
+  id: string;
+  productId: string;
+  sku: string;
+}
+
+export interface CreateStockMovementParams {
+  productId: string;
+  productVariantId?: string | null;
+  warehouseId: string;
+  movementType: MovementType;
+  delta: number;
+  notes?: string | null;
+  createdBy: string;
+  organizationId: string;
+  referenceId?: string | null;
+}
+
 export interface ReceiveStockParams {
   productId: string;
   productVariantId?: string | null;

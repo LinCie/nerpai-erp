@@ -3,50 +3,57 @@ import { db } from "@/shared/infrastructure/persistence";
 import type { StockMovement } from "@/modules/inventory/domain/entities/stock-movement";
 import type { StockLevelWithDetails } from "@/modules/inventory/domain/types";
 import type {
+  CreateStockMovementParams,
   GetMovementHistoryParams,
   GetStockLevelsParams,
   GetCurrentStockParams,
-  ReceiveStockParams,
-  DispatchStockParams,
-  AdjustStockParams,
+  InventoryVariantOption,
+  StockMovementWithDetails,
 } from "@/modules/inventory/application/types";
-import type { StockMovementWithDetails } from "@/modules/inventory/presentation/types";
 import type { IStockMovementRepository } from "@/modules/inventory/application/repositories/stock-movement.repository.interface";
 
+interface StockAggregateRow {
+  productId: string;
+  productVariantId: string | null;
+  warehouseId: string;
+  currentStock: number;
+}
+
+interface StockDisplayItem {
+  productId: string;
+  productName: string;
+  productVariantId: string | null;
+  variantSku: string | null;
+}
+
+interface ActiveProductRow {
+  id: string;
+  name: string;
+}
+
+interface ActiveVariantRow {
+  id: string;
+  productId: string;
+  sku: string;
+}
+
+interface ActiveWarehouseRow {
+  id: string;
+  name: string;
+  code: string;
+}
+
 export class StockMovementRepository implements IStockMovementRepository {
-  async create(
-    params: ReceiveStockParams | DispatchStockParams | AdjustStockParams
-  ): Promise<StockMovement> {
-    let movementType: "receive" | "dispatch" | "adjustment";
-    let delta: number;
-
-    if ("quantity" in params) {
-      if ("confirmNegative" in params) {
-        movementType = "dispatch";
-        delta = -params.quantity;
-      } else {
-        movementType = "receive";
-        delta = params.quantity;
-      }
-    } else {
-      const currentStock = await this.getCurrentStock({
-        productId: params.productId,
-        productVariantId: params.productVariantId,
-        warehouseId: params.warehouseId,
-        organizationId: params.organizationId,
-      });
-      movementType = "adjustment";
-      delta = params.newQuantity - currentStock;
-    }
-
+  async create(params: CreateStockMovementParams): Promise<StockMovement> {
     const result = await db
       .insertInto("stockMovement")
       .values({
         productId: params.productId,
         productVariantId: params.productVariantId ?? null,
         warehouseId: params.warehouseId,
-        movementType,
-        delta,
+        movementType: params.movementType,
+        delta: params.delta,
+        referenceId: params.referenceId ?? null,
         notes: params.notes ?? null,
         createdBy: params.createdBy,
         organizationId: params.organizationId,
@@ -62,21 +69,29 @@ export class StockMovementRepository implements IStockMovementRepository {
   }
 
   async createTransferPair(
-    dispatch: Omit<DispatchStockParams, "confirmNegative"> & { referenceId: string },
-    receive: Omit<ReceiveStockParams, "createdBy" | "organizationId"> & { referenceId: string }
+    dispatch: CreateStockMovementParams,
+    receive: CreateStockMovementParams
   ): Promise<[StockMovement, StockMovement]> {
     const [dispatchMovement, receiveMovement] = await db
       .transaction()
       .execute(async (trx) => {
+        const generatedReference = await trx
+          .selectNoFrom((expressionBuilder) =>
+            expressionBuilder.fn<string>("uuidv7", []).as("referenceId")
+          )
+          .executeTakeFirstOrThrow();
+
+        const referenceId = dispatch.referenceId ?? receive.referenceId ?? generatedReference.referenceId;
+
         const dispatchResult = await trx
           .insertInto("stockMovement")
           .values({
             productId: dispatch.productId,
             productVariantId: dispatch.productVariantId ?? null,
             warehouseId: dispatch.warehouseId,
-            movementType: "dispatch",
-            delta: -dispatch.quantity,
-            referenceId: dispatch.referenceId,
+            movementType: dispatch.movementType,
+            delta: dispatch.delta,
+            referenceId,
             notes: dispatch.notes ?? null,
             createdBy: dispatch.createdBy,
             organizationId: dispatch.organizationId,
@@ -90,12 +105,12 @@ export class StockMovementRepository implements IStockMovementRepository {
             productId: receive.productId,
             productVariantId: receive.productVariantId ?? null,
             warehouseId: receive.warehouseId,
-            movementType: "receive",
-            delta: receive.quantity,
-            referenceId: receive.referenceId,
+            movementType: receive.movementType,
+            delta: receive.delta,
+            referenceId,
             notes: receive.notes ?? null,
-            createdBy: dispatch.createdBy,
-            organizationId: dispatch.organizationId,
+            createdBy: receive.createdBy,
+            organizationId: receive.organizationId,
           })
           .returningAll()
           .executeTakeFirstOrThrow();
@@ -120,75 +135,62 @@ export class StockMovementRepository implements IStockMovementRepository {
   async getStockLevels(params: GetStockLevelsParams): Promise<{ data: StockLevelWithDetails[]; total: number }> {
     const { organizationId, productId, warehouseId, search, limit = 50, offset = 0 } = params;
 
-    let query = db
-      .selectFrom("stockMovement")
-      .innerJoin("product", "product.id", "stockMovement.productId")
-      .innerJoin("warehouse", "warehouse.id", "stockMovement.warehouseId")
-      .leftJoin("productVariant", "productVariant.id", "stockMovement.productVariantId")
-      .select([
-        "stockMovement.productId",
-        "product.name as productName",
-        "stockMovement.productVariantId",
-        "productVariant.sku as variantSku",
-        "stockMovement.warehouseId",
-        "warehouse.name as warehouseName",
-        "warehouse.code as warehouseCode",
-        db.fn.coalesce(db.fn.sum("stockMovement.delta"), sql.lit(0)).as("currentStock"),
+    const [products, variants, warehouses, aggregates] = await Promise.all([
+      this.getActiveProducts({ organizationId, productId }),
+      this.getActiveVariants({ organizationId, productId }),
+      this.getActiveWarehouses({ organizationId, warehouseId }),
+      this.getStockAggregates({ organizationId, productId, warehouseId }),
+    ]);
+
+    const displayItems = this.buildDisplayItems(products, variants);
+    const aggregateMap = new Map(
+      aggregates.map((aggregate) => [
+        this.getStockKey(aggregate.productId, aggregate.productVariantId, aggregate.warehouseId),
+        aggregate.currentStock,
       ])
-      .where("stockMovement.organizationId", "=", organizationId)
-      .where("stockMovement.deletedAt", "is", null)
-      .where("product.deletedAt", "is", null)
-      .where("warehouse.deletedAt", "is", null)
-      .groupBy([
-        "stockMovement.productId",
-        "product.name",
-        "stockMovement.productVariantId",
-        "productVariant.sku",
-        "stockMovement.warehouseId",
-        "warehouse.name",
-        "warehouse.code",
-      ]);
+    );
 
-    if (productId) {
-      query = query.where("stockMovement.productId", "=", productId);
+    const expandedRows: StockLevelWithDetails[] = [];
+    for (const item of displayItems) {
+      for (const warehouse of warehouses) {
+        const aggregateKey = this.getStockKey(item.productId, item.productVariantId, warehouse.id);
+        expandedRows.push({
+          productId: item.productId,
+          productName: item.productName,
+          productVariantId: item.productVariantId,
+          variantSku: item.variantSku,
+          warehouseId: warehouse.id,
+          warehouseName: warehouse.name,
+          warehouseCode: warehouse.code,
+          currentStock: aggregateMap.get(aggregateKey) ?? 0,
+        });
+      }
     }
 
-    if (warehouseId) {
-      query = query.where("stockMovement.warehouseId", "=", warehouseId);
-    }
+    const normalizedSearch = search?.trim().toLowerCase();
+    const filteredRows = normalizedSearch
+      ? expandedRows.filter((row) =>
+          row.productName.toLowerCase().includes(normalizedSearch) ||
+          (row.variantSku ?? "").toLowerCase().includes(normalizedSearch) ||
+          row.warehouseName.toLowerCase().includes(normalizedSearch) ||
+          row.warehouseCode.toLowerCase().includes(normalizedSearch)
+        )
+      : expandedRows;
 
-    if (search) {
-      const pattern = `%${search}%`;
-      query = query.where((eb) =>
-        eb.or([
-          eb("product.name", "ilike", pattern),
-          eb("productVariant.sku", "ilike", pattern),
-          eb("warehouse.name", "ilike", pattern),
-          eb("warehouse.code", "ilike", pattern),
-        ])
-      );
-    }
+    filteredRows.sort((a, b) => {
+      const byProduct = a.productName.localeCompare(b.productName);
+      if (byProduct !== 0) {
+        return byProduct;
+      }
+      const byVariant = (a.variantSku ?? "").localeCompare(b.variantSku ?? "");
+      if (byVariant !== 0) {
+        return byVariant;
+      }
+      return a.warehouseName.localeCompare(b.warehouseName);
+    });
 
-    const countQuery = db
-      .selectFrom(() => query.as("sub"))
-      .select(db.fn.countAll().as("count"));
-
-    const countResult = await countQuery.executeTakeFirst();
-    const total = Number(countResult?.count ?? 0);
-
-    const dataQuery = query.orderBy("productName").limit(limit).offset(offset);
-    const results = await dataQuery.execute();
-
-    const data: StockLevelWithDetails[] = results.map((r) => ({
-      productId: r.productId,
-      productName: r.productName ?? "",
-      productVariantId: r.productVariantId,
-      variantSku: r.variantSku,
-      warehouseId: r.warehouseId,
-      warehouseName: r.warehouseName ?? "",
-      warehouseCode: r.warehouseCode ?? "",
-      currentStock: Number(r.currentStock ?? 0),
-    }));
+    const total = filteredRows.length;
+    const data = filteredRows.slice(offset, offset + limit);
 
     return { data, total };
   }
@@ -263,23 +265,23 @@ export class StockMovementRepository implements IStockMovementRepository {
     const dataQuery = query.orderBy("stockMovement.createdAt", "desc").limit(limit).offset(offset);
     const results = await dataQuery.execute();
 
-    const data: StockMovementWithDetails[] = results.map((r) => ({
-      id: r.id,
-      productId: r.productId,
-      productName: r.productName ?? "",
-      productVariantId: r.productVariantId,
-      variantSku: r.variantSku,
-      warehouseId: r.warehouseId,
-      warehouseName: r.warehouseName ?? "",
-      warehouseCode: r.warehouseCode ?? "",
-      movementType: r.movementType as "receive" | "dispatch" | "adjustment",
-      delta: r.delta,
-      referenceId: r.referenceId,
-      notes: r.notes,
-      createdBy: r.createdBy,
-      createdByName: r.createdByName ?? "",
-      organizationId: r.organizationId,
-      createdAt: r.createdAt ?? new Date(),
+    const data: StockMovementWithDetails[] = results.map((result) => ({
+      id: result.id,
+      productId: result.productId,
+      productName: result.productName ?? "",
+      productVariantId: result.productVariantId,
+      variantSku: result.variantSku,
+      warehouseId: result.warehouseId,
+      warehouseName: result.warehouseName ?? "",
+      warehouseCode: result.warehouseCode ?? "",
+      movementType: result.movementType as "receive" | "dispatch" | "adjustment",
+      delta: result.delta,
+      referenceId: result.referenceId,
+      notes: result.notes,
+      createdBy: result.createdBy,
+      createdByName: result.createdByName ?? "",
+      organizationId: result.organizationId,
+      createdAt: result.createdAt ?? new Date(),
     }));
 
     return { data, total };
@@ -304,6 +306,141 @@ export class StockMovementRepository implements IStockMovementRepository {
 
     const result = await query.executeTakeFirst();
     return Number(result?.currentStock ?? 0);
+  }
+
+  async getSelectableVariants(params: { organizationId: string; productId?: string }): Promise<InventoryVariantOption[]> {
+    let query = db
+      .selectFrom("productVariant")
+      .select(["id", "productId", "sku"])
+      .where("organizationId", "=", params.organizationId)
+      .where("deletedAt", "is", null);
+
+    if (params.productId) {
+      query = query.where("productId", "=", params.productId);
+    }
+
+    const variants = await query.orderBy("sku", "asc").execute();
+    return variants.map((variant) => ({
+      id: variant.id,
+      productId: variant.productId,
+      sku: variant.sku,
+    }));
+  }
+
+  private async getActiveProducts(params: { organizationId: string; productId?: string }): Promise<ActiveProductRow[]> {
+    let query = db
+      .selectFrom("product")
+      .select(["id", "name"])
+      .where("organizationId", "=", params.organizationId)
+      .where("deletedAt", "is", null);
+
+    if (params.productId) {
+      query = query.where("id", "=", params.productId);
+    }
+
+    return query.execute();
+  }
+
+  private async getActiveVariants(params: { organizationId: string; productId?: string }): Promise<ActiveVariantRow[]> {
+    let query = db
+      .selectFrom("productVariant")
+      .select(["id", "productId", "sku"])
+      .where("organizationId", "=", params.organizationId)
+      .where("deletedAt", "is", null);
+
+    if (params.productId) {
+      query = query.where("productId", "=", params.productId);
+    }
+
+    return query.execute();
+  }
+
+  private async getActiveWarehouses(params: { organizationId: string; warehouseId?: string }): Promise<ActiveWarehouseRow[]> {
+    let query = db
+      .selectFrom("warehouse")
+      .select(["id", "name", "code"])
+      .where("organizationId", "=", params.organizationId)
+      .where("deletedAt", "is", null);
+
+    if (params.warehouseId) {
+      query = query.where("id", "=", params.warehouseId);
+    }
+
+    return query.execute();
+  }
+
+  private async getStockAggregates(params: {
+    organizationId: string;
+    productId?: string;
+    warehouseId?: string;
+  }): Promise<StockAggregateRow[]> {
+    let query = db
+      .selectFrom("stockMovement")
+      .select([
+        "productId",
+        "productVariantId",
+        "warehouseId",
+        db.fn.coalesce(db.fn.sum("delta"), sql.lit(0)).as("currentStock"),
+      ])
+      .where("organizationId", "=", params.organizationId)
+      .where("deletedAt", "is", null)
+      .groupBy(["productId", "productVariantId", "warehouseId"]);
+
+    if (params.productId) {
+      query = query.where("productId", "=", params.productId);
+    }
+
+    if (params.warehouseId) {
+      query = query.where("warehouseId", "=", params.warehouseId);
+    }
+
+    const rows = await query.execute();
+    return rows.map((row) => ({
+      productId: row.productId,
+      productVariantId: row.productVariantId,
+      warehouseId: row.warehouseId,
+      currentStock: Number(row.currentStock ?? 0),
+    }));
+  }
+
+  private buildDisplayItems(products: ActiveProductRow[], variants: ActiveVariantRow[]): StockDisplayItem[] {
+    const variantsByProductId = new Map<string, ActiveVariantRow[]>();
+    for (const variant of variants) {
+      const list = variantsByProductId.get(variant.productId) ?? [];
+      list.push(variant);
+      variantsByProductId.set(variant.productId, list);
+    }
+
+    const displayItems: StockDisplayItem[] = [];
+
+    for (const product of products) {
+      const productVariants = variantsByProductId.get(product.id) ?? [];
+
+      if (productVariants.length === 0) {
+        displayItems.push({
+          productId: product.id,
+          productName: product.name,
+          productVariantId: null,
+          variantSku: null,
+        });
+        continue;
+      }
+
+      for (const variant of productVariants) {
+        displayItems.push({
+          productId: product.id,
+          productName: product.name,
+          productVariantId: variant.id,
+          variantSku: variant.sku,
+        });
+      }
+    }
+
+    return displayItems;
+  }
+
+  private getStockKey(productId: string, productVariantId: string | null, warehouseId: string) {
+    return `${productId}:${productVariantId ?? "null"}:${warehouseId}`;
   }
 }
 

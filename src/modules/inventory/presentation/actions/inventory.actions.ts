@@ -9,6 +9,7 @@ import { getSessionAndOrg } from "@/shared/presentation/auth/getSession";
 import { buildServerFormErrorState } from "@/shared/presentation/library/utils";
 import { stockMovementRepository } from "../../infrastructure/repositories/stock-movement.repository";
 import { productRepository } from "@/modules/products/infrastructure/repositories/product.repository";
+import { variantRepository } from "@/modules/products/infrastructure/repositories/variant.repository";
 import { warehouseRepository } from "@/modules/warehouses/infrastructure/repositories/warehouse.repository";
 import {
   InventoryService,
@@ -23,13 +24,15 @@ import type {
   GetStockLevelsParams,
   GetMovementHistoryParams,
   GetCurrentStockParams,
+  InventoryVariantOption,
 } from "../../application/types";
 import { receiveStockFormOpts, dispatchStockFormOpts, adjustStockFormOpts, transferStockFormOpts } from "../lib/form-options";
 
 const inventoryService = new InventoryService(
   stockMovementRepository,
   productRepository,
-  warehouseRepository
+  warehouseRepository,
+  variantRepository
 );
 
 const validateReceiveStockForm = createServerValidate({
@@ -68,6 +71,14 @@ export async function getCurrentStock(params: Omit<GetCurrentStockParams, "organ
   const { organizationId } = await getSessionAndOrg();
 
   return inventoryService.getCurrentStock({
+    ...params,
+    organizationId,
+  });
+}
+
+export async function getSelectableVariants(params: { productId?: string } = {}): Promise<InventoryVariantOption[]> {
+  const { organizationId } = await getSessionAndOrg();
+  return inventoryService.getSelectableVariants({
     ...params,
     organizationId,
   });

@@ -22,10 +22,12 @@ import { transferStock } from "../actions/inventory.actions";
 import { NegativeStockWarning } from "./negative-stock-warning";
 import type { Product } from "@/modules/products/domain/entities/product";
 import type { Warehouse } from "@/modules/warehouses/domain/entities/warehouse";
+import type { InventoryVariantOption } from "../types";
 
 interface StockTransferFormProps {
   products: Product[];
   warehouses: Warehouse[];
+  variants: InventoryVariantOption[];
   onSuccess?: () => void;
 }
 
@@ -38,6 +40,7 @@ interface NegativeStockWarningState {
 export function StockTransferForm({
   products,
   warehouses,
+  variants,
   onSuccess,
 }: StockTransferFormProps) {
   const [state, action, isPending] = useActionState(
@@ -106,6 +109,11 @@ export function StockTransferForm({
     form.setFieldValue("confirmNegative", "false");
   }, [form]);
 
+  const selectedProductId = form.getFieldValue("productId") ?? "";
+  const availableVariants = selectedProductId
+    ? variants.filter((variant) => variant.productId === selectedProductId)
+    : [];
+
   return (
     <>
       <form
@@ -140,7 +148,10 @@ export function StockTransferForm({
                     id={field.name}
                     name={field.name}
                     value={field.state.value ?? ""}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                      form.setFieldValue("productVariantId", "");
+                    }}
                     onBlur={field.handleBlur}
                     disabled={form.state.isSubmitting}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -178,11 +189,22 @@ export function StockTransferForm({
                     value={field.state.value ?? ""}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    disabled={form.state.isSubmitting}
+                    disabled={form.state.isSubmitting || !selectedProductId}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     aria-invalid={hasErrors ? "true" : "false"}
                   >
-                    <option value="">No variant (base product)</option>
+                    <option value="">
+                      {!selectedProductId
+                        ? "Select a product first"
+                        : availableVariants.length === 0
+                          ? "No variants (base product)"
+                          : "No variant (base product)"}
+                    </option>
+                    {availableVariants.map((variant) => (
+                      <option key={variant.id} value={variant.id}>
+                        {variant.sku}
+                      </option>
+                    ))}
                   </select>
                   {hasErrors && (
                     <FieldError id={`${field.name}-error`}>

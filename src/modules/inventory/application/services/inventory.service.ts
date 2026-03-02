@@ -1,18 +1,22 @@
 import type { IStockMovementRepository } from "../repositories/stock-movement.repository.interface";
 import type { IProductRepository } from "@/modules/products/application/repositories/product.repository.interface";
 import type { IWarehouseRepository } from "@/modules/warehouses/application/repositories/warehouse.repository.interface";
+import type { IVariantRepository } from "@/modules/products/application/repositories/variant.repository.interface";
 import type {
   GetStockLevelsParams,
   GetMovementHistoryParams,
   GetCurrentStockParams,
+  InventoryVariantOption,
   ReceiveStockParams,
   DispatchStockParams,
   AdjustStockParams,
+  StockMovementWithDetails,
   TransferStockParams,
 } from "../types";
 import type { StockLevelWithDetails } from "../../domain/types";
-import type { StockMovementWithDetails } from "../../presentation/types";
 import type { StockMovement } from "../../domain/entities/stock-movement";
+
+type ProductVariantLookupRepository = Pick<IVariantRepository, "getVariantById">;
 
 export class ProductNotFoundError extends Error {
   constructor() {
@@ -65,7 +69,8 @@ export class InventoryService {
   constructor(
     private repository: IStockMovementRepository,
     private productRepository: IProductRepository,
-    private warehouseRepository: IWarehouseRepository
+    private warehouseRepository: IWarehouseRepository,
+    private variantRepository: ProductVariantLookupRepository
   ) {}
 
   async getStockLevels(
@@ -84,41 +89,32 @@ export class InventoryService {
     return this.repository.getCurrentStock(params);
   }
 
+  async getSelectableVariants(params: { organizationId: string; productId?: string }): Promise<InventoryVariantOption[]> {
+    return this.repository.getSelectableVariants(params);
+  }
+
   async receiveStock(params: ReceiveStockParams): Promise<StockMovement> {
     if (params.quantity <= 0) {
       throw new Error("Quantity must be greater than 0");
     }
 
-    const product = await this.productRepository.getById({
-      id: params.productId,
+    await this.validateProductWarehouseAndVariant({
+      productId: params.productId,
+      productVariantId: params.productVariantId,
+      warehouseId: params.warehouseId,
       organizationId: params.organizationId,
     });
 
-    if (!product) {
-      throw new ProductNotFoundError();
-    }
-
-    const warehouse = await this.warehouseRepository.getById({
-      id: params.warehouseId,
+    return this.repository.create({
+      productId: params.productId,
+      productVariantId: params.productVariantId ?? null,
+      warehouseId: params.warehouseId,
+      movementType: "receive",
+      delta: params.quantity,
+      notes: params.notes ?? null,
+      createdBy: params.createdBy,
       organizationId: params.organizationId,
     });
-
-    if (!warehouse) {
-      throw new WarehouseNotFoundError();
-    }
-
-    if (params.productVariantId) {
-      const variant = await this.productRepository.getById({
-        id: params.productVariantId,
-        organizationId: params.organizationId,
-      });
-
-      if (!variant) {
-        throw new ProductVariantNotFoundError();
-      }
-    }
-
-    return this.repository.create(params);
   }
 
   async dispatchStock(
@@ -129,34 +125,12 @@ export class InventoryService {
       throw new Error("Quantity must be greater than 0");
     }
 
-    const product = await this.productRepository.getById({
-      id: params.productId,
+    await this.validateProductWarehouseAndVariant({
+      productId: params.productId,
+      productVariantId: params.productVariantId,
+      warehouseId: params.warehouseId,
       organizationId: params.organizationId,
     });
-
-    if (!product) {
-      throw new ProductNotFoundError();
-    }
-
-    const warehouse = await this.warehouseRepository.getById({
-      id: params.warehouseId,
-      organizationId: params.organizationId,
-    });
-
-    if (!warehouse) {
-      throw new WarehouseNotFoundError();
-    }
-
-    if (params.productVariantId) {
-      const variant = await this.productRepository.getById({
-        id: params.productVariantId,
-        organizationId: params.organizationId,
-      });
-
-      if (!variant) {
-        throw new ProductVariantNotFoundError();
-      }
-    }
 
     const currentStock = await this.repository.getCurrentStock({
       productId: params.productId,
@@ -172,8 +146,14 @@ export class InventoryService {
     }
 
     return this.repository.create({
-      ...params,
-      quantity: -params.quantity,
+      productId: params.productId,
+      productVariantId: params.productVariantId ?? null,
+      warehouseId: params.warehouseId,
+      movementType: "dispatch",
+      delta: -params.quantity,
+      notes: params.notes ?? null,
+      createdBy: params.createdBy,
+      organizationId: params.organizationId,
     });
   }
 
@@ -182,34 +162,12 @@ export class InventoryService {
       throw new Error("New quantity must be 0 or greater");
     }
 
-    const product = await this.productRepository.getById({
-      id: params.productId,
+    await this.validateProductWarehouseAndVariant({
+      productId: params.productId,
+      productVariantId: params.productVariantId,
+      warehouseId: params.warehouseId,
       organizationId: params.organizationId,
     });
-
-    if (!product) {
-      throw new ProductNotFoundError();
-    }
-
-    const warehouse = await this.warehouseRepository.getById({
-      id: params.warehouseId,
-      organizationId: params.organizationId,
-    });
-
-    if (!warehouse) {
-      throw new WarehouseNotFoundError();
-    }
-
-    if (params.productVariantId) {
-      const variant = await this.productRepository.getById({
-        id: params.productVariantId,
-        organizationId: params.organizationId,
-      });
-
-      if (!variant) {
-        throw new ProductVariantNotFoundError();
-      }
-    }
 
     const currentStock = await this.repository.getCurrentStock({
       productId: params.productId,
@@ -225,8 +183,14 @@ export class InventoryService {
     }
 
     return this.repository.create({
-      ...params,
-      quantity: delta,
+      productId: params.productId,
+      productVariantId: params.productVariantId ?? null,
+      warehouseId: params.warehouseId,
+      movementType: "adjustment",
+      delta,
+      notes: params.notes ?? null,
+      createdBy: params.createdBy,
+      organizationId: params.organizationId,
     });
   }
 
@@ -242,42 +206,25 @@ export class InventoryService {
       throw new SameWarehouseError();
     }
 
-    const product = await this.productRepository.getById({
-      id: params.productId,
+    await this.validateProductAndVariant({
+      productId: params.productId,
+      productVariantId: params.productVariantId,
       organizationId: params.organizationId,
     });
 
-    if (!product) {
-      throw new ProductNotFoundError();
-    }
-
-    const sourceWarehouse = await this.warehouseRepository.getById({
-      id: params.sourceWarehouseId,
-      organizationId: params.organizationId,
-    });
-
-    if (!sourceWarehouse) {
-      throw new WarehouseNotFoundError();
-    }
-
-    const destinationWarehouse = await this.warehouseRepository.getById({
-      id: params.destinationWarehouseId,
-      organizationId: params.organizationId,
-    });
-
-    if (!destinationWarehouse) {
-      throw new WarehouseNotFoundError();
-    }
-
-    if (params.productVariantId) {
-      const variant = await this.productRepository.getById({
-        id: params.productVariantId,
+    const [sourceWarehouse, destinationWarehouse] = await Promise.all([
+      this.warehouseRepository.getById({
+        id: params.sourceWarehouseId,
         organizationId: params.organizationId,
-      });
+      }),
+      this.warehouseRepository.getById({
+        id: params.destinationWarehouseId,
+        organizationId: params.organizationId,
+      }),
+    ]);
 
-      if (!variant) {
-        throw new ProductVariantNotFoundError();
-      }
+    if (!sourceWarehouse || !destinationWarehouse) {
+      throw new WarehouseNotFoundError();
     }
 
     const currentStockAtSource = await this.repository.getCurrentStock({
@@ -293,27 +240,73 @@ export class InventoryService {
       throw new NegativeStockWarningError(currentStockAtSource, resultingStock);
     }
 
-    const referenceId = crypto.randomUUID();
-
     return this.repository.createTransferPair(
       {
         productId: params.productId,
-        productVariantId: params.productVariantId,
+        productVariantId: params.productVariantId ?? null,
         warehouseId: params.sourceWarehouseId,
-        quantity: params.quantity,
-        notes: params.notes,
+        movementType: "dispatch",
+        delta: -params.quantity,
+        notes: params.notes ?? null,
         createdBy: params.createdBy,
         organizationId: params.organizationId,
-        referenceId,
       },
       {
         productId: params.productId,
-        productVariantId: params.productVariantId,
+        productVariantId: params.productVariantId ?? null,
         warehouseId: params.destinationWarehouseId,
-        quantity: params.quantity,
-        notes: params.notes,
-        referenceId,
+        movementType: "receive",
+        delta: params.quantity,
+        notes: params.notes ?? null,
+        createdBy: params.createdBy,
+        organizationId: params.organizationId,
       }
     );
+  }
+
+  private async validateProductAndVariant(params: {
+    productId: string;
+    productVariantId?: string | null;
+    organizationId: string;
+  }) {
+    const product = await this.productRepository.getById({
+      id: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    if (!product) {
+      throw new ProductNotFoundError();
+    }
+
+    if (!params.productVariantId) {
+      return;
+    }
+
+    const variant = await this.variantRepository.getVariantById({
+      id: params.productVariantId,
+      organizationId: params.organizationId,
+    });
+
+    if (!variant || variant.productId !== params.productId) {
+      throw new ProductVariantNotFoundError();
+    }
+  }
+
+  private async validateProductWarehouseAndVariant(params: {
+    productId: string;
+    productVariantId?: string | null;
+    warehouseId: string;
+    organizationId: string;
+  }) {
+    await this.validateProductAndVariant(params);
+
+    const warehouse = await this.warehouseRepository.getById({
+      id: params.warehouseId,
+      organizationId: params.organizationId,
+    });
+
+    if (!warehouse) {
+      throw new WarehouseNotFoundError();
+    }
   }
 }

@@ -1,9 +1,7 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/presentation/components/ui/card";
-import { Package, History } from "lucide-react";
-import { auth } from "@/shared/infrastructure/auth/auth";
-import { getStockLevels, getMovementHistory } from "@/modules/inventory/presentation/actions/inventory.actions";
+import { Icons } from "@/shared/presentation/components/icons";
+import { getSessionAndOrg } from "@/shared/presentation/auth/getSession";
+import { getStockLevels, getMovementHistory, getSelectableVariants } from "@/modules/inventory/presentation/actions/inventory.actions";
 import { InventoryDashboard } from "@/modules/inventory/presentation/components/inventory-dashboard";
 import { MovementHistory } from "@/modules/inventory/presentation/components/movement-history";
 import { productRepository } from "@/modules/products/infrastructure/repositories/product.repository";
@@ -18,28 +16,15 @@ export const metadata = {
 const productService = new ProductService(productRepository);
 const warehouseService = new WarehouseService(warehouseRepository);
 
-async function getSessionAndOrg() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
-    redirect("/auth/sign-in");
-  }
-
-  const organizationId = session.session.activeOrganizationId;
-  if (!organizationId) {
-    redirect("/organizations");
-  }
-
-  return { session, organizationId };
-}
-
 export default async function InventoryPage() {
   const { organizationId } = await getSessionAndOrg();
 
-  const [stockLevelsData, movementsData, products, warehouses] = await Promise.all([
+  const [stockLevelsData, movementsData, products, warehouses, variants] = await Promise.all([
     getStockLevels({}),
     getMovementHistory({ limit: 50 }),
     productService.getProducts({ organizationId }),
     warehouseService.getWarehouses({ organizationId }),
+    getSelectableVariants(),
   ]);
 
   return (
@@ -54,7 +39,7 @@ export default async function InventoryPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
+            <Icons.package className="h-5 w-5" />
             Stock Levels
           </CardTitle>
           <CardDescription>
@@ -66,6 +51,7 @@ export default async function InventoryPage() {
             stockLevels={stockLevelsData.data}
             products={products}
             warehouses={warehouses}
+            variants={variants}
           />
           {stockLevelsData.total > 0 && (
             <p className="mt-4 text-sm text-muted-foreground">
@@ -78,7 +64,7 @@ export default async function InventoryPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5" />
+            <Icons.history className="h-5 w-5" />
             Movement History
           </CardTitle>
           <CardDescription>
