@@ -125,11 +125,11 @@
 
 ### Implementation for Transfer
 
-- [ ] T033 Add `transferStock` method to InventoryService in `src/modules/inventory/application/services/inventory.service.ts` — validate source ≠ destination warehouse, check current stock at source (negative stock warning if applicable), generate `referenceId` (UUID v7), call repository `createTransferPair()` with dispatch movement (source, delta: -quantity) and receive movement (destination, delta: +quantity) within a single transaction. Per R2 (Kysely transactions)
-- [ ] T034 Add `transferStock` server action in `src/modules/inventory/presentation/actions/inventory.actions.ts` — form action per contracts/server-actions.md with same-warehouse validation and negative stock warning flow. Revalidate `/inventory` on success
-- [ ] T035 Add transfer form options to `src/modules/inventory/presentation/lib/form-options.ts` — define `transferStockFormOpts` with `defaultValues` for productId, productVariantId, sourceWarehouseId, destinationWarehouseId, quantity, notes, confirmNegative
-- [ ] T036 Create stock-transfer-dialog component in `src/modules/inventory/presentation/components/stock-transfer-dialog.tsx` — Dialog with product/variant selector, source warehouse selector, destination warehouse selector (validated different from source), quantity, notes. Includes negative stock confirmation flow for source warehouse
-- [ ] T037 Integrate transfer dialog trigger into inventory dashboard — add "Transfer Stock" button to `inventory-dashboard.tsx` that opens the stock-transfer-dialog
+- [X] T033 Add `transferStock` method to InventoryService in `src/modules/inventory/application/services/inventory.service.ts` — validate source ≠ destination warehouse, check current stock at source (negative stock warning if applicable), generate `referenceId` (UUID v7), call repository `createTransferPair()` with dispatch movement (source, delta: -quantity) and receive movement (destination, delta: +quantity) within a single transaction. Per R2 (Kysely transactions)
+- [X] T034 Add `transferStock` server action in `src/modules/inventory/presentation/actions/inventory.actions.ts` — form action per contracts/server-actions.md with same-warehouse validation and negative stock warning flow. Revalidate `/inventory` on success
+- [X] T035 Add transfer form options to `src/modules/inventory/presentation/lib/form-options.ts` — define `transferStockFormOpts` with `defaultValues` for productId, productVariantId, sourceWarehouseId, destinationWarehouseId, quantity, notes, confirmNegative
+- [X] T036 Create stock-transfer-dialog component in `src/modules/inventory/presentation/components/stock-transfer-dialog.tsx` — Dialog with product/variant selector, source warehouse selector, destination warehouse selector (validated different from source), quantity, notes. Includes negative stock confirmation flow for source warehouse
+- [X] T037 Integrate transfer dialog trigger into inventory dashboard — add "Transfer Stock" button to `inventory-dashboard.tsx` that opens the stock-transfer-dialog
 
 **Checkpoint**: All user stories + transfer edge case are complete.
 

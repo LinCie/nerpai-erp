@@ -8,6 +8,7 @@ import type {
   ReceiveStockParams,
   DispatchStockParams,
   AdjustStockParams,
+  TransferStockParams,
 } from "../types";
 import type { StockLevelWithDetails } from "../../domain/types";
 import type { StockMovementWithDetails } from "../../presentation/types";
@@ -50,6 +51,13 @@ export class NoChangeNeededError extends Error {
   constructor() {
     super("Stock is already at the specified quantity");
     this.name = "NoChangeNeededError";
+  }
+}
+
+export class SameWarehouseError extends Error {
+  constructor() {
+    super("Source and destination warehouses must be different");
+    this.name = "SameWarehouseError";
   }
 }
 
@@ -220,5 +228,92 @@ export class InventoryService {
       ...params,
       quantity: delta,
     });
+  }
+
+  async transferStock(
+    params: TransferStockParams,
+    confirmNegative: boolean = false
+  ): Promise<[StockMovement, StockMovement]> {
+    if (params.quantity <= 0) {
+      throw new Error("Quantity must be greater than 0");
+    }
+
+    if (params.sourceWarehouseId === params.destinationWarehouseId) {
+      throw new SameWarehouseError();
+    }
+
+    const product = await this.productRepository.getById({
+      id: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    if (!product) {
+      throw new ProductNotFoundError();
+    }
+
+    const sourceWarehouse = await this.warehouseRepository.getById({
+      id: params.sourceWarehouseId,
+      organizationId: params.organizationId,
+    });
+
+    if (!sourceWarehouse) {
+      throw new WarehouseNotFoundError();
+    }
+
+    const destinationWarehouse = await this.warehouseRepository.getById({
+      id: params.destinationWarehouseId,
+      organizationId: params.organizationId,
+    });
+
+    if (!destinationWarehouse) {
+      throw new WarehouseNotFoundError();
+    }
+
+    if (params.productVariantId) {
+      const variant = await this.productRepository.getById({
+        id: params.productVariantId,
+        organizationId: params.organizationId,
+      });
+
+      if (!variant) {
+        throw new ProductVariantNotFoundError();
+      }
+    }
+
+    const currentStockAtSource = await this.repository.getCurrentStock({
+      productId: params.productId,
+      productVariantId: params.productVariantId ?? null,
+      warehouseId: params.sourceWarehouseId,
+      organizationId: params.organizationId,
+    });
+
+    const resultingStock = currentStockAtSource - params.quantity;
+
+    if (resultingStock < 0 && !confirmNegative) {
+      throw new NegativeStockWarningError(currentStockAtSource, resultingStock);
+    }
+
+    const referenceId = crypto.randomUUID();
+
+    return this.repository.createTransferPair(
+      {
+        productId: params.productId,
+        productVariantId: params.productVariantId,
+        warehouseId: params.sourceWarehouseId,
+        quantity: params.quantity,
+        notes: params.notes,
+        createdBy: params.createdBy,
+        organizationId: params.organizationId,
+        referenceId,
+      },
+      {
+        productId: params.productId,
+        productVariantId: params.productVariantId,
+        warehouseId: params.destinationWarehouseId,
+        quantity: params.quantity,
+        notes: params.notes,
+        referenceId,
+      }
+    );
   }
 }
