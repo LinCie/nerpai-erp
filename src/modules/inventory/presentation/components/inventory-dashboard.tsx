@@ -1,0 +1,92 @@
+"use client";
+
+import { Package, Warehouse, Tag } from "lucide-react";
+import type { StockLevelWithDetails } from "../../domain/types";
+
+interface InventoryDashboardProps {
+  stockLevels: StockLevelWithDetails[];
+}
+
+export function InventoryDashboard({ stockLevels }: InventoryDashboardProps) {
+  if (stockLevels.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
+        <Package className="h-12 w-12 text-muted-foreground/50" />
+        <h3 className="mt-4 text-lg font-semibold">No stock levels found</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Stock levels will appear here once you receive inventory
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-md border">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b bg-muted/50">
+              <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Package className="h-4 w-4" />
+                  Product
+                </div>
+              </th>
+              <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  Variant (SKU)
+                </div>
+              </th>
+              <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Warehouse className="h-4 w-4" />
+                  Warehouse
+                </div>
+              </th>
+              <th className="h-10 px-4 text-right align-middle font-medium text-muted-foreground">
+                Current Stock
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {stockLevels.map((stock) => (
+              <tr
+                key={`${stock.productId}-${stock.productVariantId}-${stock.warehouseId}`}
+                className="border-b transition-colors hover:bg-muted/50"
+              >
+                <td className="p-4 align-middle font-medium">
+                  {stock.productName}
+                </td>
+                <td className="p-4 align-middle text-muted-foreground">
+                  {stock.variantSku || "—"}
+                </td>
+                <td className="p-4 align-middle">
+                  <div className="flex flex-col">
+                    <span>{stock.warehouseName}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {stock.warehouseCode}
+                    </span>
+                  </div>
+                </td>
+                <td className="p-4 align-middle text-right">
+                  <span
+                    className={`font-mono text-lg ${
+                      stock.currentStock < 0
+                        ? "text-destructive"
+                        : stock.currentStock === 0
+                          ? "text-muted-foreground"
+                          : "text-foreground"
+                    }`}
+                  >
+                    {stock.currentStock}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
