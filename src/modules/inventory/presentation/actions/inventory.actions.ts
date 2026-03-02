@@ -10,9 +10,19 @@ import { buildServerFormErrorState } from "@/shared/presentation/library/utils";
 import { stockMovementRepository } from "../../infrastructure/repositories/stock-movement.repository";
 import { productRepository } from "@/modules/products/infrastructure/repositories/product.repository";
 import { warehouseRepository } from "@/modules/warehouses/infrastructure/repositories/warehouse.repository";
-import { InventoryService, ProductNotFoundError, WarehouseNotFoundError, ProductVariantNotFoundError } from "../../application/services/inventory.service";
-import type { GetStockLevelsParams, GetMovementHistoryParams, GetCurrentStockParams } from "../../application/types";
-import { receiveStockFormOpts } from "../lib/form-options";
+import {
+  InventoryService,
+  ProductNotFoundError,
+  WarehouseNotFoundError,
+  ProductVariantNotFoundError,
+  NegativeStockWarningError,
+} from "../../application/services/inventory.service";
+import type {
+  GetStockLevelsParams,
+  GetMovementHistoryParams,
+  GetCurrentStockParams,
+} from "../../application/types";
+import { receiveStockFormOpts, dispatchStockFormOpts } from "../lib/form-options";
 
 const inventoryService = new InventoryService(
   stockMovementRepository,
@@ -22,6 +32,13 @@ const inventoryService = new InventoryService(
 
 const validateReceiveStockForm = createServerValidate({
   ...receiveStockFormOpts,
+  onServerValidate: () => {
+    return undefined;
+  },
+});
+
+const validateDispatchStockForm = createServerValidate({
+  ...dispatchStockFormOpts,
   onServerValidate: () => {
     return undefined;
   },
@@ -90,5 +107,53 @@ export async function receiveStock(prev: unknown, formData: FormData) {
 
     console.error("Error receiving stock:", e);
     throw new Error("Failed to receive stock. Please try again.");
+  }
+}
+
+export async function dispatchStock(prev: unknown, formData: FormData) {
+  try {
+    const { session, organizationId } = await getSessionAndOrg();
+    const userId = session.user.id;
+
+    const validatedData = await validateDispatchStockForm(formData);
+
+    await inventoryService.dispatchStock(
+      {
+        productId: validatedData.productId,
+        productVariantId: validatedData.productVariantId || null,
+        warehouseId: validatedData.warehouseId,
+        quantity: validatedData.quantity,
+        notes: validatedData.notes || null,
+        createdBy: userId,
+        organizationId,
+      },
+      validatedData.confirmNegative === "true",
+    );
+
+    revalidatePath("/inventory");
+
+    return undefined;
+  } catch (e) {
+    if (e instanceof ServerValidateError) {
+      return e.formState;
+    }
+    if (e instanceof ProductNotFoundError) {
+      return buildServerFormErrorState(formData, "Product not found");
+    }
+    if (e instanceof WarehouseNotFoundError) {
+      return buildServerFormErrorState(formData, "Warehouse not found");
+    }
+    if (e instanceof ProductVariantNotFoundError) {
+      return buildServerFormErrorState(formData, "Product variant not found");
+    }
+    if (e instanceof NegativeStockWarningError) {
+      return buildServerFormErrorState(
+        formData,
+        `NEGATIVE_STOCK_WARNING:${e.currentStock}:${e.resultingStock}`,
+      );
+    }
+
+    console.error("Error dispatching stock:", e);
+    throw new Error("Failed to dispatch stock. Please try again.");
   }
 }

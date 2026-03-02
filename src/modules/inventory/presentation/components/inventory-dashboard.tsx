@@ -6,6 +6,7 @@ import type { StockLevelWithDetails } from "../../domain/types";
 import type { Product } from "@/modules/products/domain/entities/product";
 import type { Warehouse } from "@/modules/warehouses/domain/entities/warehouse";
 import { StockReceiveDialog } from "./stock-receive-dialog";
+import { StockDispatchDialog } from "./stock-dispatch-dialog";
 
 interface InventoryDashboardProps {
   stockLevels: StockLevelWithDetails[];
@@ -29,10 +30,10 @@ export function InventoryDashboard({
               : `${stockLevels.length} items in stock`}
           </p>
         </div>
-        <StockReceiveDialog
-          products={products}
-          warehouses={warehouses}
-        />
+        <div className="flex gap-2">
+          <StockDispatchDialog products={products} warehouses={warehouses} />
+          <StockReceiveDialog products={products} warehouses={warehouses} />
+        </div>
       </div>
 
       {stockLevels.length === 0 ? (
