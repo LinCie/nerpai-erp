@@ -7,6 +7,7 @@ import type {
   GetCurrentStockParams,
   ReceiveStockParams,
   DispatchStockParams,
+  AdjustStockParams,
 } from "../types";
 import type { StockLevelWithDetails } from "../../domain/types";
 import type { StockMovementWithDetails } from "../../presentation/types";
@@ -42,6 +43,13 @@ export class NegativeStockWarningError extends Error {
     this.name = "NegativeStockWarningError";
     this.currentStock = currentStock;
     this.resultingStock = resultingStock;
+  }
+}
+
+export class NoChangeNeededError extends Error {
+  constructor() {
+    super("Stock is already at the specified quantity");
+    this.name = "NoChangeNeededError";
   }
 }
 
@@ -158,6 +166,59 @@ export class InventoryService {
     return this.repository.create({
       ...params,
       quantity: -params.quantity,
+    });
+  }
+
+  async adjustStock(params: AdjustStockParams): Promise<StockMovement> {
+    if (params.newQuantity < 0) {
+      throw new Error("New quantity must be 0 or greater");
+    }
+
+    const product = await this.productRepository.getById({
+      id: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    if (!product) {
+      throw new ProductNotFoundError();
+    }
+
+    const warehouse = await this.warehouseRepository.getById({
+      id: params.warehouseId,
+      organizationId: params.organizationId,
+    });
+
+    if (!warehouse) {
+      throw new WarehouseNotFoundError();
+    }
+
+    if (params.productVariantId) {
+      const variant = await this.productRepository.getById({
+        id: params.productVariantId,
+        organizationId: params.organizationId,
+      });
+
+      if (!variant) {
+        throw new ProductVariantNotFoundError();
+      }
+    }
+
+    const currentStock = await this.repository.getCurrentStock({
+      productId: params.productId,
+      productVariantId: params.productVariantId ?? null,
+      warehouseId: params.warehouseId,
+      organizationId: params.organizationId,
+    });
+
+    const delta = params.newQuantity - currentStock;
+
+    if (delta === 0) {
+      throw new NoChangeNeededError();
+    }
+
+    return this.repository.create({
+      ...params,
+      quantity: delta,
     });
   }
 }

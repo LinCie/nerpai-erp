@@ -107,11 +107,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T028 [US4] Add `adjustStock` method to InventoryService in `src/modules/inventory/application/services/inventory.service.ts` — get current stock via `getCurrentStock`, calculate delta = `newQuantity - currentStock`. If delta === 0, return "no change needed" error. Otherwise call repository `create()` with `movementType: "adjustment"`, `delta: calculated`. Per FR-005, SC-003
-- [ ] T029 [US4] Add `adjustStock` server action in `src/modules/inventory/presentation/actions/inventory.actions.ts` — form action per contracts/server-actions.md. Handle "no change needed" as recoverable error. Revalidate `/inventory` on success
-- [ ] T030 [US4] Add adjust form options to `src/modules/inventory/presentation/lib/form-options.ts` — define `adjustStockFormOpts` with `defaultValues` for productId, productVariantId, warehouseId, newQuantity (>= 0), notes
-- [ ] T031 [US4] Create stock-adjust-dialog component in `src/modules/inventory/presentation/components/stock-adjust-dialog.tsx` — Dialog with product/variant/warehouse selectors and newQuantity field (integer >= 0). Display current stock for reference. Notes field recommended for adjustment reason. Achievable in < 5 clicks per SC-003
-- [ ] T032 [US4] Integrate adjust dialog trigger into inventory dashboard — add "Adjust Stock" button to `inventory-dashboard.tsx` that opens the stock-adjust-dialog
+- [X] T028 [US4] Add `adjustStock` method to InventoryService in `src/modules/inventory/application/services/inventory.service.ts` — get current stock via `getCurrentStock`, calculate delta = `newQuantity - currentStock`. If delta === 0, return "no change needed" error. Otherwise call repository `create()` with `movementType: "adjustment"`, `delta: calculated`. Per FR-005, SC-003
+- [X] T029 [US4] Add `adjustStock` server action in `src/modules/inventory/presentation/actions/inventory.actions.ts` — form action per contracts/server-actions.md. Handle "no change needed" as recoverable error. Revalidate `/inventory` on success
+- [X] T030 [US4] Add adjust form options to `src/modules/inventory/presentation/lib/form-options.ts` — define `adjustStockFormOpts` with `defaultValues` for productId, productVariantId, warehouseId, newQuantity (>= 0), notes
+- [X] T031 [US4] Create stock-adjust-dialog component in `src/modules/inventory/presentation/components/stock-adjust-dialog.tsx` — Dialog with product/variant/warehouse selectors and newQuantity field (integer >= 0). Display current stock for reference. Notes field recommended for adjustment reason. Achievable in < 5 clicks per SC-003
+- [X] T032 [US4] Integrate adjust dialog trigger into inventory dashboard — add "Adjust Stock" button to `inventory-dashboard.tsx` that opens the stock-adjust-dialog
 
 **Checkpoint**: All 4 user stories are independently functional and testable.
 

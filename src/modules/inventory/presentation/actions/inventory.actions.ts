@@ -16,13 +16,14 @@ import {
   WarehouseNotFoundError,
   ProductVariantNotFoundError,
   NegativeStockWarningError,
+  NoChangeNeededError,
 } from "../../application/services/inventory.service";
 import type {
   GetStockLevelsParams,
   GetMovementHistoryParams,
   GetCurrentStockParams,
 } from "../../application/types";
-import { receiveStockFormOpts, dispatchStockFormOpts } from "../lib/form-options";
+import { receiveStockFormOpts, dispatchStockFormOpts, adjustStockFormOpts } from "../lib/form-options";
 
 const inventoryService = new InventoryService(
   stockMovementRepository,
@@ -155,5 +156,54 @@ export async function dispatchStock(prev: unknown, formData: FormData) {
 
     console.error("Error dispatching stock:", e);
     throw new Error("Failed to dispatch stock. Please try again.");
+  }
+}
+
+const validateAdjustStockForm = createServerValidate({
+  ...adjustStockFormOpts,
+  onServerValidate: () => {
+    return undefined;
+  },
+});
+
+export async function adjustStock(prev: unknown, formData: FormData) {
+  try {
+    const { session, organizationId } = await getSessionAndOrg();
+    const userId = session.user.id;
+
+    const validatedData = await validateAdjustStockForm(formData);
+
+    await inventoryService.adjustStock({
+      productId: validatedData.productId,
+      productVariantId: validatedData.productVariantId || null,
+      warehouseId: validatedData.warehouseId,
+      newQuantity: validatedData.newQuantity,
+      notes: validatedData.notes || null,
+      createdBy: userId,
+      organizationId,
+    });
+
+    revalidatePath("/inventory");
+
+    return undefined;
+  } catch (e) {
+    if (e instanceof ServerValidateError) {
+      return e.formState;
+    }
+    if (e instanceof ProductNotFoundError) {
+      return buildServerFormErrorState(formData, "Product not found");
+    }
+    if (e instanceof WarehouseNotFoundError) {
+      return buildServerFormErrorState(formData, "Warehouse not found");
+    }
+    if (e instanceof ProductVariantNotFoundError) {
+      return buildServerFormErrorState(formData, "Product variant not found");
+    }
+    if (e instanceof NoChangeNeededError) {
+      return buildServerFormErrorState(formData, "Stock is already at the specified quantity");
+    }
+
+    console.error("Error adjusting stock:", e);
+    throw new Error("Failed to adjust stock. Please try again.");
   }
 }

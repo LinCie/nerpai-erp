@@ -1,5 +1,5 @@
 import { formOptions } from "@tanstack/react-form-nextjs";
-import { receiveStockSchema, dispatchStockSchema } from "../schemas/inventory.schema";
+import { receiveStockSchema, dispatchStockSchema, adjustStockSchema } from "../schemas/inventory.schema";
 
 export const receiveStockFormOpts = formOptions({
   defaultValues: {
@@ -56,4 +56,31 @@ export type DispatchStockFormValues = {
   quantity: number;
   notes?: string;
   confirmNegative?: string;
+};
+
+export const adjustStockFormOpts = formOptions({
+  defaultValues: {
+    productId: "",
+    productVariantId: "",
+    warehouseId: "",
+    newQuantity: 0,
+    notes: "",
+  } as {
+    productId: string;
+    productVariantId?: string;
+    warehouseId: string;
+    newQuantity: number;
+    notes?: string;
+  },
+  validators: {
+    onSubmit: adjustStockSchema,
+  },
+});
+
+export type AdjustStockFormValues = {
+  productId: string;
+  productVariantId?: string;
+  warehouseId: string;
+  newQuantity: number;
+  notes?: string;
 };
