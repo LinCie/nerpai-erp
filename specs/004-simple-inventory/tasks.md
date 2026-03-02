@@ -139,10 +139,10 @@
 
 **Purpose**: Verification, cleanup, and cross-cutting improvements
 
-- [ ] T038 [P] Contract parity audit — verify all server actions match documented success + recoverable error behaviors in `contracts/server-actions.md` (CR-001, CR-002)
-- [ ] T039 [P] Database integrity audit — verify all CHECK constraints, FK cascades, and indexes match `data-model.md` (DIR-001, DIR-002)
-- [ ] T040 Code cleanup, lint check, and type verification — run `bun run lint`, verify strict TypeScript compliance, ensure no `any` types
-- [ ] T041 Run quickstart.md validation — execute the end-to-end verification flow: navigate to `/inventory` → receive stock → verify dashboard → dispatch stock → test negative stock warning → adjust stock → verify final quantities
+- [X] T038 [P] Contract parity audit — verify all server actions match documented success + recoverable error behaviors in `contracts/server-actions.md` (CR-001, CR-002)
+- [X] T039 [P] Database integrity audit — verify all CHECK constraints, FK cascades, and indexes match `data-model.md` (DIR-001, DIR-002)
+- [X] T040 Code cleanup, lint check, and type verification — run `bun run lint`, verify strict TypeScript compliance, ensure no `any` types
+- [X] T041 Run quickstart.md validation — execute the end-to-end verification flow: navigate to `/inventory` → receive stock → verify dashboard → dispatch stock → test negative stock warning → adjust stock → verify final quantities
 
 ---
 
