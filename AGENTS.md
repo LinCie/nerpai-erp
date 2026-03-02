@@ -73,8 +73,6 @@ TypeScript 5.x (strict mode enabled): Follow standard conventions
 
 ## Recent Changes
 
+- 004-simple-inventory: Added TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, shadcn/ui
 - 003-warehouse-management: Added TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, shadcn/ui (Field, Input, Textarea, Dialog, Card, AlertDialog)
-
 - 002-product-variants: Added TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, @dnd-kit/core + @dnd-kit/sortable (new)
-
-- 001-basic-product-crud: Added TypeScript 5.x (strict mode enabled) + Next.js 16.1.6, React 19.2.3, Kysely 0.28.11, Zod 4.3.6, TanStack Form 1.28.3, Radix UI 1.4.3, Tailwind CSS 4.x, better-auth 1.4.18, Zustand (via stores), Lucide React 0.575.0, Motion 12.34.3
