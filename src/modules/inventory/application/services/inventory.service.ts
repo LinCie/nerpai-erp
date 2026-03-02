@@ -1,14 +1,43 @@
 import type { IStockMovementRepository } from "../repositories/stock-movement.repository.interface";
+import type { IProductRepository } from "@/modules/products/application/repositories/product.repository.interface";
+import type { IWarehouseRepository } from "@/modules/warehouses/application/repositories/warehouse.repository.interface";
 import type {
   GetStockLevelsParams,
   GetMovementHistoryParams,
   GetCurrentStockParams,
+  ReceiveStockParams,
 } from "../types";
 import type { StockLevelWithDetails } from "../../domain/types";
 import type { StockMovementWithDetails } from "../../presentation/types";
+import type { StockMovement } from "../../domain/entities/stock-movement";
+
+export class ProductNotFoundError extends Error {
+  constructor() {
+    super("Product not found");
+    this.name = "ProductNotFoundError";
+  }
+}
+
+export class WarehouseNotFoundError extends Error {
+  constructor() {
+    super("Warehouse not found");
+    this.name = "WarehouseNotFoundError";
+  }
+}
+
+export class ProductVariantNotFoundError extends Error {
+  constructor() {
+    super("Product variant not found");
+    this.name = "ProductVariantNotFoundError";
+  }
+}
 
 export class InventoryService {
-  constructor(private repository: IStockMovementRepository) {}
+  constructor(
+    private repository: IStockMovementRepository,
+    private productRepository: IProductRepository,
+    private warehouseRepository: IWarehouseRepository
+  ) {}
 
   async getStockLevels(
     params: GetStockLevelsParams,
@@ -24,5 +53,42 @@ export class InventoryService {
 
   async getCurrentStock(params: GetCurrentStockParams): Promise<number> {
     return this.repository.getCurrentStock(params);
+  }
+
+  async receiveStock(params: ReceiveStockParams): Promise<StockMovement> {
+    if (params.quantity <= 0) {
+      throw new Error("Quantity must be greater than 0");
+    }
+
+    const product = await this.productRepository.getById({
+      id: params.productId,
+      organizationId: params.organizationId,
+    });
+
+    if (!product) {
+      throw new ProductNotFoundError();
+    }
+
+    const warehouse = await this.warehouseRepository.getById({
+      id: params.warehouseId,
+      organizationId: params.organizationId,
+    });
+
+    if (!warehouse) {
+      throw new WarehouseNotFoundError();
+    }
+
+    if (params.productVariantId) {
+      const variant = await this.productRepository.getById({
+        id: params.productVariantId,
+        organizationId: params.organizationId,
+      });
+
+      if (!variant) {
+        throw new ProductVariantNotFoundError();
+      }
+    }
+
+    return this.repository.create(params);
   }
 }
