@@ -121,6 +121,21 @@ export interface Session {
   userId: string;
 }
 
+export interface StockMovement {
+  createdAt: Generated<Timestamp>;
+  createdBy: string;
+  deletedAt: Timestamp | null;
+  delta: number;
+  id: Generated<string>;
+  movementType: string;
+  notes: string | null;
+  organizationId: string;
+  productId: string;
+  productVariantId: string | null;
+  referenceId: string | null;
+  warehouseId: string;
+}
+
 export interface User {
   createdAt: Generated<Timestamp>;
   email: string;
@@ -180,6 +195,7 @@ export interface DB {
   productAttribute: ProductAttribute;
   productVariant: ProductVariant;
   session: Session;
+  stockMovement: StockMovement;
   user: User;
   variantOption: VariantOption;
   verification: Verification;

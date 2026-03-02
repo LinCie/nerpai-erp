@@ -19,9 +19,9 @@
 
 **Purpose**: Create the module directory structure and database schema
 
-- [ ] T001 Create inventory module directory structure per plan.md: `src/modules/inventory/{domain/{entities,types},application/{repositories,services,types},infrastructure/repositories,presentation/{actions,components,schemas,lib,types}}`
-- [ ] T002 Create database migration for `stock_movement` table using `bun db:migrate:create create_stock_movement_table`, then write the migration SQL from data-model.md (table, CHECK constraints, FK constraints, indexes) into the generated migration file
-- [ ] T003 Run migration (`bun db:migrate`) and regenerate database types (`bun db:codegen`), then verify with `bun run lint`
+- [X] T001 Create inventory module directory structure per plan.md: `src/modules/inventory/{domain/{entities,types},application/{repositories,services,types},infrastructure/repositories,presentation/{actions,components,schemas,lib,types}}`
+- [X] T002 Create database migration for `stock_movement` table using `bun db:migrate:create create_stock_movement_table`, then write the migration SQL from data-model.md (table, CHECK constraints, FK constraints, indexes) into the generated migration file
+- [X] T003 Run migration (`bun db:migrate`) and regenerate database types (`bun db:codegen`), then verify with `bun run lint`
 
 ---
 
