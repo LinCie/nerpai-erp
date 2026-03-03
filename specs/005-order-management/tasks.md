@@ -114,7 +114,7 @@
 
 ### Implementation for User Story 4
 
-- [ ] T035 [US4] Add "Cancel" button to `OrderStatusActions` component in `src/modules/orders/presentation/components/order-status-actions.tsx` — show "Cancel" button when `canTransition(currentStatus, 'cancelled')` is true, shadcn AlertDialog for confirmation with destructive styling, calls `transitionOrderStatus` with newStatus="cancelled"
+- [X] T035 [US4] Add "Cancel" button to `OrderStatusActions` component in `src/modules/orders/presentation/components/order-status-actions.tsx` — show "Cancel" button when `canTransition(currentStatus, 'cancelled')` is true, shadcn AlertDialog for confirmation with destructive styling, calls `transitionOrderStatus` with newStatus="cancelled"
 
 **Checkpoint**: US-4 complete — cancellation works from eligible statuses, blocked from Sent/Completed.
 
