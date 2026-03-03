@@ -32,16 +32,16 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Define `OrderStatus` type, `PIPELINE_STATUSES`, `TERMINAL_STATUSES`, `ORDER_STATUS_TRANSITIONS` map, `canTransition()`, `isTerminalStatus()`, and `ORDER_STATUS_LABELS` in `src/modules/orders/domain/types/index.ts` — per data-model.md Domain Types section and research.md R1
-- [ ] T006 [P] Define `Order` entity interface in `src/modules/orders/domain/entities/order.ts` — per data-model.md Order Entity TypeScript section
-- [ ] T007 [P] Define `OrderItem` entity interface in `src/modules/orders/domain/entities/order-item.ts` — per data-model.md Order Item Entity TypeScript section
-- [ ] T008 [P] Define `OrderStatusHistory` entity interface in `src/modules/orders/domain/entities/order-status-history.ts` — per data-model.md Order Status History Entity TypeScript section
-- [ ] T009 [P] Define application-layer DTOs (`CreateOrderParams`, `CreateOrderItemParams`, `UpdateOrderParams`, `TransitionOrderStatusParams`, `GetOrdersParams`, `GetOrderDetailParams`, `OrderListItem`, `OrderDetail`, `OrderStatusHistoryEntry`, `ProductPickerItem`) in `src/modules/orders/application/types/index.ts` — per data-model.md Application Layer DTOs section
-- [ ] T010 [P] Define `IOrderRepository` interface in `src/modules/orders/application/repositories/order.repository.interface.ts` — methods: `create`, `updateCustomerAndItems`, `updateStatusWithLock`, `findById`, `findList`, `countList`
-- [ ] T011 [P] Define `IOrderItemRepository` interface in `src/modules/orders/application/repositories/order-item.repository.interface.ts` — methods: `createMany`, `deleteByOrderId`, `findByOrderId`
-- [ ] T012 [P] Define `IOrderStatusHistoryRepository` interface in `src/modules/orders/application/repositories/order-status-history.repository.interface.ts` — methods: `create`, `findByOrderId`
-- [ ] T013 Define Zod validation schemas (`createOrderSchema`, `updateOrderSchema`, `orderItemSchema`, `transitionOrderStatusSchema`) in `src/modules/orders/presentation/schemas/order.schema.ts` — per data-model.md Validation Rules and contracts/server-actions.md input field specs. Note: `transitionOrderStatusSchema` validates the direct server action input (orderId, newStatus, version) — it is NOT a FormData schema since `transitionOrderStatus` is called via button click, not form submission
-- [ ] T014 Define presentation-layer types in `src/modules/orders/presentation/types/index.ts` — form state types for order form dialog, product picker result types
+- [X] T005 [P] Define `OrderStatus` type, `PIPELINE_STATUSES`, `TERMINAL_STATUSES`, `ORDER_STATUS_TRANSITIONS` map, `canTransition()`, `isTerminalStatus()`, and `ORDER_STATUS_LABELS` in `src/modules/orders/domain/types/index.ts` — per data-model.md Domain Types section and research.md R1
+- [X] T006 [P] Define `Order` entity interface in `src/modules/orders/domain/entities/order.ts` — per data-model.md Order Entity TypeScript section
+- [X] T007 [P] Define `OrderItem` entity interface in `src/modules/orders/domain/entities/order-item.ts` — per data-model.md Order Item Entity TypeScript section
+- [X] T008 [P] Define `OrderStatusHistory` entity interface in `src/modules/orders/domain/entities/order-status-history.ts` — per data-model.md Order Status History Entity TypeScript section
+- [X] T009 [P] Define application-layer DTOs (`CreateOrderParams`, `CreateOrderItemParams`, `UpdateOrderParams`, `TransitionOrderStatusParams`, `GetOrdersParams`, `GetOrderDetailParams`, `OrderListItem`, `OrderDetail`, `OrderStatusHistoryEntry`, `ProductPickerItem`) in `src/modules/orders/application/types/index.ts` — per data-model.md Application Layer DTOs section
+- [X] T010 [P] Define `IOrderRepository` interface in `src/modules/orders/application/repositories/order.repository.interface.ts` — methods: `create`, `updateCustomerAndItems`, `updateStatusWithLock`, `findById`, `findList`, `countList`
+- [X] T011 [P] Define `IOrderItemRepository` interface in `src/modules/orders/application/repositories/order-item.repository.interface.ts` — methods: `createMany`, `deleteByOrderId`, `findByOrderId`
+- [X] T012 [P] Define `IOrderStatusHistoryRepository` interface in `src/modules/orders/application/repositories/order-status-history.repository.interface.ts` — methods: `create`, `findByOrderId`
+- [X] T013 Define Zod validation schemas (`createOrderSchema`, `updateOrderSchema`, `orderItemSchema`, `transitionOrderStatusSchema`) in `src/modules/orders/presentation/schemas/order.schema.ts` — per data-model.md Validation Rules and contracts/server-actions.md input field specs. Note: `transitionOrderStatusSchema` validates the direct server action input (orderId, newStatus, version) — it is NOT a FormData schema since `transitionOrderStatus` is called via button click, not form submission
+- [X] T014 Define presentation-layer types in `src/modules/orders/presentation/types/index.ts` — form state types for order form dialog, product picker result types
 
 **Checkpoint**: Foundation ready — all domain types, entity interfaces, repository interfaces, DTOs, and schemas are defined. User story implementation can now begin.
 
