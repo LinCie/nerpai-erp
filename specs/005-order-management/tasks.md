@@ -128,7 +128,7 @@
 
 ### Implementation for User Story 5
 
-- [ ] T036 [US5] Add "Return" button to `OrderStatusActions` component in `src/modules/orders/presentation/components/order-status-actions.tsx` — show "Return" button when `canTransition(currentStatus, 'return')` is true, shadcn AlertDialog for confirmation with warning styling, calls `transitionOrderStatus` with newStatus="return"
+- [X] T036 [US5] Add "Return" button to `OrderStatusActions` component in `src/modules/orders/presentation/components/order-status-actions.tsx` — show "Return" button when `canTransition(currentStatus, 'return')` is true, shadcn AlertDialog for confirmation with warning styling, calls `transitionOrderStatus` with newStatus="return"
 
 **Checkpoint**: US-5 complete — returns work from Sent/Completed, blocked from earlier statuses.
 
