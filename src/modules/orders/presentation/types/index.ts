@@ -9,7 +9,7 @@ export interface OrderFormState {
 
 /** Result from product picker selection */
 export interface ProductPickerResult {
-  productId: string;
+  productId: string | null;
   productVariantId: string | null;
   productName: string;
   sku: string;
