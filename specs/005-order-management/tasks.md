@@ -78,12 +78,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T025 [US2] Add `findList` and `countList` methods to `OrderRepository` in `src/modules/orders/infrastructure/repositories/order.repository.ts` — query with optional status filter, customer name ILIKE search (pg_trgm), LEFT JOIN user for createdByName, LEFT JOIN order_item for itemCount aggregation, LIMIT/OFFSET pagination. Per data-model.md Query Optimization Notes
-- [ ] T026 [US2] Implement `OrderService.getOrders()` in `src/modules/orders/application/services/order.service.ts` — call repository.findList and repository.countList, return `{ data: OrderListItem[], total: number }`
-- [ ] T027 [US2] Implement `getOrders` read action in `src/modules/orders/presentation/actions/order.actions.ts` — per contracts/server-actions.md `getOrders` contract, call OrderService.getOrders with session organizationId
-- [ ] T028 [US2] Create `OrderStatusBadge` component in `src/modules/orders/presentation/components/order-status-badge.tsx` — shadcn Badge with color variants per status (e.g., blue for unpaid, green for paid/completed, yellow for process, red for cancelled, orange for return)
-- [ ] T029 [US2] Create `OrderList` component in `src/modules/orders/presentation/components/order-list.tsx` — shadcn Table with columns (customer name, status badge, total, item count, created date, actions), status filter dropdown, customer name search input, shadcn Pagination. Per plan.md component structure
-- [ ] T030 [US2] Create orders list page in `src/app/(app)/orders/page.tsx` — Server Component that calls `getOrders` read action, renders `OrderList` with data, includes "Create Order" button that opens `OrderFormDialog`
+- [X] T025 [US2] Add `findList` and `countList` methods to `OrderRepository` in `src/modules/orders/infrastructure/repositories/order.repository.ts` — query with optional status filter, customer name ILIKE search (pg_trgm), LEFT JOIN user for createdByName, LEFT JOIN order_item for itemCount aggregation, LIMIT/OFFSET pagination. Per data-model.md Query Optimization Notes
+- [X] T026 [US2] Implement `OrderService.getOrders()` in `src/modules/orders/application/services/order.service.ts` — call repository.findList and repository.countList, return `{ data: OrderListItem[], total: number }`
+- [X] T027 [US2] Implement `getOrders` read action in `src/modules/orders/presentation/actions/order.actions.ts` — per contracts/server-actions.md `getOrders` contract, call OrderService.getOrders with session organizationId
+- [X] T028 [US2] Create `OrderStatusBadge` component in `src/modules/orders/presentation/components/order-status-badge.tsx` — shadcn Badge with color variants per status (e.g., blue for unpaid, green for paid/completed, yellow for process, red for cancelled, orange for return)
+- [X] T029 [US2] Create `OrderList` component in `src/modules/orders/presentation/components/order-list.tsx` — shadcn Table with columns (customer name, status badge, total, item count, created date, actions), status filter dropdown, customer name search input, shadcn Pagination. Per plan.md component structure
+- [X] T030 [US2] Create orders list page in `src/app/(app)/orders/page.tsx` — Server Component that calls `getOrders` read action, renders `OrderList` with data, includes "Create Order" button that opens `OrderFormDialog`
 
 **Checkpoint**: User Stories 1 AND 2 complete — staff can create orders and view them in a filterable, searchable, paginated list.
 
