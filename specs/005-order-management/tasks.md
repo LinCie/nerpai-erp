@@ -97,10 +97,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] Add `updateStatusWithLock` method to `OrderRepository` in `src/modules/orders/infrastructure/repositories/order.repository.ts` — UPDATE order SET status, version+1, updated_at WHERE id AND version (optimistic locking), within transaction: also INSERT order_status_history. Per research.md R2
-- [ ] T032 [US3] Implement `OrderService.transitionOrderStatus()` in `src/modules/orders/application/services/order.service.ts` — validate transition via `canTransition()`, check terminal status via `isTerminalStatus()`, call repository.updateStatusWithLock, handle concurrency error
-- [ ] T033 [US3] Implement `transitionOrderStatus` server action in `src/modules/orders/presentation/actions/order.actions.ts` — per contracts/server-actions.md `transitionOrderStatus` contract, validate input, call service, revalidate paths
-- [ ] T034 [US3] Create `OrderStatusActions` component in `src/modules/orders/presentation/components/order-status-actions.tsx` — renders "Advance to {next status}" button based on current status and transition map, shadcn AlertDialog for confirmation ("Are you sure you want to advance this order to {status}?"), calls `transitionOrderStatus` on confirm. Per FR-015
+- [X] T031 [US3] Add `updateStatusWithLock` method to `OrderRepository` in `src/modules/orders/infrastructure/repositories/order.repository.ts` — UPDATE order SET status, version+1, updated_at WHERE id AND version (optimistic locking), within transaction: also INSERT order_status_history. Per research.md R2
+- [X] T032 [US3] Implement `OrderService.transitionOrderStatus()` in `src/modules/orders/application/services/order.service.ts` — validate transition via `canTransition()`, check terminal status via `isTerminalStatus()`, call repository.updateStatusWithLock, handle concurrency error
+- [X] T033 [US3] Implement `transitionOrderStatus` server action in `src/modules/orders/presentation/actions/order.actions.ts` — per contracts/server-actions.md `transitionOrderStatus` contract, validate input, call service, revalidate paths
+- [X] T034 [US3] Create `OrderStatusActions` component in `src/modules/orders/presentation/components/order-status-actions.tsx` — renders "Advance to {next status}" button based on current status and transition map, shadcn AlertDialog for confirmation ("Are you sure you want to advance this order to {status}?"), calls `transitionOrderStatus` on confirm. Per FR-015
 
 **Checkpoint**: User Stories 1, 2, AND 3 complete — staff can create orders, view them, and advance through the full pipeline.
 
