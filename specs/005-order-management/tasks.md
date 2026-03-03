@@ -179,7 +179,7 @@
 
 ### Implementation for User Story 7
 
-- [ ] T048 [US7] Add a deferred payment proof notice to the advance-to-Paid confirmation dialog in `src/modules/orders/presentation/components/order-status-actions.tsx` — when transitioning to "paid", include a notice: "Note: Proof of payment will be required in a future update." The transition is allowed without an image. Per spec US-7 acceptance scenario 3
+- [X] T048 [US7] Add a deferred payment proof notice to the advance-to-Paid confirmation dialog in `src/modules/orders/presentation/components/order-status-actions.tsx` — when transitioning to "paid", include a notice: "Note: Proof of payment will be required in a future update." The transition is allowed without an image. Per spec US-7 acceptance scenario 3
 
 **Checkpoint**: US-7 complete — deferred feature is acknowledged in the UI.
 
