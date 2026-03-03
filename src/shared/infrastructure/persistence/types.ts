@@ -67,6 +67,45 @@ export interface Member {
   userId: string;
 }
 
+export interface Order {
+  createdAt: Generated<Timestamp>;
+  createdBy: string;
+  customerName: string;
+  deletedAt: Timestamp | null;
+  id: Generated<string>;
+  organizationId: string;
+  status: Generated<string>;
+  totalAmount: Generated<Numeric>;
+  updatedAt: Generated<Timestamp>;
+  version: Generated<number>;
+}
+
+export interface OrderItem {
+  createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+  id: Generated<string>;
+  orderId: string;
+  organizationId: string;
+  productId: string | null;
+  productName: string;
+  productVariantId: string | null;
+  quantity: number;
+  sku: string;
+  subtotal: Numeric;
+  unitPrice: Numeric;
+}
+
+export interface OrderStatusHistory {
+  changedBy: string;
+  createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+  id: Generated<string>;
+  newStatus: string;
+  orderId: string;
+  organizationId: string;
+  previousStatus: string | null;
+}
+
 export interface Organization {
   createdAt: Timestamp;
   id: Generated<string>;
@@ -190,6 +229,9 @@ export interface DB {
   attributeOption: AttributeOption;
   invitation: Invitation;
   member: Member;
+  order: Order;
+  orderItem: OrderItem;
+  orderStatusHistory: OrderStatusHistory;
   organization: Organization;
   product: Product;
   productAttribute: ProductAttribute;

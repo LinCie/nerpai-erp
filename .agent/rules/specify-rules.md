@@ -8,6 +8,9 @@ Auto-generated from all feature plans. Last updated: 2026-02-24
 
 ## Active Technologies
 
+- TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, shadcn/ui (Combobox, Badge, Table, Dialog, AlertDialog, Card, Button, Input, Pagination, Separator, Skeleton) (005-order-management)
+- PostgreSQL 18.x — 3 new tables (`order`, `order_item`, `order_status_history`) with CHECK, FK, GIN (pg_trgm), and B-tree index constraints (005-order-management)
+
 - TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, shadcn/ui (Field, Input, Textarea, Dialog, Card, AlertDialog) (003-warehouse-management)
 - PostgreSQL 18.x — 1 new table (`warehouse`) with CHECK, partial UNIQUE, and FK constraints (003-warehouse-management)
 - PostgreSQL 18.x — 1 new table (`stock_movement`) with CHECK, FK, and index constraints (004-simple-inventory)
@@ -34,9 +37,9 @@ TypeScript 5.x (strict mode enabled): Follow standard conventions
 
 ## Recent Changes
 
+- 005-order-management: Added TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, shadcn/ui (Combobox, Badge, Table, Dialog, AlertDialog, Card, Button, Input, Pagination, Separator, Skeleton)
 - 004-simple-inventory: Added TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, shadcn/ui
 - 003-warehouse-management: Added TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, shadcn/ui (Field, Input, Textarea, Dialog, Card, AlertDialog)
-- 002-product-variants: Added TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, @dnd-kit/core + @dnd-kit/sortable (new)
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
