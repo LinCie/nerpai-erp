@@ -16,7 +16,10 @@ import type {
 import type { StockLevelWithDetails } from "../../domain/types";
 import type { StockMovement } from "../../domain/entities/stock-movement";
 
-type ProductVariantLookupRepository = Pick<IVariantRepository, "getVariantById">;
+type ProductVariantLookupRepository = Pick<
+  IVariantRepository,
+  "getVariantById"
+>;
 
 export class ProductNotFoundError extends Error {
   constructor() {
@@ -70,7 +73,7 @@ export class InventoryService {
     private repository: IStockMovementRepository,
     private productRepository: IProductRepository,
     private warehouseRepository: IWarehouseRepository,
-    private variantRepository: ProductVariantLookupRepository
+    private variantRepository: ProductVariantLookupRepository,
   ) {}
 
   async getStockLevels(
@@ -89,8 +92,18 @@ export class InventoryService {
     return this.repository.getCurrentStock(params);
   }
 
-  async getSelectableVariants(params: { organizationId: string; productId?: string }): Promise<InventoryVariantOption[]> {
+  async getSelectableVariants(params: {
+    organizationId: string;
+    productId?: string;
+  }): Promise<InventoryVariantOption[]> {
     return this.repository.getSelectableVariants(params);
+  }
+
+  async getTotalStockByVariantIds(params: {
+    variantIds: string[];
+    organizationId: string;
+  }): Promise<Map<string, number>> {
+    return this.repository.getTotalStockByVariantIds(params);
   }
 
   async receiveStock(params: ReceiveStockParams): Promise<StockMovement> {
@@ -196,7 +209,7 @@ export class InventoryService {
 
   async transferStock(
     params: TransferStockParams,
-    confirmNegative: boolean = false
+    confirmNegative: boolean = false,
   ): Promise<[StockMovement, StockMovement]> {
     if (params.quantity <= 0) {
       throw new Error("Quantity must be greater than 0");
@@ -260,7 +273,7 @@ export class InventoryService {
         notes: params.notes ?? null,
         createdBy: params.createdBy,
         organizationId: params.organizationId,
-      }
+      },
     );
   }
 

@@ -13,10 +13,21 @@ export interface IStockMovementRepository {
   create(params: CreateStockMovementParams): Promise<StockMovement>;
   createTransferPair(
     dispatch: CreateStockMovementParams,
-    receive: CreateStockMovementParams
+    receive: CreateStockMovementParams,
   ): Promise<[StockMovement, StockMovement]>;
-  getStockLevels(params: GetStockLevelsParams): Promise<{ data: StockLevelWithDetails[]; total: number }>;
-  getMovementHistory(params: GetMovementHistoryParams): Promise<{ data: StockMovementWithDetails[]; total: number }>;
+  getStockLevels(
+    params: GetStockLevelsParams,
+  ): Promise<{ data: StockLevelWithDetails[]; total: number }>;
+  getMovementHistory(
+    params: GetMovementHistoryParams,
+  ): Promise<{ data: StockMovementWithDetails[]; total: number }>;
   getCurrentStock(params: GetCurrentStockParams): Promise<number>;
-  getSelectableVariants(params: { organizationId: string; productId?: string }): Promise<InventoryVariantOption[]>;
+  getSelectableVariants(params: {
+    organizationId: string;
+    productId?: string;
+  }): Promise<InventoryVariantOption[]>;
+  getTotalStockByVariantIds(params: {
+    variantIds: string[];
+    organizationId: string;
+  }): Promise<Map<string, number>>;
 }

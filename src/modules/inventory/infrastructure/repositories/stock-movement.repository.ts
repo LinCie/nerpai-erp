@@ -63,25 +63,31 @@ export class StockMovementRepository implements IStockMovementRepository {
 
     return {
       ...result,
-      movementType: result.movementType as "receive" | "dispatch" | "adjustment",
+      movementType: result.movementType as
+        | "receive"
+        | "dispatch"
+        | "adjustment",
       createdAt: result.createdAt ?? new Date(),
     };
   }
 
   async createTransferPair(
     dispatch: CreateStockMovementParams,
-    receive: CreateStockMovementParams
+    receive: CreateStockMovementParams,
   ): Promise<[StockMovement, StockMovement]> {
     const [dispatchMovement, receiveMovement] = await db
       .transaction()
       .execute(async (trx) => {
         const generatedReference = await trx
           .selectNoFrom((expressionBuilder) =>
-            expressionBuilder.fn<string>("uuidv7", []).as("referenceId")
+            expressionBuilder.fn<string>("uuidv7", []).as("referenceId"),
           )
           .executeTakeFirstOrThrow();
 
-        const referenceId = dispatch.referenceId ?? receive.referenceId ?? generatedReference.referenceId;
+        const referenceId =
+          dispatch.referenceId ??
+          receive.referenceId ??
+          generatedReference.referenceId;
 
         const dispatchResult = await trx
           .insertInto("stockMovement")
@@ -121,19 +127,34 @@ export class StockMovementRepository implements IStockMovementRepository {
     return [
       {
         ...dispatchMovement,
-        movementType: dispatchMovement.movementType as "receive" | "dispatch" | "adjustment",
+        movementType: dispatchMovement.movementType as
+          | "receive"
+          | "dispatch"
+          | "adjustment",
         createdAt: dispatchMovement.createdAt ?? new Date(),
       },
       {
         ...receiveMovement,
-        movementType: receiveMovement.movementType as "receive" | "dispatch" | "adjustment",
+        movementType: receiveMovement.movementType as
+          | "receive"
+          | "dispatch"
+          | "adjustment",
         createdAt: receiveMovement.createdAt ?? new Date(),
       },
     ];
   }
 
-  async getStockLevels(params: GetStockLevelsParams): Promise<{ data: StockLevelWithDetails[]; total: number }> {
-    const { organizationId, productId, warehouseId, search, limit = 50, offset = 0 } = params;
+  async getStockLevels(
+    params: GetStockLevelsParams,
+  ): Promise<{ data: StockLevelWithDetails[]; total: number }> {
+    const {
+      organizationId,
+      productId,
+      warehouseId,
+      search,
+      limit = 50,
+      offset = 0,
+    } = params;
 
     const [products, variants, warehouses, aggregates] = await Promise.all([
       this.getActiveProducts({ organizationId, productId }),
@@ -145,15 +166,23 @@ export class StockMovementRepository implements IStockMovementRepository {
     const displayItems = this.buildDisplayItems(products, variants);
     const aggregateMap = new Map(
       aggregates.map((aggregate) => [
-        this.getStockKey(aggregate.productId, aggregate.productVariantId, aggregate.warehouseId),
+        this.getStockKey(
+          aggregate.productId,
+          aggregate.productVariantId,
+          aggregate.warehouseId,
+        ),
         aggregate.currentStock,
-      ])
+      ]),
     );
 
     const expandedRows: StockLevelWithDetails[] = [];
     for (const item of displayItems) {
       for (const warehouse of warehouses) {
-        const aggregateKey = this.getStockKey(item.productId, item.productVariantId, warehouse.id);
+        const aggregateKey = this.getStockKey(
+          item.productId,
+          item.productVariantId,
+          warehouse.id,
+        );
         expandedRows.push({
           productId: item.productId,
           productName: item.productName,
@@ -169,11 +198,12 @@ export class StockMovementRepository implements IStockMovementRepository {
 
     const normalizedSearch = search?.trim().toLowerCase();
     const filteredRows = normalizedSearch
-      ? expandedRows.filter((row) =>
-          row.productName.toLowerCase().includes(normalizedSearch) ||
-          (row.variantSku ?? "").toLowerCase().includes(normalizedSearch) ||
-          row.warehouseName.toLowerCase().includes(normalizedSearch) ||
-          row.warehouseCode.toLowerCase().includes(normalizedSearch)
+      ? expandedRows.filter(
+          (row) =>
+            row.productName.toLowerCase().includes(normalizedSearch) ||
+            (row.variantSku ?? "").toLowerCase().includes(normalizedSearch) ||
+            row.warehouseName.toLowerCase().includes(normalizedSearch) ||
+            row.warehouseCode.toLowerCase().includes(normalizedSearch),
         )
       : expandedRows;
 
@@ -195,7 +225,9 @@ export class StockMovementRepository implements IStockMovementRepository {
     return { data, total };
   }
 
-  async getMovementHistory(params: GetMovementHistoryParams): Promise<{ data: StockMovementWithDetails[]; total: number }> {
+  async getMovementHistory(
+    params: GetMovementHistoryParams,
+  ): Promise<{ data: StockMovementWithDetails[]; total: number }> {
     const {
       organizationId,
       productId,
@@ -211,7 +243,11 @@ export class StockMovementRepository implements IStockMovementRepository {
       .innerJoin("product", "product.id", "stockMovement.productId")
       .innerJoin("warehouse", "warehouse.id", "stockMovement.warehouseId")
       .innerJoin("user", "user.id", "stockMovement.createdBy")
-      .leftJoin("productVariant", "productVariant.id", "stockMovement.productVariantId")
+      .leftJoin(
+        "productVariant",
+        "productVariant.id",
+        "stockMovement.productVariantId",
+      )
       .select([
         "stockMovement.id",
         "stockMovement.productId",
@@ -243,7 +279,11 @@ export class StockMovementRepository implements IStockMovementRepository {
       if (productVariantId === null) {
         query = query.where("stockMovement.productVariantId", "is", null);
       } else {
-        query = query.where("stockMovement.productVariantId", "=", productVariantId);
+        query = query.where(
+          "stockMovement.productVariantId",
+          "=",
+          productVariantId,
+        );
       }
     }
 
@@ -262,7 +302,10 @@ export class StockMovementRepository implements IStockMovementRepository {
     const countResult = await countQuery.executeTakeFirst();
     const total = Number(countResult?.count ?? 0);
 
-    const dataQuery = query.orderBy("stockMovement.createdAt", "desc").limit(limit).offset(offset);
+    const dataQuery = query
+      .orderBy("stockMovement.createdAt", "desc")
+      .limit(limit)
+      .offset(offset);
     const results = await dataQuery.execute();
 
     const data: StockMovementWithDetails[] = results.map((result) => ({
@@ -274,7 +317,10 @@ export class StockMovementRepository implements IStockMovementRepository {
       warehouseId: result.warehouseId,
       warehouseName: result.warehouseName ?? "",
       warehouseCode: result.warehouseCode ?? "",
-      movementType: result.movementType as "receive" | "dispatch" | "adjustment",
+      movementType: result.movementType as
+        | "receive"
+        | "dispatch"
+        | "adjustment",
       delta: result.delta,
       referenceId: result.referenceId,
       notes: result.notes,
@@ -292,7 +338,9 @@ export class StockMovementRepository implements IStockMovementRepository {
 
     let query = db
       .selectFrom("stockMovement")
-      .select([db.fn.coalesce(db.fn.sum("delta"), sql.lit(0)).as("currentStock")])
+      .select([
+        db.fn.coalesce(db.fn.sum("delta"), sql.lit(0)).as("currentStock"),
+      ])
       .where("productId", "=", productId)
       .where("warehouseId", "=", warehouseId)
       .where("organizationId", "=", organizationId)
@@ -308,7 +356,10 @@ export class StockMovementRepository implements IStockMovementRepository {
     return Number(result?.currentStock ?? 0);
   }
 
-  async getSelectableVariants(params: { organizationId: string; productId?: string }): Promise<InventoryVariantOption[]> {
+  async getSelectableVariants(params: {
+    organizationId: string;
+    productId?: string;
+  }): Promise<InventoryVariantOption[]> {
     let query = db
       .selectFrom("productVariant")
       .select(["id", "productId", "sku"])
@@ -327,7 +378,39 @@ export class StockMovementRepository implements IStockMovementRepository {
     }));
   }
 
-  private async getActiveProducts(params: { organizationId: string; productId?: string }): Promise<ActiveProductRow[]> {
+  async getTotalStockByVariantIds(params: {
+    variantIds: string[];
+    organizationId: string;
+  }): Promise<Map<string, number>> {
+    if (params.variantIds.length === 0) {
+      return new Map();
+    }
+
+    const rows = await db
+      .selectFrom("stockMovement")
+      .select([
+        "productVariantId",
+        db.fn.coalesce(db.fn.sum("delta"), sql.lit(0)).as("totalStock"),
+      ])
+      .where("productVariantId", "in", params.variantIds)
+      .where("organizationId", "=", params.organizationId)
+      .where("deletedAt", "is", null)
+      .groupBy("productVariantId")
+      .execute();
+
+    const result = new Map<string, number>();
+    for (const row of rows) {
+      if (row.productVariantId) {
+        result.set(row.productVariantId, Number(row.totalStock ?? 0));
+      }
+    }
+    return result;
+  }
+
+  private async getActiveProducts(params: {
+    organizationId: string;
+    productId?: string;
+  }): Promise<ActiveProductRow[]> {
     let query = db
       .selectFrom("product")
       .select(["id", "name"])
@@ -341,7 +424,10 @@ export class StockMovementRepository implements IStockMovementRepository {
     return query.execute();
   }
 
-  private async getActiveVariants(params: { organizationId: string; productId?: string }): Promise<ActiveVariantRow[]> {
+  private async getActiveVariants(params: {
+    organizationId: string;
+    productId?: string;
+  }): Promise<ActiveVariantRow[]> {
     let query = db
       .selectFrom("productVariant")
       .select(["id", "productId", "sku"])
@@ -355,7 +441,10 @@ export class StockMovementRepository implements IStockMovementRepository {
     return query.execute();
   }
 
-  private async getActiveWarehouses(params: { organizationId: string; warehouseId?: string }): Promise<ActiveWarehouseRow[]> {
+  private async getActiveWarehouses(params: {
+    organizationId: string;
+    warehouseId?: string;
+  }): Promise<ActiveWarehouseRow[]> {
     let query = db
       .selectFrom("warehouse")
       .select(["id", "name", "code"])
@@ -403,7 +492,10 @@ export class StockMovementRepository implements IStockMovementRepository {
     }));
   }
 
-  private buildDisplayItems(products: ActiveProductRow[], variants: ActiveVariantRow[]): StockDisplayItem[] {
+  private buildDisplayItems(
+    products: ActiveProductRow[],
+    variants: ActiveVariantRow[],
+  ): StockDisplayItem[] {
     const variantsByProductId = new Map<string, ActiveVariantRow[]>();
     for (const variant of variants) {
       const list = variantsByProductId.get(variant.productId) ?? [];
@@ -439,7 +531,11 @@ export class StockMovementRepository implements IStockMovementRepository {
     return displayItems;
   }
 
-  private getStockKey(productId: string, productVariantId: string | null, warehouseId: string) {
+  private getStockKey(
+    productId: string,
+    productVariantId: string | null,
+    warehouseId: string,
+  ) {
     return `${productId}:${productVariantId ?? "null"}:${warehouseId}`;
   }
 }

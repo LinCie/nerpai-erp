@@ -26,13 +26,18 @@ import type {
   GetCurrentStockParams,
   InventoryVariantOption,
 } from "../../application/types";
-import { receiveStockFormOpts, dispatchStockFormOpts, adjustStockFormOpts, transferStockFormOpts } from "../lib/form-options";
+import {
+  receiveStockFormOpts,
+  dispatchStockFormOpts,
+  adjustStockFormOpts,
+  transferStockFormOpts,
+} from "../lib/form-options";
 
 const inventoryService = new InventoryService(
   stockMovementRepository,
   productRepository,
   warehouseRepository,
-  variantRepository
+  variantRepository,
 );
 
 const validateReceiveStockForm = createServerValidate({
@@ -49,7 +54,9 @@ const validateDispatchStockForm = createServerValidate({
   },
 });
 
-export async function getStockLevels(params: Omit<GetStockLevelsParams, "organizationId">) {
+export async function getStockLevels(
+  params: Omit<GetStockLevelsParams, "organizationId">,
+) {
   const { organizationId } = await getSessionAndOrg();
 
   return inventoryService.getStockLevels({
@@ -58,7 +65,9 @@ export async function getStockLevels(params: Omit<GetStockLevelsParams, "organiz
   });
 }
 
-export async function getMovementHistory(params: Omit<GetMovementHistoryParams, "organizationId">) {
+export async function getMovementHistory(
+  params: Omit<GetMovementHistoryParams, "organizationId">,
+) {
   const { organizationId } = await getSessionAndOrg();
 
   return inventoryService.getMovementHistory({
@@ -67,7 +76,9 @@ export async function getMovementHistory(params: Omit<GetMovementHistoryParams, 
   });
 }
 
-export async function getCurrentStock(params: Omit<GetCurrentStockParams, "organizationId">) {
+export async function getCurrentStock(
+  params: Omit<GetCurrentStockParams, "organizationId">,
+) {
   const { organizationId } = await getSessionAndOrg();
 
   return inventoryService.getCurrentStock({
@@ -76,10 +87,22 @@ export async function getCurrentStock(params: Omit<GetCurrentStockParams, "organ
   });
 }
 
-export async function getSelectableVariants(params: { productId?: string } = {}): Promise<InventoryVariantOption[]> {
+export async function getSelectableVariants(
+  params: { productId?: string } = {},
+): Promise<InventoryVariantOption[]> {
   const { organizationId } = await getSessionAndOrg();
   return inventoryService.getSelectableVariants({
     ...params,
+    organizationId,
+  });
+}
+
+export async function getTotalStockByVariantIds(
+  variantIds: string[],
+): Promise<Map<string, number>> {
+  const { organizationId } = await getSessionAndOrg();
+  return inventoryService.getTotalStockByVariantIds({
+    variantIds,
     organizationId,
   });
 }
@@ -102,6 +125,7 @@ export async function receiveStock(prev: unknown, formData: FormData) {
     });
 
     revalidatePath("/inventory");
+    revalidatePath("/products", "page");
 
     return undefined;
   } catch (e) {
@@ -144,6 +168,7 @@ export async function dispatchStock(prev: unknown, formData: FormData) {
     );
 
     revalidatePath("/inventory");
+    revalidatePath("/products", "page");
 
     return undefined;
   } catch (e) {
@@ -196,6 +221,7 @@ export async function adjustStock(prev: unknown, formData: FormData) {
     });
 
     revalidatePath("/inventory");
+    revalidatePath("/products", "page");
 
     return undefined;
   } catch (e) {
@@ -212,7 +238,10 @@ export async function adjustStock(prev: unknown, formData: FormData) {
       return buildServerFormErrorState(formData, "Product variant not found");
     }
     if (e instanceof NoChangeNeededError) {
-      return buildServerFormErrorState(formData, "Stock is already at the specified quantity");
+      return buildServerFormErrorState(
+        formData,
+        "Stock is already at the specified quantity",
+      );
     }
 
     console.error("Error adjusting stock:", e);
@@ -245,10 +274,11 @@ export async function transferStock(prev: unknown, formData: FormData) {
         createdBy: userId,
         organizationId,
       },
-      validatedData.confirmNegative === "true"
+      validatedData.confirmNegative === "true",
     );
 
     revalidatePath("/inventory");
+    revalidatePath("/products", "page");
 
     return undefined;
   } catch (e) {
@@ -265,12 +295,15 @@ export async function transferStock(prev: unknown, formData: FormData) {
       return buildServerFormErrorState(formData, "Product variant not found");
     }
     if (e instanceof SameWarehouseError) {
-      return buildServerFormErrorState(formData, "Source and destination warehouses must be different");
+      return buildServerFormErrorState(
+        formData,
+        "Source and destination warehouses must be different",
+      );
     }
     if (e instanceof NegativeStockWarningError) {
       return buildServerFormErrorState(
         formData,
-        `NEGATIVE_STOCK_WARNING:${e.currentStock}:${e.resultingStock}`
+        `NEGATIVE_STOCK_WARNING:${e.currentStock}:${e.resultingStock}`,
       );
     }
 
