@@ -189,15 +189,15 @@
 
 **Purpose**: Final integration, validation, and cleanup
 
-- [ ] T049 [P] Wire up navigation link to `/orders` in the application sidebar/nav in the appropriate layout file (e.g., `src/app/(app)/layout.tsx` or shared nav component)
-- [ ] T050 [P] Add loading states (shadcn Skeleton) to `OrderList` and `OrderDetail` components for Suspense boundaries
-- [ ] T051 Code review: verify all server actions match contracts/server-actions.md signatures and error behaviors exactly (CR-001, CR-002)
-- [ ] T052 Contract parity audit — verify spec/contracts vs implementation behavior for all 6 server actions (createOrder, updateOrder, transitionOrderStatus, getOrders, getOrderDetail, searchProducts)
-- [ ] T053 Verify all queries filter by `organization_id` from session (DIR-002, multi-tenancy audit)
-- [ ] T054 Verify status transitions enforce state machine rules — test all valid and invalid transitions against `ORDER_STATUS_TRANSITIONS` map (DIR-001)
-- [ ] T055 Verify optimistic locking works correctly — test concurrent modification detection and error message
-- [ ] T056 Run `bun run lint` to ensure no lint errors across all new files
-- [ ] T057 Run quickstart.md validation — follow all 10 verification steps from quickstart.md to confirm end-to-end flow. During validation, also verify success criteria SC-001 through SC-004: order creation completes in \<2s (SC-001), orders list loads in \<2s (SC-002), status filter responds in \<1s (SC-003), and status advancement is achievable in \<3 clicks (SC-004)
+- [X] T049 [P] Wire up navigation link to `/orders` in the application sidebar/nav in the appropriate layout file (e.g., `src/app/(app)/layout.tsx` or shared nav component)
+- [X] T050 [P] Add loading states (shadcn Skeleton) to `OrderList` and `OrderDetail` components for Suspense boundaries
+- [X] T051 Code review: verify all server actions match contracts/server-actions.md signatures and error behaviors exactly (CR-001, CR-002)
+- [X] T052 Contract parity audit — verify spec/contracts vs implementation behavior for all 6 server actions (createOrder, updateOrder, transitionOrderStatus, getOrders, getOrderDetail, searchProducts)
+- [X] T053 Verify all queries filter by `organization_id` from session (DIR-002, multi-tenancy audit)
+- [X] T054 Verify status transitions enforce state machine rules — test all valid and invalid transitions against `ORDER_STATUS_TRANSITIONS` map (DIR-001)
+- [X] T055 Verify optimistic locking works correctly — test concurrent modification detection and error message
+- [X] T056 Run `bun run lint` to ensure no lint errors across all new files
+- [X] T057 Run quickstart.md validation — follow all 10 verification steps from quickstart.md to confirm end-to-end flow. During validation, also verify success criteria SC-001 through SC-004: order creation completes in \<2s (SC-001), orders list loads in \<2s (SC-002), status filter responds in \<1s (SC-003), and status advancement is achievable in \<3 clicks (SC-004)
 
 ---
 
