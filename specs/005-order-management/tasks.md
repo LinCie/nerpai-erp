@@ -162,10 +162,10 @@
 
 ### Implementation for User Story 3 (Edit)
 
-- [ ] T044 [US3] Add `updateCustomerAndItems` method to `OrderRepository` in `src/modules/orders/infrastructure/repositories/order.repository.ts` — within transaction: check status="unpaid" and version match, UPDATE order (customer_name, total_amount, version+1), DELETE existing order_items, INSERT new order_items. Per FR-014 and research.md R2
-- [ ] T045 [US3] Implement `OrderService.updateOrder()` in `src/modules/orders/application/services/order.service.ts` — validate status is "unpaid", calculate new total, call repository.updateCustomerAndItems
-- [ ] T046 [US3] Implement `updateOrder` server action in `src/modules/orders/presentation/actions/order.actions.ts` — per contracts/server-actions.md `updateOrder` contract
-- [ ] T047 [US3] Update `OrderFormDialog` component in `src/modules/orders/presentation/components/order-form-dialog.tsx` — support edit mode: pre-populate form with existing order data, use `updateOrderFormOptions`, call `updateOrder` action. Show edit button only when order status is "unpaid". Per FR-014
+- [X] T044 [US3] Add `updateCustomerAndItems` method to `OrderRepository` in `src/modules/orders/infrastructure/repositories/order.repository.ts` — within transaction: check status="unpaid" and version match, UPDATE order (customer_name, total_amount, version+1), DELETE existing order_items, INSERT new order_items. Per FR-014 and research.md R2
+- [X] T045 [US3] Implement `OrderService.updateOrder()` in `src/modules/orders/application/services/order.service.ts` — validate status is "unpaid", calculate new total, call repository.updateCustomerAndItems
+- [X] T046 [US3] Implement `updateOrder` server action in `src/modules/orders/presentation/actions/order.actions.ts` — per contracts/server-actions.md `updateOrder` contract
+- [X] T047 [US3] Update `OrderFormDialog` component in `src/modules/orders/presentation/components/order-form-dialog.tsx` — support edit mode: pre-populate form with existing order data, use `updateOrderFormOptions`, call `updateOrder` action. Show edit button only when order status is "unpaid". Per FR-014
 
 **Checkpoint**: US-3 (edit) complete — orders can be edited while unpaid, locked after advancement.
 
