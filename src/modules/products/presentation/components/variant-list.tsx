@@ -15,10 +15,16 @@ import type { VariantWithOptions } from "../../domain/types";
 interface VariantListProps {
   variants: VariantWithOptions[];
   hasAttributes?: boolean;
+  stockByVariantId?: Map<string, number>;
   onUpdate?: () => void;
 }
 
-export function VariantList({ variants, hasAttributes = false, onUpdate }: VariantListProps) {
+export function VariantList({
+  variants,
+  hasAttributes = false,
+  stockByVariantId,
+  onUpdate,
+}: VariantListProps) {
   if (variants.length === 0) {
     return <VariantEmptyState hasAttributes={hasAttributes} />;
   }
@@ -52,6 +58,9 @@ export function VariantList({ variants, hasAttributes = false, onUpdate }: Varia
               <VariantEditRow
                 key={variantWithOptions.variant.id}
                 variantWithOptions={variantWithOptions}
+                totalStock={stockByVariantId?.get(
+                  variantWithOptions.variant.id,
+                )}
                 onUpdate={onUpdate}
               />
             ))}

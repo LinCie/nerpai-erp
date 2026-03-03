@@ -2,7 +2,13 @@ import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Settings, Package } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/presentation/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/presentation/components/ui/card";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { auth } from "@/shared/infrastructure/auth/auth";
 import { variantRepository } from "@/modules/products/infrastructure/repositories/variant.repository";
@@ -10,12 +16,17 @@ import { productRepository } from "@/modules/products/infrastructure/repositorie
 import { attributeRepository } from "@/modules/products/infrastructure/repositories/attribute.repository";
 import { VariantService } from "@/modules/products/application/services/variant.service";
 import { VariantList } from "@/modules/products/presentation/components/variant-list";
+import { getTotalStockByVariantIds } from "@/modules/inventory/presentation/actions/inventory.actions";
 
 interface ProductDetailPageProps {
   params: Promise<{ productId: string }>;
 }
 
-const variantService = new VariantService(variantRepository, productRepository, attributeRepository);
+const variantService = new VariantService(
+  variantRepository,
+  productRepository,
+  attributeRepository,
+);
 
 async function getSessionAndOrg() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -31,7 +42,9 @@ async function getSessionAndOrg() {
   return { session, organizationId };
 }
 
-export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+export default async function ProductDetailPage({
+  params,
+}: ProductDetailPageProps) {
   const { organizationId } = await getSessionAndOrg();
   const { productId } = await params;
 
@@ -43,6 +56,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   if (!productWithVariants) {
     notFound();
   }
+
+  const variantIds = productWithVariants.variants.map((v) => v.variant.id);
+  const stockByVariantId =
+    variantIds.length > 0
+      ? await getTotalStockByVariantIds(variantIds)
+      : new Map<string, number>();
 
   const hasAttributes = productWithVariants.attributes.length > 0;
 
@@ -93,17 +112,19 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Attributes</p>
                 <div className="flex flex-wrap gap-2">
-                  {productWithVariants.attributes.map(({ attribute, options }) => (
-                    <div
-                      key={attribute.id}
-                      className="inline-flex items-center rounded-full border px-3 py-1 text-sm"
-                    >
-                      <span className="font-medium">{attribute.name}</span>
-                      <span className="text-muted-foreground ml-1">
-                        ({options.length})
-                      </span>
-                    </div>
-                  ))}
+                  {productWithVariants.attributes.map(
+                    ({ attribute, options }) => (
+                      <div
+                        key={attribute.id}
+                        className="inline-flex items-center rounded-full border px-3 py-1 text-sm"
+                      >
+                        <span className="font-medium">{attribute.name}</span>
+                        <span className="text-muted-foreground ml-1">
+                          ({options.length})
+                        </span>
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
             )}
@@ -123,6 +144,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             <VariantList
               variants={productWithVariants.variants}
               hasAttributes={hasAttributes}
+              stockByVariantId={stockByVariantId}
             />
           </CardContent>
         </Card>

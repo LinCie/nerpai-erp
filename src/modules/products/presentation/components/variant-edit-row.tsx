@@ -5,10 +5,7 @@ import { Check, X, Pencil, Trash2, Power, PowerOff } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Input } from "@/shared/presentation/components/ui/input";
 import { Badge } from "@/shared/presentation/components/ui/badge";
-import {
-  TableCell,
-  TableRow,
-} from "@/shared/presentation/components/ui/table";
+import { TableCell, TableRow } from "@/shared/presentation/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,15 +27,22 @@ import type { VariantWithOptions } from "../../domain/types";
 
 interface VariantEditRowProps {
   variantWithOptions: VariantWithOptions;
+  totalStock?: number;
   onUpdate?: () => void;
 }
 
-export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowProps) {
+export function VariantEditRow({
+  variantWithOptions,
+  totalStock,
+  onUpdate,
+}: VariantEditRowProps) {
   const { variant, options } = variantWithOptions;
+  const displayStock = totalStock ?? 0;
   const [isEditing, setIsEditing] = useState(false);
   const [editSku, setEditSku] = useState(variant.sku);
-  const [editPrice, setEditPrice] = useState(parseFloat(variant.price).toString());
-  const [editStock, setEditStock] = useState(variant.stockQuantity.toString());
+  const [editPrice, setEditPrice] = useState(
+    parseFloat(variant.price).toString(),
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -47,12 +51,11 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
   >("idle");
   const [skuMessage, setSkuMessage] = useState<string | null>(null);
 
-  const isNewVariant = parseFloat(variant.price) === 0 && variant.stockQuantity === 0;
+  const isNewVariant = parseFloat(variant.price) === 0;
 
   const handleStartEdit = useCallback(() => {
     setEditSku(variant.sku);
     setEditPrice(parseFloat(variant.price).toString());
-    setEditStock(variant.stockQuantity.toString());
     setSkuStatus("idle");
     setSkuMessage(null);
     setIsEditing(true);
@@ -62,7 +65,6 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
     setIsEditing(false);
     setEditSku(variant.sku);
     setEditPrice(parseFloat(variant.price).toString());
-    setEditStock(variant.stockQuantity.toString());
     setSkuStatus("idle");
     setSkuMessage(null);
   }, [variant]);
@@ -111,7 +113,11 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
   }, [isEditing, editSku, variant.id, variant.sku]);
 
   const handleSaveEdit = async () => {
-    if (skuStatus === "checking" || skuStatus === "unavailable" || skuStatus === "invalid") {
+    if (
+      skuStatus === "checking" ||
+      skuStatus === "unavailable" ||
+      skuStatus === "invalid"
+    ) {
       toast.error(skuMessage ?? "Please resolve SKU validation before saving");
       return;
     }
@@ -120,19 +126,14 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
     try {
       const formData = new FormData();
       formData.append("id", variant.id);
-      
+
       if (editSku !== variant.sku) {
         formData.append("sku", editSku.trim());
       }
-      
+
       const newPrice = parseFloat(editPrice);
       if (!isNaN(newPrice) && newPrice !== parseFloat(variant.price)) {
         formData.append("price", newPrice.toString());
-      }
-      
-      const newStock = parseInt(editStock, 10);
-      if (!isNaN(newStock) && newStock !== variant.stockQuantity) {
-        formData.append("stockQuantity", newStock.toString());
       }
 
       const result = await updateVariant(formData);
@@ -159,7 +160,9 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
 
       const result = await toggleVariantActive(formData);
       if (result.success) {
-        toast.success(variant.isActive ? "Variant deactivated" : "Variant activated");
+        toast.success(
+          variant.isActive ? "Variant deactivated" : "Variant activated",
+        );
         onUpdate?.();
       } else {
         toast.error(result.error || "Failed to toggle variant status");
@@ -189,7 +192,10 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
   };
 
   const optionLabels = options
-    .sort((a, b) => a.productAttribute.displayOrder - b.productAttribute.displayOrder)
+    .sort(
+      (a, b) =>
+        a.productAttribute.displayOrder - b.productAttribute.displayOrder,
+    )
     .map((o) => o.option.value)
     .join(" / ");
 
@@ -207,7 +213,9 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
             {skuMessage && (
               <p
                 className={`text-xs ${
-                  skuStatus === "unavailable" || skuStatus === "invalid" || skuStatus === "error"
+                  skuStatus === "unavailable" ||
+                  skuStatus === "invalid" ||
+                  skuStatus === "error"
                     ? "text-destructive"
                     : "text-muted-foreground"
                 }`}
@@ -230,14 +238,7 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
           />
         </TableCell>
         <TableCell>
-          <Input
-            type="number"
-            min="0"
-            value={editStock}
-            onChange={(e) => setEditStock(e.target.value)}
-            className="h-8 w-24"
-            placeholder="Stock"
-          />
+          <span className="text-muted-foreground">{displayStock}</span>
         </TableCell>
         <TableCell>
           <Badge variant={variant.isActive ? "default" : "secondary"}>
@@ -250,7 +251,12 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
               variant="ghost"
               size="icon-xs"
               onClick={handleSaveEdit}
-              disabled={isSaving || skuStatus === "checking" || skuStatus === "unavailable" || skuStatus === "invalid"}
+              disabled={
+                isSaving ||
+                skuStatus === "checking" ||
+                skuStatus === "unavailable" ||
+                skuStatus === "invalid"
+              }
               aria-label="Save changes"
             >
               <Check className="h-4 w-4 text-green-500" />
@@ -278,8 +284,8 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
         <TableCell>${parseFloat(variant.price).toFixed(2)}</TableCell>
         <TableCell>
           <div className="flex items-center gap-2">
-            <span>{variant.stockQuantity}</span>
-            {variant.stockQuantity === 0 && (
+            <span>{displayStock}</span>
+            {displayStock === 0 && (
               <Badge variant="destructive">Out of Stock</Badge>
             )}
           </div>
@@ -289,9 +295,7 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
             <Badge variant={variant.isActive ? "default" : "secondary"}>
               {variant.isActive ? "Active" : "Inactive"}
             </Badge>
-            {isNewVariant && (
-              <Badge variant="outline">New</Badge>
-            )}
+            {isNewVariant && <Badge variant="outline">New</Badge>}
           </div>
         </TableCell>
         <TableCell>
@@ -309,7 +313,9 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
               size="icon-xs"
               onClick={handleToggleActive}
               disabled={isToggling}
-              aria-label={variant.isActive ? "Deactivate variant" : "Activate variant"}
+              aria-label={
+                variant.isActive ? "Deactivate variant" : "Activate variant"
+              }
             >
               {variant.isActive ? (
                 <PowerOff className="h-4 w-4 text-muted-foreground" />
@@ -334,7 +340,8 @@ export function VariantEditRow({ variantWithOptions, onUpdate }: VariantEditRowP
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Variant?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will soft-delete the variant &quot;{variant.sku}&quot;. The variant can be restored later if needed.
+              This will soft-delete the variant &quot;{variant.sku}&quot;. The
+              variant can be restored later if needed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

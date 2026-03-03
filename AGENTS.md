@@ -76,3 +76,7 @@ TypeScript 5.x (strict mode enabled): Follow standard conventions
 - 005-order-management: Added TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, shadcn/ui (Combobox, Badge, Table, Dialog, AlertDialog, Card, Button, Input, Pagination, Separator, Skeleton)
 - 004-simple-inventory: Added TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, shadcn/ui
 - 003-warehouse-management: Added TypeScript 5.x (strict mode) + Next.js 16.x (App Router), React 19.x, Kysely v0.28.x, TanStack Form 1.x, Zod, shadcn/ui (Field, Input, Textarea, Dialog, Card, AlertDialog)
+
+## Recent Adjustment
+
+- Stock editing removed from product view: Variant stock can no longer be adjusted from the product detail page (variant-edit-row.tsx). Stock can ONLY be modified through the Inventory module (adjust/receive/dispatch/transfer operations) which properly tracks stock movements. Product view now displays stock as read-only.
