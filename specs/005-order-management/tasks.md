@@ -142,13 +142,13 @@
 
 ### Implementation for User Story 6
 
-- [ ] T037 [US6] Add `findById` method to `OrderRepository` in `src/modules/orders/infrastructure/repositories/order.repository.ts` — query order with JOIN user for createdByName, scoped by organization_id
-- [ ] T038 [US6] Implement `OrderService.getOrderDetail()` in `src/modules/orders/application/services/order.service.ts` — fetch order, items, and status history; assemble `OrderDetail` DTO. Per data-model.md Query Optimization Notes
-- [ ] T039 [US6] Implement `getOrderDetail` read action in `src/modules/orders/presentation/actions/order.actions.ts` — per contracts/server-actions.md `getOrderDetail` contract
-- [ ] T040 [P] [US6] Create `OrderStatusStepper` component in `src/modules/orders/presentation/components/order-status-stepper.tsx` — custom stepper with horizontal flex layout, circle indicators for each pipeline step (Unpaid → Paid → Process → Sent → Completed), connecting lines, color coding (completed=green, current=blue, upcoming=gray). For terminal states (Cancelled/Return), render `OrderStatusBadge` instead. Per research.md R5 and FR-016
-- [ ] T041 [P] [US6] Create `OrderStatusHistory` component in `src/modules/orders/presentation/components/order-status-history.tsx` — chronological list of status transitions showing previous→new status, timestamp, and user name. Per FR-008/FR-009
-- [ ] T042 [US6] Create `OrderDetail` component in `src/modules/orders/presentation/components/order-detail.tsx` — Card layout: customer name, OrderStatusStepper (or badge), line items table (product name, SKU, unit price, quantity, subtotal), total amount, OrderStatusActions, OrderStatusHistory. Per plan.md component structure
-- [ ] T043 [US6] Create order detail page in `src/app/(app)/orders/[id]/page.tsx` — Server Component that calls `getOrderDetail`, renders `OrderDetail`. Show 404 if order not found
+- [X] T037 [US6] Add `findById` method to `OrderRepository` in `src/modules/orders/infrastructure/repositories/order.repository.ts` — query order with JOIN user for createdByName, scoped by organization_id
+- [X] T038 [US6] Implement `OrderService.getOrderDetail()` in `src/modules/orders/application/services/order.service.ts` — fetch order, items, and status history; assemble `OrderDetail` DTO. Per data-model.md Query Optimization Notes
+- [X] T039 [US6] Implement `getOrderDetail` read action in `src/modules/orders/presentation/actions/order.actions.ts` — per contracts/server-actions.md `getOrderDetail` contract
+- [X] T040 [P] [US6] Create `OrderStatusStepper` component in `src/modules/orders/presentation/components/order-status-stepper.tsx` — custom stepper with horizontal flex layout, circle indicators for each pipeline step (Unpaid → Paid → Process → Sent → Completed), connecting lines, color coding (completed=green, current=blue, upcoming=gray). For terminal states (Cancelled/Return), render `OrderStatusBadge` instead. Per research.md R5 and FR-016
+- [X] T041 [P] [US6] Create `OrderStatusHistory` component in `src/modules/orders/presentation/components/order-status-history.tsx` — chronological list of status transitions showing previous→new status, timestamp, and user name. Per FR-008/FR-009
+- [X] T042 [US6] Create `OrderDetail` component in `src/modules/orders/presentation/components/order-detail.tsx` — Card layout: customer name, OrderStatusStepper (or badge), line items table (product name, SKU, unit price, quantity, subtotal), total amount, OrderStatusActions, OrderStatusHistory. Per plan.md component structure
+- [X] T043 [US6] Create order detail page in `src/app/(app)/orders/[id]/page.tsx` — Server Component that calls `getOrderDetail`, renders `OrderDetail`. Show 404 if order not found
 
 **Checkpoint**: US-6 complete — full order detail view with visual stepper and audit trail.
 
