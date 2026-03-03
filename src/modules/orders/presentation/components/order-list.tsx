@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input } from "@/shared/presentation/components/ui/input";
-import { Search, Eye } from "lucide-react";
+import { Icons } from "@/shared/presentation/components/icons";
 import type { OrderListItem } from "../../application/types";
 import type { OrderStatus } from "../../domain/types";
 import { OrderStatusBadge } from "./order-status-badge";
@@ -63,7 +63,7 @@ export function OrderList({
     <div className="space-y-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Icons.search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search by customer name..."
             value={localSearch}
@@ -147,7 +147,7 @@ export function OrderList({
                           href={`/orders/${order.id}`}
                           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
                         >
-                          <Eye className="h-4 w-4" />
+                          <Icons.eye className="h-4 w-4" />
                           View
                         </Link>
                       </td>

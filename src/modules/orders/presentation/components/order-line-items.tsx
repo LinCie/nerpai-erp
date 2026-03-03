@@ -6,7 +6,7 @@ import {
   Field,
   FieldLabel,
 } from "@/shared/presentation/components/ui/field";
-import { Plus, Trash2 } from "lucide-react";
+import { Icons } from "@/shared/presentation/components/icons";
 import { ProductPicker } from "./product-picker";
 import type { OrderLineItemsProps } from "../types";
 
@@ -92,7 +92,7 @@ export function OrderLineItems({
           onClick={handleAddItem}
           disabled={disabled}
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Icons.plus className="w-4 h-4 mr-2" />
           Add Item
         </Button>
       </div>
@@ -127,7 +127,7 @@ export function OrderLineItems({
                   disabled={disabled || items.length === 1}
                   className="mt-6"
                 >
-                  <Trash2 className="w-4 h-4 text-destructive" />
+                  <Icons.trash className="w-4 h-4 text-destructive" />
                 </Button>
               </div>
 
@@ -152,20 +152,9 @@ export function OrderLineItems({
 
                 <Field>
                   <FieldLabel>Unit Price</FieldLabel>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={item.unitPrice}
-                    onChange={(e) =>
-                      handleItemChange(
-                        index,
-                        "unitPrice",
-                        parseFloat(e.target.value) || 0
-                      )
-                    }
-                    disabled={disabled}
-                  />
+                  <div className="h-10 flex items-center px-3 border rounded-md bg-muted">
+                    ${item.unitPrice.toFixed(2)}
+                  </div>
                 </Field>
 
                 <Field>

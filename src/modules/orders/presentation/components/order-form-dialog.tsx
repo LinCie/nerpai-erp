@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import {
   initialFormState,
   mergeForm,
@@ -23,8 +23,8 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/shared/presentation/components/ui/field";
-import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { Icons } from "@/shared/presentation/components/icons";
 import { createOrderFormOptions, updateOrderFormOptions } from "../lib/form-options";
 import { createOrder, updateOrder } from "../actions/order.actions";
 import { OrderLineItems } from "./order-line-items";
@@ -59,7 +59,7 @@ export function OrderFormDialogTrigger({
       <DialogTrigger asChild>
         {children || (
           <Button id="create-order-trigger">
-            <Plus className="w-4 h-4 mr-2" />
+            <Icons.plus className="w-4 h-4 mr-2" />
             Create Order
           </Button>
         )}
@@ -75,14 +75,13 @@ export function OrderFormDialogTrigger({
               setOpen(false);
               onSuccess?.();
             }}
+            onCancel={() => setOpen(false)}
           />
         )}
       </DialogContent>
     </Dialog>
   );
 }
-
-import { useState } from "react";
 
 export function OrderFormDialog({
   order = null,
@@ -106,6 +105,7 @@ export function OrderFormDialog({
               onOpenChange(false);
               onSuccess?.();
             }}
+            onCancel={() => onOpenChange(false)}
           />
         )}
       </DialogContent>
@@ -128,9 +128,10 @@ interface OrderFormProps {
     }[];
   } | null;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
-function OrderForm({ order, onSuccess }: OrderFormProps) {
+function OrderForm({ order, onSuccess, onCancel }: OrderFormProps) {
   const isEditMode = !!order;
   const action = isEditMode ? updateOrder : createOrder;
   const formOptions = isEditMode ? updateOrderFormOptions : createOrderFormOptions;
@@ -247,9 +248,7 @@ function OrderForm({ order, onSuccess }: OrderFormProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => {
-            // Close dialog - handled by parent
-          }}
+          onClick={() => onCancel?.()}
           disabled={form.state.isSubmitting}
         >
           Cancel
@@ -272,7 +271,7 @@ export function CreateOrderButton({ onSuccess }: { onSuccess?: () => void }) {
   return (
     <OrderFormDialogTrigger onSuccess={onSuccess}>
       <Button id="create-order-trigger">
-        <Plus className="w-4 h-4 mr-2" />
+        <Icons.plus className="w-4 h-4 mr-2" />
         Create Order
       </Button>
     </OrderFormDialogTrigger>

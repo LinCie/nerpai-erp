@@ -4,6 +4,7 @@
 export interface OrderItem {
   id: string; // UUID v7
   orderId: string; // FK → order.id
+  organizationId: string; // FK → organization.id
   productId: string | null; // FK → product.id (nullable — traceability)
   productVariantId: string | null; // FK → product_variant.id (nullable — traceability)
   productName: string; // Snapshotted at creation time

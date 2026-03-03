@@ -1,15 +1,10 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Calendar,
-  User,
-  Package,
-  CreditCard,
-  ShoppingCart,
-} from "lucide-react";
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/shared/presentation/components/ui/button";
+import { Icons } from "@/shared/presentation/components/icons";
 import {
   Card,
   CardContent,
@@ -22,6 +17,7 @@ import type { OrderDetail } from "../../application/types";
 import { OrderStatusStepper } from "./order-status-stepper";
 import { OrderStatusActions } from "./order-status-actions";
 import { OrderStatusHistory } from "./order-status-history";
+import { OrderFormDialog } from "./order-form-dialog";
 import { isTerminalStatus } from "../../domain/types";
 
 interface OrderDetailProps {
@@ -29,12 +25,30 @@ interface OrderDetailProps {
 }
 
 export function OrderDetail({ order }: OrderDetailProps) {
+  const router = useRouter();
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const canEdit = order.status === "unpaid";
+
+  const editableOrder = {
+    id: order.id,
+    version: order.version,
+    customerName: order.customerName,
+    items: order.items.map((item) => ({
+      productId: item.productId,
+      productVariantId: item.productVariantId,
+      productName: item.productName,
+      sku: item.sku,
+      unitPrice: Number(item.unitPrice),
+      quantity: item.quantity,
+    })),
+  };
+
   return (
     <div className="space-y-6">
       {/* Back button */}
       <Link href="/orders">
         <Button variant="ghost" size="sm" className="gap-2">
-          <ArrowLeft className="h-4 w-4" />
+          <Icons.arrowLeft className="h-4 w-4" />
           Back to Orders
         </Button>
       </Link>
@@ -47,11 +61,23 @@ export function OrderDetail({ order }: OrderDetailProps) {
             Order ID: {order.id.slice(0, 8)}...
           </p>
         </div>
-        <OrderStatusActions
-          orderId={order.id}
-          currentStatus={order.status}
-          version={order.version}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          {canEdit && (
+            <Button
+              variant="outline"
+              onClick={() => setIsEditOpen(true)}
+              className="gap-2"
+            >
+              <Icons.pencil className="h-4 w-4" />
+              Edit Order
+            </Button>
+          )}
+          <OrderStatusActions
+            orderId={order.id}
+            currentStatus={order.status}
+            version={order.version}
+          />
+        </div>
       </div>
 
       {/* Status Stepper / Badge */}
@@ -82,14 +108,14 @@ export function OrderDetail({ order }: OrderDetailProps) {
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="flex items-start gap-3">
-                  <User className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <Icons.user className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">{order.customerName}</p>
                     <p className="text-sm text-muted-foreground">Customer Name</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <Icons.calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">
                       {new Date(order.createdAt).toLocaleDateString(undefined, {
@@ -100,14 +126,14 @@ export function OrderDetail({ order }: OrderDetailProps) {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <ShoppingCart className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <Icons.orders className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">{order.items.length} item(s)</p>
                     <p className="text-sm text-muted-foreground">Total Items</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CreditCard className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <Icons.creditCard className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="font-medium">
                       ${parseFloat(order.totalAmount).toFixed(2)}
@@ -134,7 +160,7 @@ export function OrderDetail({ order }: OrderDetailProps) {
                     <tr className="border-b bg-muted/50">
                       <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground">
                         <div className="flex items-center gap-2">
-                          <Package className="h-4 w-4" />
+                          <Icons.package className="h-4 w-4" />
                           Product
                         </div>
                       </th>
@@ -246,6 +272,15 @@ export function OrderDetail({ order }: OrderDetailProps) {
           </Card>
         </div>
       </div>
+
+      <OrderFormDialog
+        order={editableOrder}
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        onSuccess={() => {
+          router.refresh();
+        }}
+      />
     </div>
   );
 }

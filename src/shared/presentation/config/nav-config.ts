@@ -1,21 +1,14 @@
-import {
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
-  Warehouse,
-  PackageOpen,
-  type LucideIcon,
-} from "lucide-react";
+import { Icons, type Icon } from "@/shared/presentation/components/icons";
 
 export type NavItem = {
   title: string;
   url: string;
-  icon?: LucideIcon;
+  icon?: Icon;
   isActive?: boolean;
   items?: {
     title: string;
     url: string;
-    icon?: LucideIcon;
+    icon?: Icon;
   }[];
 };
 
@@ -23,14 +16,14 @@ export const navItems: NavItem[] = [
   {
     title: "Dashboard",
     url: "/",
-    icon: LayoutDashboard,
+    icon: Icons.dashboard,
     isActive: false,
     items: [],
   },
   {
     title: "Products",
     url: "/products",
-    icon: Package,
+    icon: Icons.products,
     isActive: false,
     items: [
       {
@@ -50,14 +43,14 @@ export const navItems: NavItem[] = [
   {
     title: "Inventory",
     url: "/inventory",
-    icon: PackageOpen,
+    icon: Icons.packageOpen,
     isActive: false,
     items: [],
   },
   {
     title: "Warehouses",
     url: "/warehouses",
-    icon: Warehouse,
+    icon: Icons.warehouse,
     isActive: false,
     items: [
       {
@@ -73,24 +66,12 @@ export const navItems: NavItem[] = [
   {
     title: "Orders",
     url: "/orders",
-    icon: ShoppingCart,
+    icon: Icons.orders,
     isActive: false,
     items: [
       {
         title: "All Orders",
         url: "/orders",
-      },
-      {
-        title: "Pending",
-        url: "/orders/pending",
-      },
-      {
-        title: "Completed",
-        url: "/orders/completed",
-      },
-      {
-        title: "Create New",
-        url: "/orders/new",
       },
     ],
   },

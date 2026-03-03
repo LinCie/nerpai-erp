@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { X, Search, Loader2 } from "lucide-react";
 import { Input } from "@/shared/presentation/components/ui/input";
 import { Button } from "@/shared/presentation/components/ui/button";
+import { Icons } from "@/shared/presentation/components/icons";
 import { searchProducts } from "../actions/order.actions";
 import type { ProductPickerResult } from "../types";
 
@@ -127,12 +127,12 @@ export function ProductPicker({
             disabled={disabled}
             className="shrink-0"
           >
-            <X className="w-4 h-4" />
+            <Icons.x className="w-4 h-4" />
           </Button>
         </div>
       ) : (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Icons.search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             ref={inputRef}
             type="text"
@@ -147,7 +147,7 @@ export function ProductPicker({
             className="pl-9"
           />
           {isLoading && (
-            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+            <Icons.loader className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
           )}
         </div>
       )}

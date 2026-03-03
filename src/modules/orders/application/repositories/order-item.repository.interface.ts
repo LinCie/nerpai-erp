@@ -6,12 +6,13 @@ export interface IOrderItemRepository {
   /** Create multiple order items in a batch */
   createMany(
     orderId: string,
+    organizationId: string,
     items: CreateOrderItemParams[],
   ): Promise<OrderItem[]>;
 
-  /** Delete all items for an order */
-  deleteByOrderId(orderId: string): Promise<void>;
+  /** Soft-delete all active items for an order */
+  deleteByOrderId(orderId: string, organizationId: string): Promise<void>;
 
   /** Find all items for an order */
-  findByOrderId(orderId: string): Promise<OrderItem[]>;
+  findByOrderId(orderId: string, organizationId: string): Promise<OrderItem[]>;
 }

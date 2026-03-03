@@ -1,8 +1,6 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/presentation/components/ui/card";
-import { ShoppingCart } from "lucide-react";
-import { auth } from "@/shared/infrastructure/auth/auth";
+import { Icons } from "@/shared/presentation/components/icons";
+import { getSessionAndOrg } from "@/shared/presentation/auth/getSession";
 import { getOrders } from "@/modules/orders/presentation/actions/order.actions";
 import { OrderList } from "@/modules/orders/presentation/components/order-list";
 import { CreateOrderButton } from "@/modules/orders/presentation/components/order-form-dialog";
@@ -10,20 +8,6 @@ import type { OrderStatus } from "@/modules/orders/domain/types";
 
 interface OrdersPageProps {
   searchParams: Promise<{ search?: string; status?: string; page?: string; limit?: string }>;
-}
-
-async function getSessionAndOrg() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
-    redirect("/auth/sign-in");
-  }
-
-  const organizationId = session.session.activeOrganizationId;
-  if (!organizationId) {
-    redirect("/organizations");
-  }
-
-  return { session, organizationId };
 }
 
 export default async function OrdersPage({ searchParams }: OrdersPageProps) {
@@ -57,7 +41,7 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <ShoppingCart className="h-5 w-5" />
+            <Icons.orders className="h-5 w-5" />
             All Orders
           </CardTitle>
           <CardDescription>

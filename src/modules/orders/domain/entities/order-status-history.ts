@@ -5,6 +5,7 @@ import type { OrderStatus } from "../types";
 export interface OrderStatusHistory {
   id: string; // UUID v7
   orderId: string; // FK → order.id
+  organizationId: string; // FK → organization.id
   previousStatus: OrderStatus | null; // NULL for initial creation
   newStatus: OrderStatus;
   changedBy: string; // FK → user.id

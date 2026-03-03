@@ -1,4 +1,5 @@
 // src/modules/orders/infrastructure/repositories/order-item.repository.ts
+import { sql } from "kysely";
 import { db } from "@/shared/infrastructure/persistence";
 import type { OrderItem } from "../../domain/entities/order-item";
 import type { CreateOrderItemParams } from "../../application/types";
@@ -7,6 +8,7 @@ import type { IOrderItemRepository } from "../../application/repositories/order-
 export class OrderItemRepository implements IOrderItemRepository {
   async createMany(
     orderId: string,
+    organizationId: string,
     items: CreateOrderItemParams[]
   ): Promise<OrderItem[]> {
     if (items.length === 0) {
@@ -15,6 +17,7 @@ export class OrderItemRepository implements IOrderItemRepository {
 
     const values = items.map((item) => ({
       orderId,
+      organizationId,
       productId: item.productId,
       productVariantId: item.productVariantId,
       productName: item.productName,
@@ -33,18 +36,22 @@ export class OrderItemRepository implements IOrderItemRepository {
     return results.map((result) => this.mapToDomain(result));
   }
 
-  async deleteByOrderId(orderId: string): Promise<void> {
+  async deleteByOrderId(orderId: string, organizationId: string): Promise<void> {
     await db
-      .deleteFrom("orderItem")
+      .updateTable("orderItem")
+      .set({ deletedAt: sql`CURRENT_TIMESTAMP` })
       .where("orderId", "=", orderId)
+      .where("organizationId", "=", organizationId)
+      .where("deletedAt", "is", null)
       .execute();
   }
 
-  async findByOrderId(orderId: string): Promise<OrderItem[]> {
+  async findByOrderId(orderId: string, organizationId: string): Promise<OrderItem[]> {
     const results = await db
       .selectFrom("orderItem")
       .selectAll()
       .where("orderId", "=", orderId)
+      .where("organizationId", "=", organizationId)
       .where("deletedAt", "is", null)
       .orderBy("createdAt", "asc")
       .execute();
@@ -55,6 +62,7 @@ export class OrderItemRepository implements IOrderItemRepository {
   private mapToDomain(result: {
     id: string;
     orderId: string;
+    organizationId: string;
     productId: string | null;
     productVariantId: string | null;
     productName: string;
@@ -68,6 +76,7 @@ export class OrderItemRepository implements IOrderItemRepository {
     return {
       id: result.id,
       orderId: result.orderId,
+      organizationId: result.organizationId,
       productId: result.productId,
       productVariantId: result.productVariantId,
       productName: result.productName,

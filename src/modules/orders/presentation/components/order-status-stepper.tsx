@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Icons } from "@/shared/presentation/components/icons";
 import type { OrderStatus } from "../../domain/types";
 import {
   PIPELINE_STATUSES,
@@ -49,7 +49,7 @@ export function OrderStatusStepper({ currentStatus }: OrderStatusStepperProps) {
                   aria-current={isCurrent ? "step" : undefined}
                 >
                   {isCompleted ? (
-                    <Check className="w-5 h-5" aria-hidden="true" />
+                    <Icons.check className="w-5 h-5" aria-hidden="true" />
                   ) : (
                     <span className="text-sm font-medium">
                       {index + 1}

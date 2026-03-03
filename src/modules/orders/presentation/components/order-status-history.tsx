@@ -1,6 +1,6 @@
 "use client";
 
-import { History, ArrowRight, Circle } from "lucide-react";
+import { Icons } from "@/shared/presentation/components/icons";
 import type { OrderStatusHistoryEntry } from "../../application/types";
 import { OrderStatusBadge } from "./order-status-badge";
 
@@ -25,7 +25,7 @@ export function OrderStatusHistory({ history }: OrderStatusHistoryProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <History className="h-4 w-4 text-muted-foreground" />
+        <Icons.history className="h-4 w-4 text-muted-foreground" />
         <h4 className="text-sm font-medium">Status History</h4>
       </div>
 
@@ -33,12 +33,12 @@ export function OrderStatusHistory({ history }: OrderStatusHistoryProps) {
         {sortedHistory.map((entry) => (
           <div key={entry.id} className="relative">
             {/* Timeline dot */}
-            <div className="absolute -left-[21px] top-1">
-              {entry.previousStatus === null ? (
-                <Circle className="h-3 w-3 fill-blue-600 text-blue-600" />
-              ) : (
-                <div className="h-3 w-3 rounded-full bg-gray-300" />
-              )}
+              <div className="absolute -left-[21px] top-1">
+                {entry.previousStatus === null ? (
+                  <Icons.circle className="h-3 w-3 fill-blue-600 text-blue-600" />
+                ) : (
+                  <div className="h-3 w-3 rounded-full bg-gray-300" />
+                )}
             </div>
 
             {/* Content */}
@@ -51,7 +51,7 @@ export function OrderStatusHistory({ history }: OrderStatusHistoryProps) {
                 ) : (
                   <>
                     <OrderStatusBadge status={entry.previousStatus} />
-                    <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                    <Icons.arrowRight className="h-3 w-3 text-muted-foreground" />
                   </>
                 )}
                 <OrderStatusBadge status={entry.newStatus} />

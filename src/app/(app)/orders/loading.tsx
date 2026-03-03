@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/presentation/components/ui/card";
-import { ShoppingCart } from "lucide-react";
+import { Icons } from "@/shared/presentation/components/icons";
 import { Skeleton } from "@/shared/presentation/components/ui/skeleton";
 
 export default function OrdersLoading() {
@@ -16,7 +16,7 @@ export default function OrdersLoading() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <ShoppingCart className="h-5 w-5" />
+            <Icons.orders className="h-5 w-5" />
             All Orders
           </CardTitle>
           <CardDescription>

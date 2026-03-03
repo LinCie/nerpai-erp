@@ -22,6 +22,7 @@ import type {
   GetOrdersParams,
   GetOrderDetailParams,
 } from "../../application/types";
+import type { OrderStatus } from "../../domain/types";
 import { createOrderFormOptions, updateOrderFormOptions } from "../lib/form-options";
 import { transitionOrderStatusSchema } from "../schemas/order.schema";
 
@@ -176,7 +177,7 @@ export async function updateOrder(prev: unknown, formData: FormData) {
 
 export async function transitionOrderStatus(params: {
   orderId: string;
-  newStatus: string;
+  newStatus: OrderStatus;
   version: number;
 }): Promise<{ success: true } | { success: false; error: string }> {
   try {

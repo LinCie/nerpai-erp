@@ -85,6 +85,7 @@ export interface OrderItem {
   deletedAt: Timestamp | null;
   id: Generated<string>;
   orderId: string;
+  organizationId: string;
   productId: string | null;
   productName: string;
   productVariantId: string | null;
@@ -101,6 +102,7 @@ export interface OrderStatusHistory {
   id: Generated<string>;
   newStatus: string;
   orderId: string;
+  organizationId: string;
   previousStatus: string | null;
 }
 
