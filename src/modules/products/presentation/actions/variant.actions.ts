@@ -304,7 +304,6 @@ export async function updateVariant(
     const rawId = formData.get("id");
     const rawSku = formData.get("sku");
     const rawPrice = formData.get("price");
-    const rawStockQuantity = formData.get("stockQuantity");
 
     const id = typeof rawId === "string" ? rawId : "";
     const parsedId = softDeleteVariantSchema.safeParse({ id });
@@ -318,7 +317,6 @@ export async function updateVariant(
     const updateInput: {
       sku?: string;
       price?: number;
-      stockQuantity?: number;
     } = {};
 
     if (typeof rawSku === "string") {
@@ -331,17 +329,6 @@ export async function updateVariant(
         return { success: false, error: "Price must be a number" };
       }
       updateInput.price = price;
-    }
-
-    if (
-      typeof rawStockQuantity === "string" &&
-      rawStockQuantity.trim() !== ""
-    ) {
-      const stockQuantity = Number(rawStockQuantity);
-      if (Number.isNaN(stockQuantity)) {
-        return { success: false, error: "Stock quantity must be a number" };
-      }
-      updateInput.stockQuantity = stockQuantity;
     }
 
     const parsedUpdate = updateVariantSchema.safeParse(updateInput);
@@ -357,7 +344,6 @@ export async function updateVariant(
       organizationId: string;
       sku?: string;
       price?: number;
-      stockQuantity?: number;
     } = {
       id,
       organizationId,
@@ -375,7 +361,6 @@ export async function updateVariant(
         id: variant.id,
         sku: variant.sku,
         price: parseFloat(variant.price),
-        stockQuantity: variant.stockQuantity,
       },
     };
   } catch (e) {

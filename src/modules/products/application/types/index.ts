@@ -116,7 +116,6 @@ export interface UpdateVariantParams {
   id: string;
   sku?: string;
   price?: number;
-  stockQuantity?: number;
   organizationId: string;
 }
 
@@ -183,7 +182,6 @@ export interface UpdateVariantResult {
     id: string;
     sku: string;
     price: number;
-    stockQuantity: number;
   };
   error?: string;
 }

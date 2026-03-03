@@ -9,10 +9,6 @@ export const variantSchema = z.object({
   price: z
     .number()
     .min(0, { error: "Price must be a non-negative value" }),
-  stockQuantity: z
-    .number()
-    .int({ error: "Stock quantity must be an integer" })
-    .min(0, { error: "Stock quantity must be a non-negative integer" }),
 });
 
 export const updateVariantSchema = z.object({
@@ -25,11 +21,6 @@ export const updateVariantSchema = z.object({
   price: z
     .number()
     .min(0, { error: "Price must be a non-negative value" })
-    .optional(),
-  stockQuantity: z
-    .number()
-    .int({ error: "Stock quantity must be an integer" })
-    .min(0, { error: "Stock quantity must be a non-negative integer" })
     .optional(),
 });
 

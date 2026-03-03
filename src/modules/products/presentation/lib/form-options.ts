@@ -3,7 +3,10 @@
 
 import { formOptions } from "@tanstack/react-form-nextjs";
 import { productSchema } from "../schemas/product.schema";
-import { attributeSchema, attributeOptionSchema } from "../schemas/attribute.schema";
+import {
+  attributeSchema,
+  attributeOptionSchema,
+} from "../schemas/attribute.schema";
 import { variantSchema } from "../schemas/variant.schema";
 
 export const createProductFormOptions = formOptions({
@@ -55,7 +58,6 @@ export const variantFormOptions = formOptions({
   defaultValues: {
     sku: "",
     price: 0,
-    stockQuantity: 0,
   },
   validators: {
     onSubmit: variantSchema,
@@ -77,5 +79,4 @@ export type AttributeOptionFormValues = {
 export type VariantFormValues = {
   sku: string;
   price: number;
-  stockQuantity: number;
 };

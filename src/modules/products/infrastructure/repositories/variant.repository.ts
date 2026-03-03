@@ -4,7 +4,10 @@ import type { ProductAttribute } from "../../domain/entities/product-attribute";
 import type { ProductVariant } from "../../domain/entities/product-variant";
 import type { VariantOption } from "../../domain/entities/variant-option";
 import type { AttributeOption } from "../../domain/entities/attribute-option";
-import type { ProductWithVariants, VariantWithOptions } from "../../domain/types";
+import type {
+  ProductWithVariants,
+  VariantWithOptions,
+} from "../../domain/types";
 import type { IVariantRepository } from "../../application/repositories/variant.repository.interface";
 
 export class VariantRepository implements IVariantRepository {
@@ -153,7 +156,11 @@ export class VariantRepository implements IVariantRepository {
 
     const result = await db
       .selectFrom("variantOption")
-      .innerJoin("productVariant", "productVariant.id", "variantOption.productVariantId")
+      .innerJoin(
+        "productVariant",
+        "productVariant.id",
+        "variantOption.productVariantId",
+      )
       .where("variantOption.productAttributeId", "=", productAttribute.id)
       .where("variantOption.organizationId", "=", organizationId)
       .where("productVariant.deletedAt", "is", null)
@@ -198,8 +205,12 @@ export class VariantRepository implements IVariantRepository {
       .where("deletedAt", "is", null)
       .execute();
 
-    const optionIds = [...new Set(variantOptions.map((vo) => vo.attributeOptionId))];
-    const productAttributeIds = [...new Set(variantOptions.map((vo) => vo.productAttributeId))];
+    const optionIds = [
+      ...new Set(variantOptions.map((vo) => vo.attributeOptionId)),
+    ];
+    const productAttributeIds = [
+      ...new Set(variantOptions.map((vo) => vo.productAttributeId)),
+    ];
 
     const [attributeOptions, productAttributesResult] = await Promise.all([
       db
@@ -230,7 +241,9 @@ export class VariantRepository implements IVariantRepository {
       .execute();
 
     const optionsMap = new Map(attributeOptions.map((o) => [o.id, o]));
-    const productAttributesMap = new Map(productAttributes.map((pa) => [pa.id, pa]));
+    const productAttributesMap = new Map(
+      productAttributes.map((pa) => [pa.id, pa]),
+    );
     const attributesMap = new Map(attributes.map((a) => [a.id, a]));
 
     const optionsByVariantId = new Map<string, typeof variantOptions>();
@@ -244,8 +257,12 @@ export class VariantRepository implements IVariantRepository {
       const vos = optionsByVariantId.get(variant.id) ?? [];
       const options = vos.map((vo) => {
         const option = optionsMap.get(vo.attributeOptionId);
-        const productAttribute = productAttributesMap.get(vo.productAttributeId);
-        const attribute = productAttribute ? attributesMap.get(productAttribute.attributeId) : undefined;
+        const productAttribute = productAttributesMap.get(
+          vo.productAttributeId,
+        );
+        const attribute = productAttribute
+          ? attributesMap.get(productAttribute.attributeId)
+          : undefined;
 
         return {
           option: option!,
@@ -308,7 +325,9 @@ export class VariantRepository implements IVariantRepository {
     });
 
     const optionIds = variantOptions.map((vo) => vo.attributeOptionId);
-    const productAttributeIds = variantOptions.map((vo) => vo.productAttributeId);
+    const productAttributeIds = variantOptions.map(
+      (vo) => vo.productAttributeId,
+    );
 
     const [attributeOptions, productAttributes] = await Promise.all([
       db
@@ -328,17 +347,31 @@ export class VariantRepository implements IVariantRepository {
     ]);
 
     const optionsMap = new Map(attributeOptions.map((o) => [o.id, o]));
-    const productAttributesMap = new Map(productAttributes.map((pa) => [pa.id, pa]));
+    const productAttributesMap = new Map(
+      productAttributes.map((pa) => [pa.id, pa]),
+    );
 
     const options = variantOptions
       .map((vo) => {
         const option = optionsMap.get(vo.attributeOptionId);
-        const productAttribute = productAttributesMap.get(vo.productAttributeId);
+        const productAttribute = productAttributesMap.get(
+          vo.productAttributeId,
+        );
         if (!option || !productAttribute) return null;
         return { option, productAttribute };
       })
-      .filter((o): o is { option: AttributeOption; productAttribute: ProductAttribute } => o !== null)
-      .sort((a, b) => a.productAttribute.displayOrder - b.productAttribute.displayOrder);
+      .filter(
+        (
+          o,
+        ): o is {
+          option: AttributeOption;
+          productAttribute: ProductAttribute;
+        } => o !== null,
+      )
+      .sort(
+        (a, b) =>
+          a.productAttribute.displayOrder - b.productAttribute.displayOrder,
+      );
 
     return { variant, options };
   }
@@ -347,13 +380,11 @@ export class VariantRepository implements IVariantRepository {
     productId,
     sku,
     price,
-    stockQuantity,
     organizationId,
   }: {
     productId: string;
     sku: string;
     price: number;
-    stockQuantity: number;
     organizationId: string;
   }): Promise<ProductVariant> {
     return await db
@@ -362,7 +393,6 @@ export class VariantRepository implements IVariantRepository {
         productId,
         sku,
         price: price.toString(),
-        stockQuantity,
         organizationId,
       })
       .returningAll()
@@ -373,13 +403,11 @@ export class VariantRepository implements IVariantRepository {
     id,
     sku,
     price,
-    stockQuantity,
     organizationId,
   }: {
     id: string;
     sku?: string;
     price?: number;
-    stockQuantity?: number;
     organizationId: string;
   }): Promise<ProductVariant | null> {
     const updateData: Record<string, unknown> = {
@@ -391,9 +419,6 @@ export class VariantRepository implements IVariantRepository {
     }
     if (price !== undefined) {
       updateData.price = price.toString();
-    }
-    if (stockQuantity !== undefined) {
-      updateData.stockQuantity = stockQuantity;
     }
 
     const variant = await db
@@ -484,7 +509,7 @@ export class VariantRepository implements IVariantRepository {
           .select("variantOption.productVariantId")
           .where("variantOption.productAttributeId", "=", productAttribute.id)
           .where("variantOption.organizationId", "=", organizationId)
-          .where("variantOption.deletedAt", "is", null)
+          .where("variantOption.deletedAt", "is", null),
       )
       .where("productVariant.organizationId", "=", organizationId)
       .where("productVariant.deletedAt", "is", null)
@@ -628,7 +653,10 @@ export class VariantRepository implements IVariantRepository {
         };
       })
       .filter((a): a is NonNullable<typeof a> => a !== null)
-      .sort((a, b) => a.productAttribute.displayOrder - b.productAttribute.displayOrder);
+      .sort(
+        (a, b) =>
+          a.productAttribute.displayOrder - b.productAttribute.displayOrder,
+      );
 
     const variants = await this.getVariantsByProduct({
       productId,
@@ -678,12 +706,16 @@ export class VariantRepository implements IVariantRepository {
           .where("deletedAt", "is", null)
           .execute();
 
-        const optionValueById = new Map(optionRows.map((row) => [row.id, row.value]));
+        const optionValueById = new Map(
+          optionRows.map((row) => [row.id, row.value]),
+        );
         const orderedOptionValues: string[] = [];
         for (const optionId of combination.attributeOptionIds) {
           const value = optionValueById.get(optionId);
           if (value === undefined) {
-            throw new Error("One or more selected attribute options are missing.");
+            throw new Error(
+              "One or more selected attribute options are missing.",
+            );
           }
           orderedOptionValues.push(value);
         }
@@ -705,7 +737,6 @@ export class VariantRepository implements IVariantRepository {
             productId,
             sku: finalSku,
             price: "0",
-            stockQuantity: 0,
             organizationId,
           })
           .returningAll()

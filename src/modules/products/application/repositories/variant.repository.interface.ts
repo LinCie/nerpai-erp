@@ -1,7 +1,10 @@
 import type { ProductAttribute } from "../../domain/entities/product-attribute";
 import type { ProductVariant } from "../../domain/entities/product-variant";
 import type { VariantOption } from "../../domain/entities/variant-option";
-import type { ProductWithVariants, VariantWithOptions } from "../../domain/types";
+import type {
+  ProductWithVariants,
+  VariantWithOptions,
+} from "../../domain/types";
 
 export interface IVariantRepository {
   getProductAttributes(params: {
@@ -60,7 +63,6 @@ export interface IVariantRepository {
     productId: string;
     sku: string;
     price: number;
-    stockQuantity: number;
     organizationId: string;
   }): Promise<ProductVariant>;
 
@@ -68,7 +70,6 @@ export interface IVariantRepository {
     id: string;
     sku?: string;
     price?: number;
-    stockQuantity?: number;
     organizationId: string;
   }): Promise<ProductVariant | null>;
 

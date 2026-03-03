@@ -314,7 +314,6 @@ export class VariantService {
     id: string;
     sku?: string;
     price?: number;
-    stockQuantity?: number;
     organizationId: string;
   }): Promise<ProductVariant> {
     if (params.sku !== undefined) {
