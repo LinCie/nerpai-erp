@@ -19,10 +19,10 @@
 
 **Purpose**: Database migrations, module directory structure, and shared type generation
 
-- [ ] T001 Create the orders module directory structure: `mkdir -p src/modules/orders/{domain/{entities,types},application/{repositories,services,types},infrastructure/repositories,presentation/{actions,components,schemas,lib,types}}`
-- [ ] T002 Create database migration for pg_trgm extension via `bun db:migrate:create enable_pg_trgm_extension` — copy SQL from data-model.md Migration 1 (idempotent `CREATE EXTENSION IF NOT EXISTS pg_trgm`)
-- [ ] T003 Create database migration for order tables via `bun db:migrate:create create_order_tables` — copy SQL from data-model.md Migration 2 (creates `order`, `order_item`, `order_status_history` tables with all CHECK constraints, FK constraints, and indexes)
-- [ ] T004 Run database migrations via `bun db:migrate` and regenerate database types via `bun db:codegen` to update `src/shared/infrastructure/persistence/types.ts` with Order, OrderItem, and OrderStatusHistory table types
+- [X] T001 Create the orders module directory structure: `mkdir -p src/modules/orders/{domain/{entities,types},application/{repositories,services,types},infrastructure/repositories,presentation/{actions,components,schemas,lib,types}}`
+- [X] T002 Create database migration for pg_trgm extension via `bun db:migrate:create enable_pg_trgm_extension` — copy SQL from data-model.md Migration 1 (idempotent `CREATE EXTENSION IF NOT EXISTS pg_trgm`)
+- [X] T003 Create database migration for order tables via `bun db:migrate:create create_order_tables` — copy SQL from data-model.md Migration 2 (creates `order`, `order_item`, `order_status_history` tables with all CHECK constraints, FK constraints, and indexes)
+- [X] T004 Run database migrations via `bun db:migrate` and regenerate database types via `bun db:codegen` to update `src/shared/infrastructure/persistence/types.ts` with Order, OrderItem, and OrderStatusHistory table types
 
 ---
 
