@@ -29,7 +29,7 @@
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 **Required Verification:**
 
@@ -45,8 +45,10 @@
 - [ ] **Soft Delete Enforcement**: All entities have `deleted_at` column, use soft delete methods, no hard deletes without approval (IX)
 - [ ] **X. Multi-Tenancy**: organization_id present on all business entities, queries scoped to active org (X)
 - [ ] **XI. Contract Fidelity**: Server Action/API behaviors match documented success + recoverable error contracts, and completion claims are evidence-backed
+- [ ] **XII. Typed Server Action Parameters**: Server Actions accept typed parameters, not `FormData`; `FormData` only for file uploads or progressive enhancement (documented reason required)
 
 **Research Phase Check:**
+
 - [ ] All library versions verified via Context7 (where available)
 - [ ] Context7 library IDs documented in research.md
 - [ ] Prior knowledge invalidated when Context7 data retrieved
@@ -67,6 +69,7 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
+
 <!--
   ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
   for this feature. Delete unused options and expand the chosen structure with
@@ -117,7 +120,7 @@ directories captured above]
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| Violation                  | Why Needed         | Simpler Alternative Rejected Because |
+| -------------------------- | ------------------ | ------------------------------------ |
+| [e.g., 4th project]        | [current need]     | [why 3 projects insufficient]        |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient]  |

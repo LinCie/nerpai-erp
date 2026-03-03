@@ -1,41 +1,44 @@
-<!--
-================================================================================
-SYNC IMPACT REPORT
-================================================================================
-Version change: 1.9.2 → 1.10.0 (Minor - added contract fidelity principle and
-expanded database extension/integrity requirements)
+# <!--
+
+# SYNC IMPACT REPORT
+
+Version change: 1.10.0 → 1.11.0 (Minor - added typed server action parameters
+principle)
 
 Modified principles:
-  - III. Next.js App Router Standards (added documented contract parity rule)
-  - VIII. Database Naming Conventions → VIII. Database Naming, Extensions & Integrity
+
+- III. Next.js App Router Standards (added typed-parameters-first guidance)
 
 Added principles:
-  - XI. Contract Fidelity & Verification Integrity
+
+- XII. Typed Server Action Parameters
 
 Modified sections:
-  - Technology Standards (added extension governance guidance)
-  - Development Workflow / Quality Gates (added contract/evidence/DB integrity gates)
+
+- Development Workflow / Quality Gates (added typed parameter gate)
 
 Added sections:
-  - None
+
+- None
 
 Removed sections:
-  - None
+
+- None
 
 Templates requiring updates:
-  ✅ .specify/templates/plan-template.md
-  ✅ .specify/templates/spec-template.md
-  ✅ .specify/templates/tasks-template.md
-  ⚠ .specify/templates/commands/*.md (directory not present; no command templates to validate)
+✅ .specify/templates/plan-template.md
+✅ .specify/templates/spec-template.md
+✅ .specify/templates/tasks-template.md
+⚠ .specify/templates/commands/\*.md (directory not present; no command
+templates to validate)
 
 Runtime docs requiring updates:
-  ✅ README.md
-  ✅ specs/001-basic-product-crud/quickstart.md
+✅ .agent/rules/nextjs-server-action-guide.md
 
 Follow-up TODOs:
-  - None
-================================================================================
--->
+
+- # None
+  -->
 
 # NERPAI ERP Constitution
 
@@ -79,6 +82,7 @@ Leverage Next.js 16 App Router capabilities for optimal performance and UX.
 - Server Components are the default; use `'use client'` directive only when
   necessary
 - Server Actions handle mutations; validate inputs with Zod or similar
+- Server Actions MUST accept typed parameters, not `FormData` (see XII)
 - Server Actions and route handlers MUST match documented contracts for success,
   validation, authorization, and not-found outcomes
 - Use streaming and Suspense for progressive loading
@@ -167,6 +171,7 @@ All feature code lives in `src/modules/[module-name]/` with four distinct layers
     management (Zustand), Zod schemas, presentation types
 
 **Cross-Cutting Concerns**:
+
 - Shared utilities: `src/lib/`
 - Cross-module types: `src/types/`
 - Global styles: `src/styles/`
@@ -268,6 +273,35 @@ completion claims MUST be evidence-backed.
 **Rationale**: Contract drift causes user-facing defects and wasted debugging.
 Evidence-based completion prevents false confidence in quality gates.
 
+### XII. Typed Server Action Parameters
+
+Server Actions MUST accept typed parameters instead of `FormData`. The
+`FormData` API is reserved exclusively for scenarios where it is technically
+necessary.
+
+- Server Actions MUST accept explicitly typed parameter objects (for example,
+  `createOrder(data: CreateOrderInput)`) instead of `FormData`
+- TanStack Form's `onSubmit({ value })` MUST pass the typed `value` directly
+  to the server action function; do NOT serialize form values into `FormData`
+- `FormData` is permitted ONLY when one of these conditions is met:
+  - File uploads that require `multipart/form-data` encoding
+  - Progressive enhancement where the form MUST function without JavaScript
+- When `FormData` is required, the reason MUST be documented in a code comment
+  at the action definition site
+- Zod validation MUST be applied to the typed parameters on the server side;
+  client-side validation via TanStack Form validators is complementary, not a
+  substitute
+- Server Action return types MUST be explicitly typed (for example,
+  `Promise<{ success: true } | { success: false; error: string }>`)
+
+**Rationale**: `FormData` introduces unnecessary complexity: `formData.get()`
+returns `string | File | null` requiring manual type coercion, nested objects
+require JSON serialization workarounds, and checkbox/multi-value fields have
+unintuitive behavior. Typed parameters provide compile-time safety, eliminate
+coercion bugs, and align with the Type Safety First principle (I). TanStack Form
+already provides validated, typed values via `onSubmit` — converting these to
+`FormData` only to parse them back is wasteful indirection.
+
 ## Technology Standards
 
 **Framework**: Next.js 16.x with App Router
@@ -287,6 +321,7 @@ with `bun db:migrate`)
 **Package Manager**: Bun only (`npm`, `yarn`, `pnpm`, and `deno` are prohibited)
 
 **Versioning**: Semantic Versioning (MAJOR.MINOR.PATCH)
+
 - MAJOR: Backward incompatible governance changes
 - MINOR: New principle/section or materially expanded guidance
 - PATCH: Clarifications and non-semantic refinements
@@ -319,6 +354,8 @@ with `bun db:migrate`)
 13. DB constraints enforce critical domain invariants where feasible (VIII)
 14. Performance claims include reproducible evidence and matching
     extension/index strategy where applicable (VIII, XI)
+15. Server Actions accept typed parameters, not `FormData`, unless file upload
+    or progressive enhancement requires it (XII)
 
 ### File Organization
 
@@ -351,6 +388,7 @@ src/
 ```
 
 **Key Rules**:
+
 - Each module is self-contained; minimize cross-module imports
 - Domain layer has zero external dependencies (no React, no Kysely)
 - Application layer depends only on Domain layer
@@ -364,6 +402,7 @@ This constitution supersedes all other development practices within this
 project.
 
 **Amendment Process**:
+
 1. Propose change via pull request to `constitution.md`
 2. Document rationale and impact on existing code/process
 3. Increment version per semantic versioning rules
@@ -371,12 +410,14 @@ project.
 5. Propagate changes to dependent templates and documentation
 
 **Compliance Review**:
+
 - All PRs MUST verify compliance with constitution principles
 - Deviations require explicit justification documented in Complexity Tracking
 - Claimed completed validations MUST include evidence references in PR notes
 
 **Guidance Files**:
+
 - `AGENTS.md`: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.10.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-24
+**Version**: 1.11.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-03-04

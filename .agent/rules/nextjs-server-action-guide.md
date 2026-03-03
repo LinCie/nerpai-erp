@@ -15,16 +15,33 @@ Key Principles:
 Usage:
 
 - Define async functions with 'use server'
-- Call from forms (action prop)
+- Call from forms (via TanStack Form onSubmit)
 - Call from event handlers (onClick)
 - Call from useEffect (rare)
 
-Forms:
+Typed Parameters (Constitution XII):
 
-- Use <form action={serverAction}>
-- Use useFormStatus for pending states
-- Use useFormState for server responses
-- Handle validation on the server (Zod)
+- Server Actions MUST accept typed parameter objects, NOT FormData
+- Use TanStack Form's onSubmit({ value }) to pass typed data directly
+- FormData is only permitted for file uploads or progressive enhancement
+- If FormData is required, document the reason in a code comment
+- Example:
+  - CORRECT: `async function createOrder(data: CreateOrderInput)`
+  - WRONG: `async function createOrder(prev: unknown, formData: FormData)`
+- TanStack Form pattern:
+  ```
+  const form = useForm({
+    onSubmit: async ({ value }) => {
+      await createOrder(value) // typed, validated value
+    },
+  })
+  ```
+
+Validation:
+
+- Validate inputs with Zod on the server side
+- TanStack Form client validators are complementary, not a substitute
+- Apply Zod schema to the typed parameter before processing
 
 Security:
 
@@ -42,6 +59,7 @@ Revalidation:
 Best Practices:
 
 - Keep actions in separate files for clarity
-- Type arguments and return values
-- Handle errors gracefully and return to client
+- Type arguments and return values explicitly
+- Handle errors gracefully and return typed results to client
 - Use optimistic updates with useOptimistic
+- Return discriminated unions for success/error states
