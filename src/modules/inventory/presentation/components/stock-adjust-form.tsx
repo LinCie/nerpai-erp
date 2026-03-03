@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import {
   initialFormState,
   mergeForm,
@@ -57,7 +57,7 @@ export function StockAdjustForm({
     }
   }, [state, isPending, onSuccess]);
 
-  const selectedProductId = form.getFieldValue("productId") ?? "";
+  const [selectedProductId, setSelectedProductId] = useState("");
   const availableVariants = selectedProductId
     ? variants.filter((variant) => variant.productId === selectedProductId)
     : [];
@@ -90,6 +90,7 @@ export function StockAdjustForm({
                   value={field.state.value ?? ""}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
+                    setSelectedProductId(e.target.value);
                     form.setFieldValue("productVariantId", "");
                   }}
                   onBlur={field.handleBlur}
@@ -218,7 +219,8 @@ export function StockAdjustForm({
                   }
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Set the absolute stock quantity (current stock will be adjusted to this value)
+                  Set the absolute stock quantity (current stock will be
+                  adjusted to this value)
                 </p>
                 {hasErrors && (
                   <FieldError id={`${field.name}-error`}>
@@ -236,7 +238,9 @@ export function StockAdjustForm({
             const notesLength = field.state.value?.length || 0;
             return (
               <Field data-invalid={hasErrors}>
-                <FieldLabel htmlFor={field.name}>Notes (Recommended)</FieldLabel>
+                <FieldLabel htmlFor={field.name}>
+                  Notes (Recommended)
+                </FieldLabel>
                 <Textarea
                   id={field.name}
                   name={field.name}

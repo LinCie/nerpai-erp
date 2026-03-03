@@ -109,7 +109,7 @@ export function StockTransferForm({
     form.setFieldValue("confirmNegative", "false");
   }, [form]);
 
-  const selectedProductId = form.getFieldValue("productId") ?? "";
+  const [selectedProductId, setSelectedProductId] = useState("");
   const availableVariants = selectedProductId
     ? variants.filter((variant) => variant.productId === selectedProductId)
     : [];
@@ -150,6 +150,7 @@ export function StockTransferForm({
                     value={field.state.value ?? ""}
                     onChange={(e) => {
                       field.handleChange(e.target.value);
+                      setSelectedProductId(e.target.value);
                       form.setFieldValue("productVariantId", "");
                     }}
                     onBlur={field.handleBlur}
@@ -222,7 +223,9 @@ export function StockTransferForm({
                 const hasErrors = field.state.meta.errors.length > 0;
                 return (
                   <Field data-invalid={hasErrors}>
-                    <FieldLabel htmlFor={field.name}>Source Warehouse *</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>
+                      Source Warehouse *
+                    </FieldLabel>
                     <select
                       id={field.name}
                       name={field.name}
@@ -243,7 +246,9 @@ export function StockTransferForm({
                     </select>
                     {hasErrors && (
                       <FieldError id={`${field.name}-error`}>
-                        {field.state.meta.errors.map((e) => String(e)).join(", ")}
+                        {field.state.meta.errors
+                          .map((e) => String(e))
+                          .join(", ")}
                       </FieldError>
                     )}
                   </Field>
@@ -256,7 +261,9 @@ export function StockTransferForm({
                 const hasErrors = field.state.meta.errors.length > 0;
                 return (
                   <Field data-invalid={hasErrors}>
-                    <FieldLabel htmlFor={field.name}>Destination Warehouse *</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>
+                      Destination Warehouse *
+                    </FieldLabel>
                     <select
                       id={field.name}
                       name={field.name}
@@ -277,7 +284,9 @@ export function StockTransferForm({
                     </select>
                     {hasErrors && (
                       <FieldError id={`${field.name}-error`}>
-                        {field.state.meta.errors.map((e) => String(e)).join(", ")}
+                        {field.state.meta.errors
+                          .map((e) => String(e))
+                          .join(", ")}
                       </FieldError>
                     )}
                   </Field>
@@ -348,7 +357,9 @@ export function StockTransferForm({
                   <div className="flex justify-between text-xs text-muted-foreground">
                     {hasErrors && (
                       <FieldError id={`${field.name}-error`}>
-                        {field.state.meta.errors.map((e) => String(e)).join(", ")}
+                        {field.state.meta.errors
+                          .map((e) => String(e))
+                          .join(", ")}
                       </FieldError>
                     )}
                     <span className="ml-auto">{notesLength}/1000</span>

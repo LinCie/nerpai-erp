@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import {
   initialFormState,
   mergeForm,
@@ -57,7 +57,7 @@ export function StockReceiveForm({
     }
   }, [state, isPending, onSuccess]);
 
-  const selectedProductId = form.getFieldValue("productId") ?? "";
+  const [selectedProductId, setSelectedProductId] = useState("");
   const availableVariants = selectedProductId
     ? variants.filter((variant) => variant.productId === selectedProductId)
     : [];
@@ -90,6 +90,7 @@ export function StockReceiveForm({
                   value={field.state.value ?? ""}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
+                    setSelectedProductId(e.target.value);
                     form.setFieldValue("productVariantId", "");
                   }}
                   onBlur={field.handleBlur}

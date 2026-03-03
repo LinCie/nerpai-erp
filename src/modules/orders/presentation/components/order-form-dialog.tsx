@@ -25,7 +25,10 @@ import {
 } from "@/shared/presentation/components/ui/field";
 import { toast } from "sonner";
 import { Icons } from "@/shared/presentation/components/icons";
-import { createOrderFormOptions, updateOrderFormOptions } from "../lib/form-options";
+import {
+  createOrderFormOptions,
+  updateOrderFormOptions,
+} from "../lib/form-options";
 import { createOrder, updateOrder } from "../actions/order.actions";
 import { OrderLineItems } from "./order-line-items";
 import type { OrderFormDialogProps } from "../types";
@@ -95,13 +98,19 @@ export function OrderFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? "Edit Order" : "Create New Order"}</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? "Edit Order" : "Create New Order"}
+          </DialogTitle>
         </DialogHeader>
         {open && (
           <OrderForm
             order={order}
             onSuccess={() => {
-              toast.success(isEditMode ? "Order updated successfully" : "Order created successfully");
+              toast.success(
+                isEditMode
+                  ? "Order updated successfully"
+                  : "Order created successfully",
+              );
               onOpenChange(false);
               onSuccess?.();
             }}
@@ -134,36 +143,39 @@ interface OrderFormProps {
 function OrderForm({ order, onSuccess, onCancel }: OrderFormProps) {
   const isEditMode = !!order;
   const action = isEditMode ? updateOrder : createOrder;
-  const formOptions = isEditMode ? updateOrderFormOptions : createOrderFormOptions;
+  const formOptions = isEditMode
+    ? updateOrderFormOptions
+    : createOrderFormOptions;
 
   const [state, formAction, isPending] = useActionState(
     action,
-    initialFormState
+    initialFormState,
   );
 
   const form = useForm({
     ...formOptions,
     transform: useTransform(
       (baseForm) => mergeForm(baseForm, state ?? {}),
-      [state]
+      [state],
     ),
     defaultValues: isEditMode
       ? {
           id: order!.id,
           version: order!.version,
           customerName: order!.customerName,
-          items: order!.items.length > 0
-            ? order!.items
-            : [
-                {
-                  productId: "",
-                  productVariantId: "",
-                  productName: "",
-                  sku: "",
-                  unitPrice: 0,
-                  quantity: 1,
-                },
-              ],
+          items:
+            order!.items.length > 0
+              ? order!.items
+              : [
+                  {
+                    productId: "",
+                    productVariantId: "",
+                    productName: "",
+                    sku: "",
+                    unitPrice: 0,
+                    quantity: 1,
+                  },
+                ],
         }
       : formOptions.defaultValues,
   });
@@ -202,7 +214,7 @@ function OrderForm({ order, onSuccess, onCancel }: OrderFormProps) {
                   id={field.name}
                   name={field.name}
                   type="text"
-                  value={field.state.value}
+                  value={field.state.value ?? ""}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   placeholder="Enter customer name"
@@ -225,11 +237,51 @@ function OrderForm({ order, onSuccess, onCancel }: OrderFormProps) {
 
         <form.Field name="items">
           {(field) => {
+            const items = field.state.value || [];
             const hasErrors = field.state.meta.errors.length > 0;
             return (
               <Field data-invalid={hasErrors}>
+                {/* Hidden inputs serialize the items array into FormData for the server action */}
+                {items.map((item, index) => (
+                  <div
+                    key={index}
+                    style={{ display: "none" }}
+                    aria-hidden="true"
+                  >
+                    <input
+                      readOnly
+                      name={`items[${index}].productId`}
+                      value={item.productId ?? ""}
+                    />
+                    <input
+                      readOnly
+                      name={`items[${index}].productVariantId`}
+                      value={item.productVariantId ?? ""}
+                    />
+                    <input
+                      readOnly
+                      name={`items[${index}].productName`}
+                      value={item.productName}
+                    />
+                    <input
+                      readOnly
+                      name={`items[${index}].sku`}
+                      value={item.sku}
+                    />
+                    <input
+                      readOnly
+                      name={`items[${index}].unitPrice`}
+                      value={String(item.unitPrice)}
+                    />
+                    <input
+                      readOnly
+                      name={`items[${index}].quantity`}
+                      value={String(item.quantity)}
+                    />
+                  </div>
+                ))}
                 <OrderLineItems
-                  items={field.state.value || []}
+                  items={items}
                   onItemsChange={(newItems) => field.handleChange(newItems)}
                   disabled={form.state.isSubmitting}
                 />
@@ -259,8 +311,8 @@ function OrderForm({ order, onSuccess, onCancel }: OrderFormProps) {
               ? "Updating..."
               : "Creating..."
             : isEditMode
-            ? "Update Order"
-            : "Create Order"}
+              ? "Update Order"
+              : "Create Order"}
         </Button>
       </div>
     </form>

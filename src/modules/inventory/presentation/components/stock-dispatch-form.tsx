@@ -109,7 +109,7 @@ export function StockDispatchForm({
     form.setFieldValue("confirmNegative", "false");
   }, [form]);
 
-  const selectedProductId = form.getFieldValue("productId") ?? "";
+  const [selectedProductId, setSelectedProductId] = useState("");
   const availableVariants = selectedProductId
     ? variants.filter((variant) => variant.productId === selectedProductId)
     : [];
@@ -150,6 +150,7 @@ export function StockDispatchForm({
                     value={field.state.value ?? ""}
                     onChange={(e) => {
                       field.handleChange(e.target.value);
+                      setSelectedProductId(e.target.value);
                       form.setFieldValue("productVariantId", "");
                     }}
                     onBlur={field.handleBlur}
@@ -312,7 +313,9 @@ export function StockDispatchForm({
                   <div className="flex justify-between text-xs text-muted-foreground">
                     {hasErrors && (
                       <FieldError id={`${field.name}-error`}>
-                        {field.state.meta.errors.map((e) => String(e)).join(", ")}
+                        {field.state.meta.errors
+                          .map((e) => String(e))
+                          .join(", ")}
                       </FieldError>
                     )}
                     <span className="ml-auto">{notesLength}/1000</span>
