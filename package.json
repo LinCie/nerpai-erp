@@ -23,6 +23,7 @@
     "@fontsource-variable/roboto": "^5.2.9",
     "@tanstack/react-form": "^1.28.3",
     "@tanstack/react-form-nextjs": "^1.28.3",
+    "@tanstack/react-query": "^5.90.21",
     "argon2": "^0.44.0",
     "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",
