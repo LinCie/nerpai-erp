@@ -97,9 +97,10 @@ _Example of marking unclear requirements:_
 
 ### Contract & Integrity Requirements _(mandatory when applicable)_
 
-- **CR-001**: Server Actions/APIs MUST define explicit success and recoverable error behaviors (validation, not found, forbidden) in contracts.
+- **CR-001**: Elysia API routes MUST define explicit success and recoverable error behaviors (validation, not found, forbidden) in contracts.
 - **CR-002**: Implementation MUST match documented contract shapes for all exposed mutation/read operations.
-- **CR-003**: Server Actions MUST accept typed parameters, not `FormData`, unless file upload or progressive enhancement requires it (XII).
+- **CR-003**: Elysia route handlers MUST define TypeBox request body and response schemas per status code for end-to-end type safety (XII).
+- **CR-004**: All client-side API calls MUST use Eden Treaty client; raw `fetch` and `'use server'` directives are prohibited (XII).
 - **DIR-001**: Critical domain invariants MUST be enforced at the database layer where feasible (e.g., CHECK/NOT NULL/foreign key constraints).
 - **DIR-002**: If substring text search is required, specify matching index/extension strategy (e.g., `pg_trgm`) in requirements or research.
 

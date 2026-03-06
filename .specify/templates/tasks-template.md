@@ -68,9 +68,9 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T007 Create base models/entities that all stories depend on
 - [ ] T008 Configure error handling and logging infrastructure
 - [ ] T009 Setup environment configuration management
-- [ ] T00X Define/confirm Server Action or API contracts for success + recoverable errors in `contracts/`
+- [ ] T00X Define/confirm Elysia API route contracts for success + recoverable errors in `contracts/`
 - [ ] T00Y Add DB integrity constraints and required extension/index migrations for planned query patterns
-- [ ] T00Z Verify Server Actions accept typed parameters (not FormData) per Constitution XII
+- [ ] T00Z Verify Elysia route handlers define TypeBox request/response schemas per Constitution XII
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -97,8 +97,8 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T015 [US1] Implement [EntityRepository] in src/modules/[module]/infrastructure/repositories/ (depends on T014)
 - [ ] T016 [US1] Implement [Service] in src/modules/[module]/application/services/[service].ts (depends on T012, T013)
 - [ ] T017 [US1] Create Zod schema in src/modules/[module]/presentation/schemas/
-- [ ] T018 [US1] Implement [Server Action] in src/modules/[module]/presentation/actions/
-- [ ] T019 [US1] Implement [API route] in src/modules/[module]/presentation/api/
+- [ ] T018 [US1] Implement Elysia route handler in src/modules/[module]/presentation/routes/
+- [ ] T019 [US1] Register route plugin in main Elysia app instance
 - [ ] T020 [US1] Create [Component] in src/modules/[module]/presentation/components/
 - [ ] T021 [US1] Add validation and error handling
 
@@ -124,7 +124,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T024 [US2] Implement repository in src/modules/[module]/infrastructure/repositories/
 - [ ] T025 [US2] Implement [Service] in src/modules/[module]/application/services/
 - [ ] T026 [US2] Create Zod schema in src/modules/[module]/presentation/schemas/
-- [ ] T027 [US2] Implement [Server Action/API] in src/modules/[module]/presentation/
+- [ ] T027 [US2] Implement Elysia route handler in src/modules/[module]/presentation/routes/
 - [ ] T028 [US2] Create [Component] in src/modules/[module]/presentation/components/
 - [ ] T029 [US2] Integrate with User Story 1 components (if needed)
 
@@ -150,7 +150,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T032 [US3] Implement repository in src/modules/[module]/infrastructure/repositories/
 - [ ] T033 [US3] Implement [Service] in src/modules/[module]/application/services/
 - [ ] T034 [US3] Create Zod schema in src/modules/[module]/presentation/schemas/
-- [ ] T035 [US3] Implement [Server Action/API] in src/modules/[module]/presentation/
+- [ ] T035 [US3] Implement Elysia route handler in src/modules/[module]/presentation/routes/
 - [ ] T036 [US3] Create [Component] in src/modules/[module]/presentation/components/
 
 **Checkpoint**: All user stories should now be independently functional
@@ -171,7 +171,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
 - [ ] TXXX Security hardening
 - [ ] TXXX Contract parity audit (spec/contracts vs implementation behavior)
-- [ ] TXXX Typed parameter audit: verify no Server Action uses FormData without documented justification (XII)
+- [ ] TXXX Elysia API audit: verify all route handlers have TypeBox schemas and no `'use server'` directives exist (XII)
 - [ ] TXXX Capture performance evidence (benchmark note or EXPLAIN plan) for verified claims
 - [ ] TXXX Run quickstart.md validation
 
@@ -210,7 +210,7 @@ Examples of foundational tasks (adjust based on your project):
 - Once Foundational phase completes, all user stories can start in parallel (if team capacity allows)
 - All tests for a user story marked [P] can run in parallel
 - Domain entities within a story marked [P] can run in parallel
-- Presentation layer components (actions, components, schemas) within a story marked [P] can run in parallel
+- Presentation layer components (routes, components, schemas) within a story marked [P] can run in parallel
 - Different user stories can be worked on in parallel by different team members
 - Different modules can be developed in parallel with minimal conflicts due to vertical slice isolation
 
@@ -233,7 +233,7 @@ Task: "Implement [EntityRepository] in src/modules/[module]/infrastructure/repos
 
 # Launch presentation layer components in parallel:
 Task: "Create Zod schema in src/modules/[module]/presentation/schemas/"
-Task: "Implement [Server Action] in src/modules/[module]/presentation/actions/"
+Task: "Implement Elysia route handler in src/modules/[module]/presentation/routes/"
 Task: "Create [Component] in src/modules/[module]/presentation/components/"
 ```
 

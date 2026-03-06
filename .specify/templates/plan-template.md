@@ -35,17 +35,17 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 - [ ] **I. Type Safety**: Strict mode enabled, no `any` types
 - [ ] **II. React Discipline**: Hooks rules followed, minimize manual memoization (React Compiler)
-- [ ] **III. Next.js Standards**: App Router patterns, Server Actions validation
+- [ ] **III. Next.js Standards**: App Router patterns, Elysia API mounted via catch-all route
 - [ ] **IV. A11y & Performance**: Semantic HTML, Core Web Vitals targets
-- [ ] **V. Code Quality**: Review process, security practices
+- [ ] **V. Code Quality**: Review process, security practices, better-auth on Elysia
 - [ ] **VI. Documentation-First Research**: Context7 verification for all library research (resolve IDs, use specific versions, document references)
 - [ ] **VII. Vertical Slice Architecture**: Code organized in `src/modules/[feature]/` with domain, application, infrastructure, presentation layers
 - [ ] **VIII. Database Naming, Extensions & Integrity**: DB uses snake_case, app uses camelCase, migrations use `db:migrate:create`, extension changes are idempotent, and critical invariants have DB constraints
 - [ ] **UUID v7 Compliance**: All primary keys use UUID v7 auto-generation, never auto-increment integers (VIII)
 - [ ] **Soft Delete Enforcement**: All entities have `deleted_at` column, use soft delete methods, no hard deletes without approval (IX)
 - [ ] **X. Multi-Tenancy**: organization_id present on all business entities, queries scoped to active org (X)
-- [ ] **XI. Contract Fidelity**: Server Action/API behaviors match documented success + recoverable error contracts, and completion claims are evidence-backed
-- [ ] **XII. Typed Server Action Parameters**: Server Actions accept typed parameters, not `FormData`; `FormData` only for file uploads or progressive enhancement (documented reason required)
+- [ ] **XI. Contract Fidelity**: API route behaviors match documented success + recoverable error contracts, and completion claims are evidence-backed
+- [ ] **XII. Elysia REST API & Eden Treaty**: Route handlers define TypeBox request/response schemas; Eden Treaty client used for all client-side API calls; no `'use server'` directives or server actions
 
 **Research Phase Check:**
 
