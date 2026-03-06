@@ -21,16 +21,17 @@ Setup (Next.js catch-all route):
 
 Route Handler Patterns:
 
-- Define request body with `t.Object(...)` (TypeBox) for runtime validation
+- Define request body and response schemas with Zod for runtime validation
 - Define response schemas per status code for type-safe error handling
 - Use `guard` for shared validation across route groups
 - Use `group` for resource prefix organization
 - Use Elysia plugins to encapsulate feature module routes
+- Reuse Zod schemas from `presentation/schemas/` in route definitions
 - Example:
   ```
   const productRoutes = new Elysia({ prefix: '/products' })
     .get('/', () => getProducts(), {
-      response: { 200: t.Array(ProductSchema) }
+      response: { 200: z.array(ProductSchema) }
     })
     .post('/', ({ body }) => createProduct(body), {
       body: CreateProductSchema,
@@ -62,8 +63,10 @@ Authentication via Elysia:
 
 Validation:
 
-- Elysia TypeBox schemas handle runtime validation automatically
-- Zod schemas can complement for complex business rule validation
+- Elysia route schemas MUST use Zod (not TypeBox) for runtime validation
+- Zod schemas from `presentation/schemas/` SHOULD be reused in route handlers
+- A single Zod schema can serve route validation, form validation, and type
+  inference
 - TanStack Form client validators are complementary, not a substitute
 
 Error Handling:
