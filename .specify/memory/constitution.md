@@ -2,53 +2,54 @@
 
 # SYNC IMPACT REPORT
 
-Version change: 1.11.0 → 2.0.0 (Major - backward incompatible governance
-change: server actions removed, Elysia REST API layer adopted)
+Version change: 2.0.0 → 2.1.0 (Minor - new principle added: XIII.
+Client-Side Data Fetching with TanStack Query)
 
 Modified principles:
 
-- III. Next.js App Router Standards (removed all server action references,
-  added Elysia API integration guidance)
-- VII. Vertical Slice Architecture with Clean Architecture (presentation
-  layer updated: `actions/` replaced with `routes/` for Elysia handlers)
-
-Removed principles:
-
-- XII. Typed Server Action Parameters (entire principle removed; superseded
-  by XIII. Elysia REST API & Eden Treaty)
+- XII. Elysia REST API & Eden Treaty (Eden Treaty Client section updated
+  to reference TanStack Query as the caching/state layer for client
+  components; direct Treaty calls from components now prohibited for
+  queries)
 
 Added principles:
 
-- XIII. Elysia REST API & Eden Treaty (end-to-end type-safe REST API layer)
+- XIII. Client-Side Data Fetching with TanStack Query (query/mutation
+  hooks wrapping Eden Treaty, query key factories, QueryClientProvider
+  setup, prohibited manual fetching patterns)
 
 Modified sections:
 
-- Technology Standards (added Elysia, @elysiajs/eden, @elysiajs/cors)
-- Development Workflow / Quality Gates (replaced server action gates with
-  Elysia API gates)
-- File Organization (presentation/actions/ replaced with
-  presentation/routes/)
+- Technology Standards (added @tanstack/react-query 5.x)
+- Development Workflow / Quality Gates (added TanStack Query gates: query
+  hooks for client fetching, no useEffect+setState for API calls, query
+  key factories per module)
+- File Organization (added presentation/queries/ directory for query key
+  factories and custom hooks)
 
 Templates requiring updates:
-✅ .specify/templates/plan-template.md (Constitution Check updated)
-✅ .specify/templates/spec-template.md (Contract & Integrity Requirements
-  updated)
-✅ .specify/templates/tasks-template.md (sample tasks updated to Elysia)
+✅ .specify/templates/plan-template.md (Constitution Check updated with
+  XIII. TanStack Query item)
+✅ .specify/templates/spec-template.md (CR-005 added for TanStack Query
+  requirement)
+✅ .specify/templates/tasks-template.md (sample tasks updated with query
+  hook tasks)
 ⚠ .specify/templates/commands/*.md (directory not present; no command
   templates to validate)
 
 Runtime docs requiring updates:
-✅ .agent/rules/elysia-api-guide.md (created as replacement for
-  nextjs-server-action-guide.md)
-✅ AGENTS.md (updated to reference elysia-api-guide.md)
+✅ .agent/rules/elysia-api-guide.md (updated to reference TanStack Query
+  integration)
 
 Follow-up TODOs:
 
-- Replace .agent/rules/nextjs-server-action-guide.md with
-  .agent/rules/elysia-api-guide.md
-- Update AGENTS.md to reference the new Elysia API guide instead of the
-  server action guide
-- Migrate existing server actions in codebase to Elysia route handlers
+- Install @tanstack/react-query package: bun add @tanstack/react-query
+- Create QueryClientProvider wrapper component
+- Create shared query key factory utility
+- Migrate existing direct Eden Treaty calls in client components to
+  useQuery/useMutation hooks
+- Migrate legacy server actions in presentation/actions/ to Elysia routes
+  + TanStack Query hooks
 
 -->
 
@@ -322,7 +323,8 @@ Actions are prohibited.
 
 - A single Eden Treaty client MUST be created in `src/lib/api-client.ts` using
   the isomorphic pattern (direct instance on server, URL on client)
-- Client components MUST use the Eden Treaty client for all API calls
+- Client components MUST use TanStack Query hooks wrapping the Eden Treaty
+  client for all data fetching and mutations (see XIII)
 - Server-side data fetching in Server Components MAY call Elysia's app instance
   directly (zero network overhead) via the Treaty client
 - Treaty client MUST be configured with `{ fetch: { credentials: 'include' } }`
@@ -354,11 +356,74 @@ consumption by mobile apps, third-party integrations, and other non-browser
 clients. Removing server actions eliminates the tight coupling between React
 components and server-side mutation logic.
 
+### XIII. Client-Side Data Fetching with TanStack Query
+
+All client-side data fetching and mutation state MUST be managed through
+TanStack Query (`@tanstack/react-query`) using the Eden Treaty client as the
+underlying fetch mechanism. TanStack Query provides caching, background
+refetching, deduplication, and optimistic updates on top of the type-safe
+Eden Treaty layer.
+
+**QueryClient Setup**:
+
+- A single `QueryClient` instance MUST be created in a client-side provider
+  component (e.g., `src/shared/presentation/providers/query-provider.tsx`)
+- The `QueryClientProvider` MUST wrap the application at the root layout level
+- Default options SHOULD configure sensible `staleTime` and `gcTime` policies
+  appropriate to the domain; `retry: 1` is the recommended default
+
+**Query Patterns**:
+
+- All data fetching in client components MUST use `useQuery` or
+  `useSuspenseQuery` from `@tanstack/react-query`
+- Query functions MUST use the Eden Treaty client (`api`) for the actual API
+  call and MUST unwrap the `{ data, error }` response to throw on error
+- Query keys MUST follow a consistent factory pattern per module (e.g.,
+  `productKeys.list(filters)`, `productKeys.detail(id)`)
+- Query key factories MUST be co-located in the module's
+  `presentation/queries/` directory
+
+**Mutation Patterns**:
+
+- Client-side mutations MUST use `useMutation` from `@tanstack/react-query`
+- Mutations MUST call the Eden Treaty client inside `mutationFn`
+- Successful mutations MUST invalidate relevant query keys via
+  `queryClient.invalidateQueries` in `onSuccess` or `onSettled`
+- Optimistic updates SHOULD be used for UI-critical mutations where perceived
+  latency matters
+- Mutation error handling MUST leverage the typed error responses from Eden
+  Treaty response schemas
+
+**File Organization**:
+
+- Query key factories: `presentation/queries/[resource]-keys.ts`
+- Custom query hooks: `presentation/queries/use-[resource].ts`
+- Custom mutation hooks: `presentation/queries/use-[mutation-name].ts`
+
+**Prohibited Patterns**:
+
+- `useEffect` + `setState` for data fetching is prohibited; use `useQuery`
+- Manual `isLoading` / `isError` state tracking for API calls is prohibited;
+  use TanStack Query's built-in states (`isPending`, `isError`, `data`)
+- Storing server-fetched data in Zustand stores is prohibited when TanStack
+  Query can manage the cache; Zustand remains appropriate for client-only UI
+  state
+- Direct Eden Treaty calls from client components without TanStack Query
+  wrapping are prohibited for read operations
+
+**Rationale**: TanStack Query eliminates boilerplate loading/error state
+management, provides automatic cache invalidation and background refetching,
+and integrates seamlessly with Eden Treaty's typed responses. This separation
+keeps components focused on rendering while the query layer manages server
+state lifecycle.
+
 ## Technology Standards
 
 **Framework**: Next.js 16.x with App Router (rendering, routing, SSR)
 **API Layer**: Elysia (REST API framework, mounted in Next.js catch-all route)
 **API Client**: @elysiajs/eden (Eden Treaty for end-to-end type-safe API calls)
+**Client Data Layer**: @tanstack/react-query 5.x (caching, deduplication,
+background refetching, optimistic updates on top of Eden Treaty)
 **Language**: TypeScript 5.x (strict mode)
 **UI Library**: React 19.x with React Compiler
 **Styling**: Tailwind CSS 4.x
@@ -413,6 +478,13 @@ with `bun db:migrate`)
 16. All client-side API calls use Eden Treaty client, not raw `fetch` (XII)
 17. No `'use server'` directives or server action files in the codebase (XII)
 18. better-auth mounted on Elysia with auth macro for protected routes (V, XII)
+19. Client components use `useQuery`/`useMutation` from TanStack Query for all
+    data fetching and mutations; no `useEffect` + `setState` fetch patterns
+    (XIII)
+20. Query key factories exist per module in `presentation/queries/` with
+    consistent naming (XIII)
+21. Server-fetched data not duplicated into Zustand stores when TanStack Query
+    cache suffices (XIII)
 
 ### File Organization
 
@@ -429,10 +501,11 @@ src/
 │   │   │   └── types/    # getManyProps, getManyReturn, etc.
 │   │   ├── infrastructure/  # Repository implementations
 │   │   │   └── repositories/  # Concrete implementations (e.g., ProductRepository)
-│   │   └── presentation/ # Routes, APIs, components, stores, schemas
+│   │   └── presentation/ # Routes, APIs, components, stores, queries, schemas
 │   │       ├── routes/   # Elysia route handler plugins (e.g., productRoutes)
+│   │       ├── queries/  # TanStack Query key factories + custom hooks
 │   │       ├── components/  # React components
-│   │       ├── stores/   # Zustand stores
+│   │       ├── stores/   # Zustand stores (client-only UI state)
 │   │       ├── types/    # Presentation-layer types
 │   │       └── schemas/  # Zod validation schemas
 │   ├── auth/             # Example: Authentication module
@@ -479,4 +552,4 @@ project.
 - `AGENTS.md`: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 2.0.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-03-06
+**Version**: 2.1.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-03-06

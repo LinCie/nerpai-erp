@@ -24,7 +24,7 @@ Instructions:
 ### Next.js
 
 - App Router architecture: @.agent/rules/nextjs-app-router-guide.md
-- Elysia API & Eden Treaty: @.agent/rules/elysia-api-guide.md
+- Elysia API & Eden Treaty + TanStack Query: @.agent/rules/elysia-api-guide.md
 - Internationalization (next-intl): @.agent/rules/nextjs-internationalization-guide.md
 - Performance: @.agent/rules/nextjs-performance-guide.md
 

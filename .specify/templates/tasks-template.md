@@ -99,8 +99,10 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T017 [US1] Create Zod schema in src/modules/[module]/presentation/schemas/
 - [ ] T018 [US1] Implement Elysia route handler in src/modules/[module]/presentation/routes/
 - [ ] T019 [US1] Register route plugin in main Elysia app instance
-- [ ] T020 [US1] Create [Component] in src/modules/[module]/presentation/components/
-- [ ] T021 [US1] Add validation and error handling
+- [ ] T020 [US1] Create query key factory in src/modules/[module]/presentation/queries/[resource]-keys.ts
+- [ ] T021 [US1] Create useQuery/useMutation hooks in src/modules/[module]/presentation/queries/use-[resource].ts
+- [ ] T022 [US1] Create [Component] in src/modules/[module]/presentation/components/ (using query hooks)
+- [ ] T023 [US1] Add validation and error handling
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -125,8 +127,9 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T025 [US2] Implement [Service] in src/modules/[module]/application/services/
 - [ ] T026 [US2] Create Zod schema in src/modules/[module]/presentation/schemas/
 - [ ] T027 [US2] Implement Elysia route handler in src/modules/[module]/presentation/routes/
-- [ ] T028 [US2] Create [Component] in src/modules/[module]/presentation/components/
-- [ ] T029 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T028 [US2] Create query key factory + query/mutation hooks in src/modules/[module]/presentation/queries/
+- [ ] T029 [US2] Create [Component] in src/modules/[module]/presentation/components/ (using query hooks)
+- [ ] T030 [US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -151,7 +154,8 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T033 [US3] Implement [Service] in src/modules/[module]/application/services/
 - [ ] T034 [US3] Create Zod schema in src/modules/[module]/presentation/schemas/
 - [ ] T035 [US3] Implement Elysia route handler in src/modules/[module]/presentation/routes/
-- [ ] T036 [US3] Create [Component] in src/modules/[module]/presentation/components/
+- [ ] T036 [US3] Create query key factory + query/mutation hooks in src/modules/[module]/presentation/queries/
+- [ ] T037 [US3] Create [Component] in src/modules/[module]/presentation/components/ (using query hooks)
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -172,6 +176,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX Security hardening
 - [ ] TXXX Contract parity audit (spec/contracts vs implementation behavior)
 - [ ] TXXX Elysia API audit: verify all route handlers have TypeBox schemas and no `'use server'` directives exist (XII)
+- [ ] TXXX TanStack Query audit: verify all client data fetching uses useQuery/useMutation, no useEffect+setState fetch patterns, query key factories per module (XIII)
 - [ ] TXXX Capture performance evidence (benchmark note or EXPLAIN plan) for verified claims
 - [ ] TXXX Run quickstart.md validation
 

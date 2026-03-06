@@ -78,6 +78,8 @@ Prohibited Patterns:
 - NO server action files in `presentation/actions/`
 - NO raw `fetch('/api/...')` calls from client components
 - NO `FormData` submission patterns for mutations
+- NO direct Eden Treaty calls from client components without TanStack Query
+- NO `useEffect` + `setState` patterns for data fetching
 
 Best Practices:
 
@@ -85,3 +87,34 @@ Best Practices:
 - One Elysia plugin per feature module in `presentation/routes/`
 - Compose all module plugins into the main app via `.use()`
 - Return discriminated unions for success/error states via response schemas
+
+TanStack Query Integration (Constitution XIII):
+
+- Client components MUST use `useQuery`/`useMutation` wrapping Eden Treaty
+- Create query key factories in `presentation/queries/[resource]-keys.ts`
+- Create custom hooks in `presentation/queries/use-[resource].ts`
+- Invalidate relevant queries on mutation success
+- Use typed Eden Treaty error responses in mutation `onError` handlers
+- Example:
+  ```
+  // presentation/queries/product-keys.ts
+  export const productKeys = {
+    all: ['products'] as const,
+    lists: () => [...productKeys.all, 'list'] as const,
+    list: (filters: ProductFilters) => [...productKeys.lists(), filters] as const,
+    details: () => [...productKeys.all, 'detail'] as const,
+    detail: (id: string) => [...productKeys.details(), id] as const,
+  }
+
+  // presentation/queries/use-products.ts
+  export function useProducts(filters: ProductFilters) {
+    return useQuery({
+      queryKey: productKeys.list(filters),
+      queryFn: async () => {
+        const { data, error } = await api.products.get({ query: filters })
+        if (error) throw error
+        return data
+      },
+    })
+  }
+  ```
