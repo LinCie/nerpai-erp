@@ -30,12 +30,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete — hooks and routes depend on these schemas and key factories.
 
-- [ ] T003 [P] Extend product Zod schemas with API request body and response schemas (createProductBody, updateProductBody, productResponse, productListResponse) in src/modules/products/presentation/schemas/product.schema.ts per data-model.md
-- [ ] T004 [P] Extend attribute Zod schemas with API request body and response schemas (createAttributeBody, updateAttributeBody, createAttributeOptionBody, updateAttributeOptionBody, attributeResponse, attributeOptionResponse, attributeWithOptionsResponse) in src/modules/products/presentation/schemas/attribute.schema.ts per data-model.md
-- [ ] T005 [P] Extend variant Zod schemas with API request body and response schemas (assignAttributeBody, reorderAttributesBody, generateVariantsBody, updateVariantBody, toggleVariantActiveBody, checkSkuBody, variantResponse, generateVariantsResponse, removeAttributeResponse, removeAttributeConfirmationResponse, skuAvailabilityResponse, assignAttributeResponse) in src/modules/products/presentation/schemas/variant.schema.ts per data-model.md
-- [ ] T006 [P] Create product query key factory in src/modules/products/presentation/queries/product-keys.ts using createQueryKeys('products')
-- [ ] T007 [P] Create attribute query key factory in src/modules/products/presentation/queries/attribute-keys.ts using createQueryKeys('attributes')
-- [ ] T008 [P] Create variant query key factory in src/modules/products/presentation/queries/variant-keys.ts using createQueryKeys('variants')
+- [X] T003 [P] Extend product Zod schemas with API request body and response schemas (createProductBody, updateProductBody, productResponse, productListResponse) in src/modules/products/presentation/schemas/product.schema.ts per data-model.md
+- [X] T004 [P] Extend attribute Zod schemas with API request body and response schemas (createAttributeBody, updateAttributeBody, createAttributeOptionBody, updateAttributeOptionBody, attributeResponse, attributeOptionResponse, attributeWithOptionsResponse) in src/modules/products/presentation/schemas/attribute.schema.ts per data-model.md
+- [X] T005 [P] Extend variant Zod schemas with API request body and response schemas (assignAttributeBody, reorderAttributesBody, generateVariantsBody, updateVariantBody, toggleVariantActiveBody, checkSkuBody, variantResponse, generateVariantsResponse, removeAttributeResponse, removeAttributeConfirmationResponse, skuAvailabilityResponse, assignAttributeResponse) in src/modules/products/presentation/schemas/variant.schema.ts per data-model.md
+- [X] T006 [P] Create product query key factory in src/modules/products/presentation/queries/product-keys.ts using createQueryKeys('products')
+- [X] T007 [P] Create attribute query key factory in src/modules/products/presentation/queries/attribute-keys.ts using createQueryKeys('attributes')
+- [X] T008 [P] Create variant query key factory in src/modules/products/presentation/queries/variant-keys.ts using createQueryKeys('variants')
 
 **Checkpoint**: Schemas extended, query keys ready — user story implementation can now begin
 

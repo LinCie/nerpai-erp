@@ -24,9 +24,17 @@ export const updateVariantSchema = z.object({
     .optional(),
 });
 
+export const assignAttributeBody = z.object({
+  attributeId: z.string().uuid({ error: "Attribute ID must be a valid UUID" }),
+});
+
 export const assignAttributeSchema = z.object({
   productId: z.string().uuid({ error: "Product ID must be a valid UUID" }),
   attributeId: z.string().uuid({ error: "Attribute ID must be a valid UUID" }),
+});
+
+export const removeAttributeQuery = z.object({
+  confirmed: z.coerce.boolean().optional().default(false),
 });
 
 export const removeAttributeSchema = z.object({
@@ -35,9 +43,23 @@ export const removeAttributeSchema = z.object({
   confirmed: z.boolean(),
 });
 
+export const reorderAttributesBody = z.object({
+  orderedAttributeIds: z.array(z.string().uuid()).min(1, { error: "At least one attribute must be provided" }),
+});
+
 export const reorderAttributesSchema = z.object({
   productId: z.string().uuid({ error: "Product ID must be a valid UUID" }),
   orderedAttributeIds: z.array(z.string().uuid()).min(1, { error: "At least one attribute must be provided" }),
+});
+
+export const generateVariantsBody = z.object({
+  selections: z.record(z.string(), z.array(z.string().uuid())).refine(
+    (selections) => {
+      return Object.values(selections).every((options) => options.length > 0);
+    },
+    { error: "Each attribute must have at least one option selected" }
+  ),
+  onlyNew: z.boolean().optional().default(false),
 });
 
 export const generateVariantsSchema = z.object({
@@ -50,6 +72,12 @@ export const generateVariantsSchema = z.object({
   ),
 });
 
+export const updateVariantBody = updateVariantSchema;
+
+export const toggleVariantActiveBody = z.object({
+  isActive: z.boolean(),
+});
+
 export const toggleVariantActiveSchema = z.object({
   id: z.string().uuid({ error: "Variant ID must be a valid UUID" }),
   isActive: z.boolean(),
@@ -57,6 +85,49 @@ export const toggleVariantActiveSchema = z.object({
 
 export const softDeleteVariantSchema = z.object({
   id: z.string().uuid({ error: "Variant ID must be a valid UUID" }),
+});
+
+export const checkSkuBody = z.object({
+  sku: z.string().trim().min(1, { error: "SKU is required" }),
+  excludeVariantId: z.string().uuid({ error: "Variant ID must be a valid UUID" }).optional(),
+});
+
+export const variantResponse = z.object({
+  id: z.string().uuid(),
+  productId: z.string().uuid(),
+  sku: z.string(),
+  price: z.number(),
+  isActive: z.boolean(),
+});
+
+export const generateVariantsResponse = z.object({
+  created: z.number(),
+  variants: z.array(
+    z.object({
+      id: z.string().uuid(),
+      sku: z.string(),
+    })
+  ),
+  skipped: z.number().optional(),
+});
+
+export const removeAttributeResponse = z.object({
+  deactivatedCount: z.number(),
+});
+
+export const removeAttributeConfirmationResponse = z.object({
+  needsConfirmation: z.literal(true),
+  affectedCount: z.number(),
+  message: z.string(),
+});
+
+export const skuAvailabilityResponse = z.object({
+  available: z.boolean(),
+});
+
+export const assignAttributeResponse = z.object({
+  id: z.string().uuid(),
+  displayOrder: z.number(),
 });
 
 export type VariantFormData = z.infer<typeof variantSchema>;
