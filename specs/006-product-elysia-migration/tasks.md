@@ -49,16 +49,16 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Implement product Elysia route handlers (GET /, GET /trash, GET /:id, POST /, PUT /:id, DELETE /:id, POST /:id/restore) in src/modules/products/presentation/routes/product.routes.ts per contracts/product-api.md — use authPlugin, Zod body/response schemas, delegate to ProductService
-- [ ] T010 [US1] Register product routes in the module route index at src/modules/products/presentation/routes/index.ts via `.use(productRoutes)`
-- [ ] T011 [P] [US1] Create product query hooks (useProducts for active list, useProductsTrash for trash list, useProduct for detail) in src/modules/products/presentation/queries/use-products.ts
-- [ ] T012 [P] [US1] Create product mutation hooks (useCreateProduct, useUpdateProduct, useDeleteProduct, useRestoreProduct) with cache invalidation in src/modules/products/presentation/queries/use-create-product.ts, use-update-product.ts, use-delete-product.ts, use-restore-product.ts
-- [ ] T013 [US1] Refactor product-add-dialog.tsx and product-form.tsx to use useCreateProduct mutation — replace useActionState/server action with mutate + onSuccess/onError in src/modules/products/presentation/components/
-- [ ] T014 [US1] Refactor product-edit-dialog.tsx and product-edit-form.tsx to use useUpdateProduct mutation — replace server action pattern with mutation hook in src/modules/products/presentation/components/
-- [ ] T015 [P] [US1] Refactor product-delete-dialog.tsx to use useDeleteProduct mutation in src/modules/products/presentation/components/product-delete-dialog.tsx
-- [ ] T016 [US1] Refactor product-list.tsx to use useProducts query hook — replace server action data fetching with useQuery in src/modules/products/presentation/components/product-list.tsx
-- [ ] T017 [US1] Refactor product-trash-list.tsx to use useProductsTrash query and useRestoreProduct mutation in src/modules/products/presentation/components/product-trash-list.tsx
-- [ ] T018 [US1] Remove product server actions file src/modules/products/presentation/actions/product.actions.ts and remove all imports referencing it
+- [X] T009 [US1] Implement product Elysia route handlers (GET /, GET /trash, GET /:id, POST /, PUT /:id, DELETE /:id, POST /:id/restore) in src/modules/products/presentation/routes/product.routes.ts per contracts/product-api.md — use authPlugin, Zod body/response schemas, delegate to ProductService
+- [X] T010 [US1] Register product routes in the module route index at src/modules/products/presentation/routes/index.ts via `.use(productRoutes)`
+- [X] T011 [P] [US1] Create product query hooks (useProducts for active list, useProductsTrash for trash list, useProduct for detail) in src/modules/products/presentation/queries/use-products.ts
+- [X] T012 [P] [US1] Create product mutation hooks (useCreateProduct, useUpdateProduct, useDeleteProduct, useRestoreProduct) with cache invalidation in src/modules/products/presentation/queries/use-create-product.ts, use-update-product.ts, use-delete-product.ts, use-restore-product.ts
+- [X] T013 [US1] Refactor product-add-dialog.tsx and product-form.tsx to use useCreateProduct mutation — replace useActionState/server action with mutate + onSuccess/onError in src/modules/products/presentation/components/
+- [X] T014 [US1] Refactor product-edit-dialog.tsx and product-edit-form.tsx to use useUpdateProduct mutation — replace server action pattern with mutation hook in src/modules/products/presentation/components/
+- [X] T015 [P] [US1] Refactor product-delete-dialog.tsx to use useDeleteProduct mutation in src/modules/products/presentation/components/product-delete-dialog.tsx
+- [X] T016 [US1] Refactor product-list.tsx to use useProducts query hook — replace server action data fetching with useQuery in src/modules/products/presentation/components/product-list.tsx
+- [X] T017 [US1] Refactor product-trash-list.tsx to use useProductsTrash query and useRestoreProduct mutation in src/modules/products/presentation/components/product-trash-list.tsx
+- [X] T018 [US1] Remove product server actions file src/modules/products/presentation/actions/product.actions.ts and remove all imports referencing it
 
 **Checkpoint**: Product CRUD fully functional via API — create, edit, soft-delete, restore all work through Elysia endpoints
 

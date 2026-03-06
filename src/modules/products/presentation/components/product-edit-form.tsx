@@ -1,13 +1,7 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
-import {
-  initialFormState,
-  mergeForm,
-  useForm,
-  useStore,
-  useTransform,
-} from "@tanstack/react-form-nextjs";
+import { useState } from "react";
+import { useForm, useStore } from "@tanstack/react-form-nextjs";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Input } from "@/shared/presentation/components/ui/input";
@@ -18,49 +12,75 @@ import {
   FieldLabel,
 } from "@/shared/presentation/components/ui/field";
 import { updateProductFormOptions } from "../lib/form-options";
-import { updateProduct } from "../actions/product.actions";
 import type { Product } from "../../domain/entities/product";
+import { useUpdateProduct } from "../queries/use-update-product";
 
 interface ProductEditFormProps {
   product: Product;
   onSuccess?: () => void;
 }
 
+function getErrorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "value" in error) {
+    const errorValue = (error as { value?: unknown }).value;
+    if (
+      errorValue &&
+      typeof errorValue === "object" &&
+      "error" in errorValue &&
+      typeof (errorValue as { error?: unknown }).error === "string"
+    ) {
+      return (errorValue as { error: string }).error;
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return "Failed to update product. Please try again.";
+}
+
 export function ProductEditForm({ product, onSuccess }: ProductEditFormProps) {
-  const [state, action, isPending] = useActionState(updateProduct, initialFormState);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const updateProductMutation = useUpdateProduct();
 
   const form = useForm({
     ...updateProductFormOptions,
     defaultValues: {
       name: product.name,
     },
-    transform: useTransform((baseForm) => mergeForm(baseForm, state ?? {}), [state]),
+    onSubmit: async ({ value }) => {
+      setServerError(null);
+
+      try {
+        await updateProductMutation.mutateAsync({
+          id: product.id,
+          name: value.name,
+        });
+        onSuccess?.();
+      } catch (error) {
+        setServerError(getErrorMessage(error));
+      }
+    },
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);
 
-  // Handle success - when state is undefined (no validation errors) and we were submitting
-  useEffect(() => {
-    if (!state && !isPending) {
-      // Form submitted successfully
-      onSuccess?.();
-    }
-  }, [state, isPending, onSuccess]);
-
   return (
     <form
-      action={action as never}
-      onSubmit={() => form.handleSubmit()}
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void form.handleSubmit();
+      }}
       className="space-y-4"
     >
-      {/* Hidden field for product ID */}
-      <input type="hidden" name="id" value={product.id} />
-
-      {formErrors.length > 0 && (
+      {(formErrors.length > 0 || serverError) && (
         <div className="text-destructive text-sm">
           {formErrors.map((error) => (
             <p key={String(error)}>{String(error)}</p>
           ))}
+          {serverError ? <p>{serverError}</p> : null}
         </div>
       )}
 
@@ -78,7 +98,7 @@ export function ProductEditForm({ product, onSuccess }: ProductEditFormProps) {
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
                 placeholder="Enter product name"
-                disabled={form.state.isSubmitting}
+                disabled={form.state.isSubmitting || updateProductMutation.isPending}
                 autoFocus
               />
               {field.state.meta.errors.length > 0 && (
