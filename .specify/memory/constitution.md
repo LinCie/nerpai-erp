@@ -2,54 +2,42 @@
 
 # SYNC IMPACT REPORT
 
-Version change: 2.0.0 → 2.1.0 (Minor - new principle added: XIII.
-Client-Side Data Fetching with TanStack Query)
+Version change: 2.1.0 → 2.2.0 (Minor - Elysia route validation changed
+from TypeBox to Zod)
 
 Modified principles:
 
-- XII. Elysia REST API & Eden Treaty (Eden Treaty Client section updated
-  to reference TanStack Query as the caching/state layer for client
-  components; direct Treaty calls from components now prohibited for
-  queries)
-
-Added principles:
-
-- XIII. Client-Side Data Fetching with TanStack Query (query/mutation
-  hooks wrapping Eden Treaty, query key factories, QueryClientProvider
-  setup, prohibited manual fetching patterns)
+- XII. Elysia REST API & Eden Treaty (TypeBox replaced with Zod for route
+  request/response schemas; examples updated to use Zod syntax; added note
+  on Zod integration approach)
 
 Modified sections:
 
-- Technology Standards (added @tanstack/react-query 5.x)
-- Development Workflow / Quality Gates (added TanStack Query gates: query
-  hooks for client fetching, no useEffect+setState for API calls, query
-  key factories per module)
-- File Organization (added presentation/queries/ directory for query key
-  factories and custom hooks)
+- Technology Standards (explicit note that Zod serves both form validation
+  and Elysia route schemas; TypeBox no longer required)
+- Development Workflow / Quality Gates (gate 15 updated from TypeBox to
+  Zod)
 
 Templates requiring updates:
-✅ .specify/templates/plan-template.md (Constitution Check updated with
-  XIII. TanStack Query item)
-✅ .specify/templates/spec-template.md (CR-005 added for TanStack Query
-  requirement)
-✅ .specify/templates/tasks-template.md (sample tasks updated with query
-  hook tasks)
+✅ .specify/templates/plan-template.md (Constitution Check XII updated
+  from TypeBox to Zod)
+✅ .specify/templates/spec-template.md (CR-003 updated from TypeBox to
+  Zod)
+✅ .specify/templates/tasks-template.md (foundational and audit tasks
+  updated from TypeBox to Zod)
 ⚠ .specify/templates/commands/*.md (directory not present; no command
   templates to validate)
 
 Runtime docs requiring updates:
-✅ .agent/rules/elysia-api-guide.md (updated to reference TanStack Query
-  integration)
+✅ .agent/rules/elysia-api-guide.md (TypeBox references and code examples
+  updated to Zod)
 
 Follow-up TODOs:
 
-- Install @tanstack/react-query package: bun add @tanstack/react-query
-- Create QueryClientProvider wrapper component
-- Create shared query key factory utility
-- Migrate existing direct Eden Treaty calls in client components to
-  useQuery/useMutation hooks
-- Migrate legacy server actions in presentation/actions/ to Elysia routes
-  + TanStack Query hooks
+- Verify Elysia + Zod integration approach during implementation research
+  (Standard Schema support in Elysia 1.4.x or @elysiajs/zod plugin)
+- Migrate any existing TypeBox schemas in route handlers to Zod
+  equivalents
 
 -->
 
@@ -308,10 +296,10 @@ Actions are prohibited.
 
 **Route Handler Requirements**:
 
-- Route handlers MUST define explicit request body schemas using Elysia's `t`
-  (TypeBox) for runtime validation and type inference
+- Route handlers MUST define explicit request body and response schemas using
+  Zod for runtime validation and type inference
 - Route handlers MUST define explicit response schemas per status code (for
-  example, `{ 200: t.Object(...), 400: t.Object(...) }`) for type-safe error
+  example, `{ 200: z.object(...), 400: z.object(...) }`) for type-safe error
   handling on the client
 - Use Elysia `guard` to apply shared validation (for example, auth headers) to
   route groups
@@ -329,6 +317,16 @@ Actions are prohibited.
   directly (zero network overhead) via the Treaty client
 - Treaty client MUST be configured with `{ fetch: { credentials: 'include' } }`
   for cookie-based auth
+
+**Zod Integration with Elysia**:
+
+- Elysia route schemas MUST use Zod instead of Elysia's built-in TypeBox (`t`)
+- Integration MUST be established via Zod's Standard Schema support or the
+  `@elysiajs/zod` plugin (confirm approach during implementation research)
+- Zod schemas defined in `presentation/schemas/` SHOULD be reused in route
+  handler `body` and `response` definitions to avoid duplication
+- A single Zod schema can serve form validation (TanStack Form), route
+  validation (Elysia), and type inference (TypeScript)
 
 **Authentication via Elysia**:
 
@@ -434,6 +432,8 @@ only via idempotent migrations
 with `bun db:migrate`)
 **Type Generation**: `db:codegen` command for database types
 **Authentication**: better-auth 1.4.x (mounted on Elysia via `.mount()`)
+**Validation**: Zod 4.x (unified schema validation for Elysia routes, TanStack
+Form, and general type inference; replaces Elysia's default TypeBox)
 **Forms**: TanStack Form 1.x (headless form management with Zod integration)
 **Testing**: Jest v30.x + React Testing Library (when tests requested)
 **Linting**: ESLint 9.x with next/core-web-vitals config
@@ -474,7 +474,7 @@ with `bun db:migrate`)
 14. Performance claims include reproducible evidence and matching
     extension/index strategy where applicable (VIII, XI)
 15. Elysia route handlers define explicit request body and response schemas
-    using TypeBox (XII)
+    using Zod (XII)
 16. All client-side API calls use Eden Treaty client, not raw `fetch` (XII)
 17. No `'use server'` directives or server action files in the codebase (XII)
 18. better-auth mounted on Elysia with auth macro for protected routes (V, XII)
@@ -552,4 +552,4 @@ project.
 - `AGENTS.md`: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 2.1.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-03-06
+**Version**: 2.2.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-03-06

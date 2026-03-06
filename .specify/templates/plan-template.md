@@ -45,7 +45,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 - [ ] **Soft Delete Enforcement**: All entities have `deleted_at` column, use soft delete methods, no hard deletes without approval (IX)
 - [ ] **X. Multi-Tenancy**: organization_id present on all business entities, queries scoped to active org (X)
 - [ ] **XI. Contract Fidelity**: API route behaviors match documented success + recoverable error contracts, and completion claims are evidence-backed
-- [ ] **XII. Elysia REST API & Eden Treaty**: Route handlers define TypeBox request/response schemas; Eden Treaty client used for all client-side API calls; no `'use server'` directives or server actions
+- [ ] **XII. Elysia REST API & Eden Treaty**: Route handlers define Zod request/response schemas; Eden Treaty client used for all client-side API calls; no `'use server'` directives or server actions
 - [ ] **XIII. TanStack Query**: Client components use `useQuery`/`useMutation` for data fetching; query key factories in `presentation/queries/`; no `useEffect` + `setState` fetch patterns; server data not duplicated into Zustand
 
 **Research Phase Check:**
