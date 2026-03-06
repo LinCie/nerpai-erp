@@ -6,6 +6,7 @@ import { auth } from "@/shared/infrastructure/auth/auth";
 import { attributeRepository } from "@/modules/products/infrastructure/repositories/attribute.repository";
 import { AttributeService } from "@/modules/products/application/services/attribute.service";
 import { AttributeListServer } from "@/modules/products/presentation/components/attribute-list-server";
+import type { AttributeWithOptionsApi } from "@/modules/products/presentation/queries/use-attributes";
 
 interface AttributesPageProps {
   searchParams: Promise<{ search?: string }>;
@@ -42,6 +43,17 @@ export default async function AttributesPage({ searchParams }: AttributesPagePro
       )
     : attributes;
 
+  const initialAttributes: AttributeWithOptionsApi[] = filteredAttributes.map(
+    ({ attribute, options }) => ({
+      ...attribute,
+      options: options.map((option) => ({
+        id: option.id,
+        value: option.value,
+        attributeId: option.attributeId,
+      })),
+    }),
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -63,7 +75,7 @@ export default async function AttributesPage({ searchParams }: AttributesPagePro
         </CardHeader>
         <CardContent>
           <AttributeListServer
-            attributes={filteredAttributes}
+            initialAttributes={initialAttributes}
             searchQuery={searchQuery}
           />
         </CardContent>

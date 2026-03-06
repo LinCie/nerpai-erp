@@ -72,16 +72,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Implement attribute Elysia route handlers (GET /, GET /:id, POST /, PUT /:id, DELETE /:id, POST /:id/options, PUT /:attributeId/options/:id, DELETE /:attributeId/options/:id) in src/modules/products/presentation/routes/attribute.routes.ts per contracts/attribute-api.md — use authPlugin, Zod schemas, delegate to AttributeService
-- [ ] T020 [US2] Register attribute routes in the module route index at src/modules/products/presentation/routes/index.ts via `.use(attributeRoutes)`
-- [ ] T021 [P] [US2] Create attribute query hooks (useAttributes for list, useAttribute for detail) in src/modules/products/presentation/queries/use-attributes.ts
-- [ ] T022 [P] [US2] Create attribute mutation hooks (useCreateAttribute, useUpdateAttribute, useDeleteAttribute) with cache invalidation in src/modules/products/presentation/queries/use-create-attribute.ts, use-update-attribute.ts, use-delete-attribute.ts
-- [ ] T023 [P] [US2] Create attribute option mutation hooks (useCreateAttributeOption, useUpdateAttributeOption, useDeleteAttributeOption) with cache invalidation in src/modules/products/presentation/queries/use-attribute-options.ts
-- [ ] T024 [US2] Refactor attribute-add-dialog.tsx and attribute-form.tsx to use useCreateAttribute mutation in src/modules/products/presentation/components/
-- [ ] T025 [US2] Refactor attribute-edit-dialog.tsx and attribute-edit-form.tsx to use useUpdateAttribute mutation in src/modules/products/presentation/components/
-- [ ] T026 [US2] Refactor attribute-option-form.tsx and attribute-option-list.tsx to use attribute option mutation hooks in src/modules/products/presentation/components/
-- [ ] T027 [US2] Refactor attribute-list.tsx to use useAttributes query and useDeleteAttribute mutation in src/modules/products/presentation/components/attribute-list.tsx
-- [ ] T028 [US2] Remove attribute server actions file src/modules/products/presentation/actions/attribute.actions.ts and remove all imports referencing it
+- [X] T019 [US2] Implement attribute Elysia route handlers (GET /, GET /:id, POST /, PUT /:id, DELETE /:id, POST /:id/options, PUT /:attributeId/options/:id, DELETE /:attributeId/options/:id) in src/modules/products/presentation/routes/attribute.routes.ts per contracts/attribute-api.md — use authPlugin, Zod schemas, delegate to AttributeService
+- [X] T020 [US2] Register attribute routes in the module route index at src/modules/products/presentation/routes/index.ts via `.use(attributeRoutes)`
+- [X] T021 [P] [US2] Create attribute query hooks (useAttributes for list, useAttribute for detail) in src/modules/products/presentation/queries/use-attributes.ts
+- [X] T022 [P] [US2] Create attribute mutation hooks (useCreateAttribute, useUpdateAttribute, useDeleteAttribute) with cache invalidation in src/modules/products/presentation/queries/use-create-attribute.ts, use-update-attribute.ts, use-delete-attribute.ts
+- [X] T023 [P] [US2] Create attribute option mutation hooks (useCreateAttributeOption, useUpdateAttributeOption, useDeleteAttributeOption) with cache invalidation in src/modules/products/presentation/queries/use-attribute-options.ts
+- [X] T024 [US2] Refactor attribute-add-dialog.tsx and attribute-form.tsx to use useCreateAttribute mutation in src/modules/products/presentation/components/
+- [X] T025 [US2] Refactor attribute-edit-dialog.tsx and attribute-edit-form.tsx to use useUpdateAttribute mutation in src/modules/products/presentation/components/
+- [X] T026 [US2] Refactor attribute-option-form.tsx and attribute-option-list.tsx to use attribute option mutation hooks in src/modules/products/presentation/components/
+- [X] T027 [US2] Refactor attribute-list.tsx to use useAttributes query and useDeleteAttribute mutation in src/modules/products/presentation/components/attribute-list.tsx
+- [X] T028 [US2] Remove attribute server actions file src/modules/products/presentation/actions/attribute.actions.ts and remove all imports referencing it
 
 **Checkpoint**: Attribute and option CRUD fully functional via API — all operations work through Elysia endpoints
 

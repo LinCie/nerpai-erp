@@ -11,11 +11,11 @@ import {
   DialogTrigger,
 } from "@/shared/presentation/components/ui/dialog";
 import { toast } from "sonner";
-import type { Attribute } from "../../domain/entities/attribute";
+import type { AttributeWithOptionsApi } from "../queries/use-attributes";
 import { AttributeEditForm } from "./attribute-edit-form";
 
 interface EditAttributeDialogProps {
-  attribute: Attribute;
+  attribute: Pick<AttributeWithOptionsApi, "id" | "name">;
   onSuccess?: () => void;
 }
 
