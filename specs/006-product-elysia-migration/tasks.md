@@ -19,8 +19,8 @@
 
 **Purpose**: Create directory structure and wire the product module route plugin into the Elysia app.
 
-- [ ] T001 Create route module index plugin at src/modules/products/presentation/routes/index.ts — empty Elysia plugin with prefix `/products` that will compose sub-resource routes
-- [ ] T002 Register product module route plugin in Elysia app entry point at src/app/api/[[...slugs]]/route.ts via `.use(productModuleRoutes)`
+- [X] T001 Create route module index plugin at src/modules/products/presentation/routes/index.ts — empty Elysia plugin with prefix `/products` that will compose sub-resource routes
+- [X] T002 Register product module route plugin in Elysia app entry point at src/app/api/[[...slugs]]/route.ts via `.use(productModuleRoutes)`
 
 ---
 
