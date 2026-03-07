@@ -43,7 +43,10 @@ const errorResponse = z.object({
 
 const attributeWithOptionsListResponse = z.array(attributeWithOptionsResponse);
 
-export const attributeRoutes = new Elysia({ prefix: "/attributes" })
+export const attributeRoutes = new Elysia({
+  prefix: "/attributes",
+  detail: { tags: ["Attributes"] },
+})
   .use(authPlugin)
   .get(
     "/",

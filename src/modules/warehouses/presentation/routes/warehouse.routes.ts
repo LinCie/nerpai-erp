@@ -21,7 +21,7 @@ import {
 
 const warehouseService = new WarehouseService(warehouseRepository);
 
-export const warehouseRoutes = new Elysia()
+export const warehouseRoutes = new Elysia({ detail: { tags: ["Warehouses"] } })
   .use(authPlugin)
   .get(
     "/",

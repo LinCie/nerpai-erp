@@ -9,6 +9,18 @@ export const app = new Elysia({ prefix: "/api" })
   .use(
     swagger({
       path: "/swagger",
+      documentation: {
+        info: {
+          title: "nerpai-erp API",
+          version: "1.0.0",
+        },
+        tags: [
+          { name: "Products", description: "Product management endpoints" },
+          { name: "Variants", description: "Product variant management" },
+          { name: "Attributes", description: "Product attribute management" },
+          { name: "Warehouses", description: "Warehouse management endpoints" },
+        ],
+      },
     }),
   )
   .use(

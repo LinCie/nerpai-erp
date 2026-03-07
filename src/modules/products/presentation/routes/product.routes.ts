@@ -31,7 +31,7 @@ const errorResponse = z.object({
   error: z.string(),
 });
 
-export const productRoutes = new Elysia()
+export const productRoutes = new Elysia({ detail: { tags: ["Products"] } })
   .use(authPlugin)
   .get(
     "/",
