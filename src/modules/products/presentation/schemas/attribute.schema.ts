@@ -22,15 +22,15 @@ export const createAttributeOptionBody = attributeOptionSchema;
 export const updateAttributeOptionBody = attributeOptionSchema;
 
 export const attributeOptionResponse = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   value: z.string(),
-  attributeId: z.string().uuid(),
+  attributeId: z.uuid(),
 });
 
 export const attributeResponse = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string(),
-  organizationId: z.string().uuid(),
+  organizationId: z.uuid(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

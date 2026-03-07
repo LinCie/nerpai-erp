@@ -12,9 +12,9 @@ export const createProductBody = productSchema;
 export const updateProductBody = productSchema;
 
 export const productResponse = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string(),
-  organizationId: z.string().uuid(),
+  organizationId: z.uuid(),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().nullable(),

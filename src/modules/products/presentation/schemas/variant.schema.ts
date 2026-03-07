@@ -25,12 +25,12 @@ export const updateVariantSchema = z.object({
 });
 
 export const assignAttributeBody = z.object({
-  attributeId: z.string().uuid({ error: "Attribute ID must be a valid UUID" }),
+  attributeId: z.uuid({ error: "Attribute ID must be a valid UUID" }),
 });
 
 export const assignAttributeSchema = z.object({
-  productId: z.string().uuid({ error: "Product ID must be a valid UUID" }),
-  attributeId: z.string().uuid({ error: "Attribute ID must be a valid UUID" }),
+  productId: z.uuid({ error: "Product ID must be a valid UUID" }),
+  attributeId: z.uuid({ error: "Attribute ID must be a valid UUID" }),
 });
 
 export const removeAttributeQuery = z.object({
@@ -38,22 +38,22 @@ export const removeAttributeQuery = z.object({
 });
 
 export const removeAttributeSchema = z.object({
-  productId: z.string().uuid({ error: "Product ID must be a valid UUID" }),
-  attributeId: z.string().uuid({ error: "Attribute ID must be a valid UUID" }),
+  productId: z.uuid({ error: "Product ID must be a valid UUID" }),
+  attributeId: z.uuid({ error: "Attribute ID must be a valid UUID" }),
   confirmed: z.boolean(),
 });
 
 export const reorderAttributesBody = z.object({
-  orderedAttributeIds: z.array(z.string().uuid()).min(1, { error: "At least one attribute must be provided" }),
+  orderedAttributeIds: z.array(z.uuid()).min(1, { error: "At least one attribute must be provided" }),
 });
 
 export const reorderAttributesSchema = z.object({
-  productId: z.string().uuid({ error: "Product ID must be a valid UUID" }),
-  orderedAttributeIds: z.array(z.string().uuid()).min(1, { error: "At least one attribute must be provided" }),
+  productId: z.uuid({ error: "Product ID must be a valid UUID" }),
+  orderedAttributeIds: z.array(z.uuid()).min(1, { error: "At least one attribute must be provided" }),
 });
 
 export const generateVariantsBody = z.object({
-  selections: z.record(z.string(), z.array(z.string().uuid())).refine(
+  selections: z.record(z.string(), z.array(z.uuid())).refine(
     (selections) => {
       return Object.values(selections).every((options) => options.length > 0);
     },
@@ -63,8 +63,8 @@ export const generateVariantsBody = z.object({
 });
 
 export const generateVariantsSchema = z.object({
-  productId: z.string().uuid({ error: "Product ID must be a valid UUID" }),
-  selections: z.record(z.string(), z.array(z.string().uuid())).refine(
+  productId: z.uuid({ error: "Product ID must be a valid UUID" }),
+  selections: z.record(z.string(), z.array(z.uuid())).refine(
     (selections) => {
       return Object.values(selections).every((options) => options.length > 0);
     },
@@ -79,22 +79,22 @@ export const toggleVariantActiveBody = z.object({
 });
 
 export const toggleVariantActiveSchema = z.object({
-  id: z.string().uuid({ error: "Variant ID must be a valid UUID" }),
+  id: z.uuid({ error: "Variant ID must be a valid UUID" }),
   isActive: z.boolean(),
 });
 
 export const softDeleteVariantSchema = z.object({
-  id: z.string().uuid({ error: "Variant ID must be a valid UUID" }),
+  id: z.uuid({ error: "Variant ID must be a valid UUID" }),
 });
 
 export const checkSkuBody = z.object({
   sku: z.string().trim().min(1, { error: "SKU is required" }),
-  excludeVariantId: z.string().uuid({ error: "Variant ID must be a valid UUID" }).optional(),
+  excludeVariantId: z.uuid({ error: "Variant ID must be a valid UUID" }).optional(),
 });
 
 export const variantResponse = z.object({
-  id: z.string().uuid(),
-  productId: z.string().uuid(),
+  id: z.uuid(),
+  productId: z.uuid(),
   sku: z.string(),
   price: z.number(),
   isActive: z.boolean(),
@@ -104,7 +104,7 @@ export const generateVariantsResponse = z.object({
   created: z.number(),
   variants: z.array(
     z.object({
-      id: z.string().uuid(),
+      id: z.uuid(),
       sku: z.string(),
     })
   ),
@@ -126,7 +126,7 @@ export const skuAvailabilityResponse = z.object({
 });
 
 export const assignAttributeResponse = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   displayOrder: z.number(),
 });
 
