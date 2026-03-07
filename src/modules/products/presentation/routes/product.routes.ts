@@ -1,5 +1,4 @@
-import { Elysia } from "elysia";
-import { z } from "zod";
+import { Elysia, t } from "elysia";
 import { authPlugin } from "@/shared/infrastructure/auth/auth-plugin";
 import {
   ProductNotFoundError,
@@ -7,28 +6,28 @@ import {
 } from "../../application/services/product.service";
 import { productRepository } from "../../infrastructure/repositories/product.repository";
 import {
-  createProductBody,
-  productListResponse,
-  productResponse,
-  updateProductBody,
-} from "../schemas/product.schema";
+  createProductBodyDto,
+  productListResponseDto,
+  productResponseDto,
+  updateProductBodyDto,
+} from "../schemas/product.dto";
 
 const productService = new ProductService(productRepository);
 
-const querySchema = z.object({
-  search: z.string().optional(),
+const querySchema = t.Object({
+  search: t.Optional(t.String()),
 });
 
-const paramsSchema = z.object({
-  id: z.string().uuid(),
+const paramsSchema = t.Object({
+  id: t.String({ format: "uuid" }),
 });
 
-const successResponse = z.object({
-  success: z.literal(true),
+const successResponse = t.Object({
+  success: t.Literal(true),
 });
 
-const errorResponse = z.object({
-  error: z.string(),
+const errorResponse = t.Object({
+  error: t.String(),
 });
 
 export const productRoutes = new Elysia({ detail: { tags: ["Products"] } })
@@ -49,7 +48,7 @@ export const productRoutes = new Elysia({ detail: { tags: ["Products"] } })
       auth: true,
       query: querySchema,
       response: {
-        200: productListResponse,
+        200: productListResponseDto,
       },
     },
   )
@@ -67,7 +66,7 @@ export const productRoutes = new Elysia({ detail: { tags: ["Products"] } })
     {
       auth: true,
       response: {
-        200: productListResponse,
+        200: productListResponseDto,
       },
     },
   )
@@ -93,7 +92,7 @@ export const productRoutes = new Elysia({ detail: { tags: ["Products"] } })
       auth: true,
       params: paramsSchema,
       response: {
-        200: productResponse,
+        200: productResponseDto,
         404: errorResponse,
       },
     },
@@ -112,9 +111,9 @@ export const productRoutes = new Elysia({ detail: { tags: ["Products"] } })
     },
     {
       auth: true,
-      body: createProductBody,
+      body: createProductBodyDto,
       response: {
-        200: productResponse,
+        200: productResponseDto,
         400: errorResponse,
       },
     },
@@ -143,9 +142,9 @@ export const productRoutes = new Elysia({ detail: { tags: ["Products"] } })
     {
       auth: true,
       params: paramsSchema,
-      body: updateProductBody,
+      body: updateProductBodyDto,
       response: {
-        200: productResponse,
+        200: productResponseDto,
         400: errorResponse,
         404: errorResponse,
       },

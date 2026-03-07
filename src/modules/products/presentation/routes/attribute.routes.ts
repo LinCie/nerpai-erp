@@ -1,5 +1,4 @@
-import { Elysia } from "elysia";
-import { z } from "zod";
+import { Elysia, t } from "elysia";
 import { authPlugin } from "@/shared/infrastructure/auth/auth-plugin";
 import {
   AttributeNotFoundError,
@@ -9,39 +8,41 @@ import {
 } from "../../application/services/attribute.service";
 import { attributeRepository } from "../../infrastructure/repositories/attribute.repository";
 import {
-  attributeOptionResponse,
-  attributeResponse,
-  attributeWithOptionsResponse,
-  createAttributeBody,
-  createAttributeOptionBody,
-  updateAttributeBody,
-  updateAttributeOptionBody,
-} from "../schemas/attribute.schema";
+  attributeOptionResponseDto,
+  attributeResponseDto,
+  attributeWithOptionsResponseDto,
+  createAttributeBodyDto,
+  createAttributeOptionBodyDto,
+  updateAttributeBodyDto,
+  updateAttributeOptionBodyDto,
+} from "../schemas/attribute.dto";
 
 const attributeService = new AttributeService(attributeRepository);
 
-const querySchema = z.object({
-  search: z.string().optional(),
+const querySchema = t.Object({
+  search: t.Optional(t.String()),
 });
 
-const paramsSchema = z.object({
-  id: z.string().uuid(),
+const paramsSchema = t.Object({
+  id: t.String({ format: "uuid" }),
 });
 
-const optionParamsSchema = z.object({
-  id: z.string().uuid(),
-  optionId: z.string().uuid(),
+const optionParamsSchema = t.Object({
+  id: t.String({ format: "uuid" }),
+  optionId: t.String({ format: "uuid" }),
 });
 
-const successResponse = z.object({
-  success: z.literal(true),
+const successResponse = t.Object({
+  success: t.Literal(true),
 });
 
-const errorResponse = z.object({
-  error: z.string(),
+const errorResponse = t.Object({
+  error: t.String(),
 });
 
-const attributeWithOptionsListResponse = z.array(attributeWithOptionsResponse);
+const attributeWithOptionsListResponseDto = t.Array(
+  attributeWithOptionsResponseDto,
+);
 
 export const attributeRoutes = new Elysia({
   prefix: "/attributes",
@@ -81,7 +82,7 @@ export const attributeRoutes = new Elysia({
       auth: true,
       query: querySchema,
       response: {
-        200: attributeWithOptionsListResponse,
+        200: attributeWithOptionsListResponseDto,
       },
     },
   )
@@ -119,7 +120,7 @@ export const attributeRoutes = new Elysia({
       auth: true,
       params: paramsSchema,
       response: {
-        200: attributeWithOptionsResponse,
+        200: attributeWithOptionsResponseDto,
         404: errorResponse,
       },
     },
@@ -138,9 +139,9 @@ export const attributeRoutes = new Elysia({
     },
     {
       auth: true,
-      body: createAttributeBody,
+      body: createAttributeBodyDto,
       response: {
-        200: attributeResponse,
+        200: attributeResponseDto,
         400: errorResponse,
       },
     },
@@ -169,9 +170,9 @@ export const attributeRoutes = new Elysia({
     {
       auth: true,
       params: paramsSchema,
-      body: updateAttributeBody,
+      body: updateAttributeBodyDto,
       response: {
-        200: attributeResponse,
+        200: attributeResponseDto,
         400: errorResponse,
         404: errorResponse,
       },
@@ -228,9 +229,9 @@ export const attributeRoutes = new Elysia({
     {
       auth: true,
       params: paramsSchema,
-      body: createAttributeOptionBody,
+      body: createAttributeOptionBodyDto,
       response: {
-        200: attributeOptionResponse,
+        200: attributeOptionResponseDto,
         400: errorResponse,
         404: errorResponse,
       },
@@ -260,9 +261,9 @@ export const attributeRoutes = new Elysia({
     {
       auth: true,
       params: optionParamsSchema,
-      body: updateAttributeOptionBody,
+      body: updateAttributeOptionBodyDto,
       response: {
-        200: attributeOptionResponse,
+        200: attributeOptionResponseDto,
         400: errorResponse,
         404: errorResponse,
       },

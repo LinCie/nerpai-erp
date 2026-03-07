@@ -1,25 +1,24 @@
-import { Elysia } from "elysia";
-import { z } from "zod";
+import { Elysia, t } from "elysia";
 import { authPlugin } from "@/shared/infrastructure/auth/auth-plugin";
 import { VariantService } from "../../application/services/variant.service";
 import { variantRepository } from "../../infrastructure/repositories/variant.repository";
 import { productRepository } from "../../infrastructure/repositories/product.repository";
 import { attributeRepository } from "../../infrastructure/repositories/attribute.repository";
 import {
-  assignAttributeBody,
-  removeAttributeQuery,
-  reorderAttributesBody,
-  generateVariantsBody,
-  updateVariantBody,
-  toggleVariantActiveBody,
-  checkSkuBody,
-  variantResponse,
-  generateVariantsResponse,
-  removeAttributeResponse,
-  removeAttributeConfirmationResponse,
-  skuAvailabilityResponse,
-  assignAttributeResponse,
-} from "../schemas/variant.schema";
+  assignAttributeBodyDto,
+  removeAttributeQueryDto,
+  reorderAttributesBodyDto,
+  generateVariantsBodyDto,
+  updateVariantBodyDto,
+  toggleVariantActiveBodyDto,
+  checkSkuBodyDto,
+  variantResponseDto,
+  generateVariantsResponseDto,
+  removeAttributeResponseDto,
+  removeAttributeConfirmationResponseDto,
+  skuAvailabilityResponseDto,
+  assignAttributeResponseDto,
+} from "../schemas/variant.dto";
 
 const variantService = new VariantService(
   variantRepository,
@@ -27,12 +26,12 @@ const variantService = new VariantService(
   attributeRepository,
 );
 
-const successResponse = z.object({ success: z.literal(true) });
-const errorResponse = z.object({ error: z.string() });
-const combinationResponse = z.object({
-  allCombinations: z.array(z.array(z.string())),
-  existingCombinations: z.array(z.array(z.string())),
-  newCombinations: z.array(z.array(z.string())),
+const successResponse = t.Object({ success: t.Literal(true) });
+const errorResponse = t.Object({ error: t.String() });
+const combinationResponse = t.Object({
+  allCombinations: t.Array(t.Array(t.String())),
+  existingCombinations: t.Array(t.Array(t.String())),
+  newCombinations: t.Array(t.Array(t.String())),
 });
 
 export const variantRoutes = new Elysia({ detail: { tags: ["Variants"] } })
@@ -53,9 +52,9 @@ export const variantRoutes = new Elysia({ detail: { tags: ["Variants"] } })
     },
     {
       auth: true,
-      body: assignAttributeBody,
+      body: assignAttributeBodyDto,
       response: {
-        200: assignAttributeResponse,
+        200: assignAttributeResponseDto,
         400: errorResponse,
         404: errorResponse,
         409: errorResponse,
@@ -72,7 +71,7 @@ export const variantRoutes = new Elysia({ detail: { tags: ["Variants"] } })
         productId: params.productId,
         attributeId: params.attributeId,
         organizationId: organization.id,
-        confirmed: query.confirmed,
+        confirmed: query.confirmed === "true" || query.confirmed === true,
       });
 
       if (result.needsConfirmation) {
@@ -87,11 +86,11 @@ export const variantRoutes = new Elysia({ detail: { tags: ["Variants"] } })
     },
     {
       auth: true,
-      query: removeAttributeQuery,
+      query: removeAttributeQueryDto,
       response: {
-        200: z.union([
-          removeAttributeResponse,
-          removeAttributeConfirmationResponse,
+        200: t.Union([
+          removeAttributeResponseDto,
+          removeAttributeConfirmationResponseDto,
         ]),
         400: errorResponse,
         404: errorResponse,
@@ -114,7 +113,7 @@ export const variantRoutes = new Elysia({ detail: { tags: ["Variants"] } })
     },
     {
       auth: true,
-      body: reorderAttributesBody,
+      body: reorderAttributesBodyDto,
       response: {
         200: successResponse,
         400: errorResponse,
@@ -143,9 +142,9 @@ export const variantRoutes = new Elysia({ detail: { tags: ["Variants"] } })
     },
     {
       auth: true,
-      body: generateVariantsBody,
+      body: generateVariantsBodyDto,
       response: {
-        200: generateVariantsResponse,
+        200: generateVariantsResponseDto,
         400: errorResponse,
         404: errorResponse,
       },
@@ -174,9 +173,9 @@ export const variantRoutes = new Elysia({ detail: { tags: ["Variants"] } })
     },
     {
       auth: true,
-      body: updateVariantBody,
+      body: updateVariantBodyDto,
       response: {
-        200: variantResponse,
+        200: variantResponseDto,
         400: errorResponse,
         404: errorResponse,
         409: errorResponse,
@@ -199,7 +198,7 @@ export const variantRoutes = new Elysia({ detail: { tags: ["Variants"] } })
     },
     {
       auth: true,
-      body: toggleVariantActiveBody,
+      body: toggleVariantActiveBodyDto,
       response: {
         200: successResponse,
         404: errorResponse,
@@ -270,9 +269,9 @@ export const variantRoutes = new Elysia({ detail: { tags: ["Variants"] } })
     },
     {
       auth: true,
-      body: checkSkuBody,
+      body: checkSkuBodyDto,
       response: {
-        200: skuAvailabilityResponse,
+        200: skuAvailabilityResponseDto,
         400: errorResponse,
       },
     },
