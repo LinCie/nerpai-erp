@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, useStore } from "@tanstack/react-form-nextjs";
+import { useForm, useStore } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Input } from "@/shared/presentation/components/ui/input";
@@ -11,7 +11,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/shared/presentation/components/ui/field";
-import { updateAttributeFormOptions } from "../lib/form-options";
+import { attributeSchema } from "../schemas/attribute.schema";
 import { useUpdateAttribute } from "../queries/use-update-attribute";
 import type { AttributeWithOptionsApi } from "../queries/use-attributes";
 
@@ -25,10 +25,8 @@ export function AttributeEditForm({ attribute, onSuccess }: AttributeEditFormPro
   const updateAttributeMutation = useUpdateAttribute();
 
   const form = useForm({
-    ...updateAttributeFormOptions,
-    defaultValues: {
-      name: attribute.name,
-    },
+    defaultValues: { name: attribute.name },
+    validators: { onSubmit: attributeSchema },
     onSubmit: async ({ value }) => {
       setServerError(null);
 

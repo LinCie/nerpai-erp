@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, useStore } from "@tanstack/react-form-nextjs";
+import { useForm, useStore } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Input } from "@/shared/presentation/components/ui/input";
@@ -11,7 +11,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/shared/presentation/components/ui/field";
-import { createAttributeFormOptions } from "../lib/form-options";
+import { attributeSchema } from "../schemas/attribute.schema";
 import { useCreateAttribute } from "../queries/use-create-attribute";
 
 interface AttributeFormProps {
@@ -23,7 +23,8 @@ export function AttributeForm({ onSuccess }: AttributeFormProps) {
   const createAttributeMutation = useCreateAttribute();
 
   const form = useForm({
-    ...createAttributeFormOptions,
+    defaultValues: { name: "" },
+    validators: { onSubmit: attributeSchema },
     onSubmit: async ({ value }) => {
       setServerError(null);
 

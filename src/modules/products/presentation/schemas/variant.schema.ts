@@ -138,3 +138,12 @@ export type ReorderAttributesFormData = z.infer<typeof reorderAttributesSchema>;
 export type GenerateVariantsFormData = z.infer<typeof generateVariantsSchema>;
 export type ToggleVariantActiveFormData = z.infer<typeof toggleVariantActiveSchema>;
 export type SoftDeleteVariantFormData = z.infer<typeof softDeleteVariantSchema>;
+
+// Body types for API hooks
+export type AssignAttributeBody = z.infer<typeof assignAttributeBody>;
+export type RemoveAttributeQuery = z.infer<typeof removeAttributeQuery>;
+export type ReorderAttributesBody = z.infer<typeof reorderAttributesBody>;
+export type GenerateVariantsBody = z.infer<typeof generateVariantsBody>;
+export type UpdateVariantBody = z.infer<typeof updateVariantBody>;
+export type ToggleVariantActiveBody = z.infer<typeof toggleVariantActiveBody>;
+export type CheckSkuBody = z.infer<typeof checkSkuBody>;

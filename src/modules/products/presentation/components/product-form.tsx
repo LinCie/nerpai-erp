@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, useStore } from "@tanstack/react-form-nextjs";
+import { useForm, useStore } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Input } from "@/shared/presentation/components/ui/input";
@@ -11,7 +11,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/shared/presentation/components/ui/field";
-import { createProductFormOptions } from "../lib/form-options";
+import { productSchema } from "../schemas/product.schema";
 import { useCreateProduct } from "../queries/use-create-product";
 
 interface ProductFormProps {
@@ -43,7 +43,8 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
   const createProductMutation = useCreateProduct();
 
   const form = useForm({
-    ...createProductFormOptions,
+    defaultValues: { name: "" },
+    validators: { onSubmit: productSchema },
     onSubmit: async ({ value }) => {
       setServerError(null);
 

@@ -1,3 +1,9 @@
-import { createQueryKeys } from "@/shared/presentation/queries/create-query-keys";
-
-export const variantKeys = createQueryKeys("variants");
+export const variantKeys = {
+  all: ["variants"] as const,
+  lists: () => [...variantKeys.all, "list"] as const,
+  list: (productId: string) => [...variantKeys.lists(), productId] as const,
+  details: () => [...variantKeys.all, "detail"] as const,
+  detail: (id: string) => [...variantKeys.details(), id] as const,
+  combinations: (productId: string) =>
+    [...variantKeys.all, "combinations", productId] as const,
+} as const;
