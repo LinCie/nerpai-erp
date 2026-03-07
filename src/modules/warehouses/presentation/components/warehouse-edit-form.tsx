@@ -1,14 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useMemo } from "react";
-import {
-  formOptions,
-  initialFormState,
-  mergeForm,
-  useForm,
-  useStore,
-  useTransform,
-} from "@tanstack/react-form-nextjs";
+import { useState } from "react";
+import { useForm, useStore } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Input } from "@/shared/presentation/components/ui/input";
@@ -19,10 +12,10 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/shared/presentation/components/ui/field";
-import { updateWarehouseFormOptions } from "../lib/form-options";
-import { updateWarehouse } from "../actions/warehouse.actions";
-
 import type { Warehouse } from "../../domain/entities/warehouse";
+import { warehouseUpdateSchema } from "../schemas/warehouse.schema";
+import { getWarehouseErrorMessage } from "../queries/get-warehouse-error-message";
+import { useUpdateWarehouse } from "../queries/use-update-warehouse";
 
 interface WarehouseEditFormProps {
   warehouse: Warehouse;
@@ -30,12 +23,10 @@ interface WarehouseEditFormProps {
 }
 
 export function WarehouseEditForm({ warehouse, onSuccess }: WarehouseEditFormProps) {
-  const [state, action, isPending] = useActionState(
-    updateWarehouse,
-    initialFormState,
-  );
+  const [serverError, setServerError] = useState<string | null>(null);
+  const updateWarehouseMutation = useUpdateWarehouse();
 
-  const editFormOptions = useMemo(() => formOptions({
+  const form = useForm({
     defaultValues: {
       name: warehouse.name,
       streetAddress: warehouse.streetAddress ?? "",
@@ -48,15 +39,27 @@ export function WarehouseEditForm({ warehouse, onSuccess }: WarehouseEditFormPro
       contactEmail: warehouse.contactEmail ?? "",
       notes: warehouse.notes ?? "",
     },
-    validators: updateWarehouseFormOptions.validators,
-  }), [warehouse]);
+    validators: {
+      onSubmit: warehouseUpdateSchema,
+    },
+    onSubmit: async ({ value }) => {
+      setServerError(null);
 
-  const form = useForm({
-    ...editFormOptions,
-    transform: useTransform(
-      (baseForm) => mergeForm(baseForm, state ?? {}),
-      [state],
-    ),
+      try {
+        await updateWarehouseMutation.mutateAsync({
+          id: warehouse.id,
+          ...value,
+        });
+        onSuccess?.();
+      } catch (error) {
+        setServerError(
+          getWarehouseErrorMessage(
+            error,
+            "Failed to update warehouse. Please try again.",
+          ),
+        );
+      }
+    },
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);
@@ -65,26 +68,22 @@ export function WarehouseEditForm({ warehouse, onSuccess }: WarehouseEditFormPro
     (formState) => formState.values?.notes?.length || 0,
   );
 
-  useEffect(() => {
-    if (!state && !isPending) {
-      onSuccess?.();
-    }
-  }, [state, isPending, onSuccess]);
-
   return (
     <form
-      action={action as never}
-      onSubmit={() => form.handleSubmit()}
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void form.handleSubmit();
+      }}
       className="space-y-6"
       noValidate
     >
-      <input type="hidden" name="id" value={warehouse.id} />
-
-      {formErrors.length > 0 && (
+      {(formErrors.length > 0 || serverError) && (
         <div className="text-destructive text-sm" role="alert">
           {formErrors.map((error) => (
             <p key={String(error)}>{String(error)}</p>
           ))}
+          {serverError ? <p>{serverError}</p> : null}
         </div>
       )}
 

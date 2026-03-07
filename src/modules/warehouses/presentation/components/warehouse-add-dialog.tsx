@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import {
@@ -18,13 +19,15 @@ interface AddWarehouseDialogProps {
 }
 
 export function AddWarehouseDialog({ onSuccess }: AddWarehouseDialogProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const handleSuccess = useCallback(() => {
     toast.success("Warehouse created successfully");
     setOpen(false);
+    router.refresh();
     onSuccess?.();
-  }, [onSuccess]);
+  }, [onSuccess, router]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -1,13 +1,7 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
-import {
-  initialFormState,
-  mergeForm,
-  useForm,
-  useStore,
-  useTransform,
-} from "@tanstack/react-form-nextjs";
+import { useState } from "react";
+import { useForm, useStore } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Input } from "@/shared/presentation/components/ui/input";
@@ -18,29 +12,53 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/shared/presentation/components/ui/field";
-import { createWarehouseFormOptions } from "../lib/form-options";
-import {
-  createWarehouse,
-  checkWarehouseCode,
-} from "../actions/warehouse.actions";
 import { normalizeTanstackErrors } from "@/shared/presentation/library/utils";
+import { warehouseCreateSchema } from "../schemas/warehouse.schema";
+import { getWarehouseErrorMessage } from "../queries/get-warehouse-error-message";
+import { useCheckWarehouseCode } from "../queries/use-check-warehouse-code";
+import { useCreateWarehouse } from "../queries/use-create-warehouse";
 
 interface WarehouseFormProps {
   onSuccess?: () => void;
 }
 
 export function WarehouseForm({ onSuccess }: WarehouseFormProps) {
-  const [state, action, isPending] = useActionState(
-    createWarehouse,
-    initialFormState,
-  );
+  const [serverError, setServerError] = useState<string | null>(null);
+  const createWarehouseMutation = useCreateWarehouse();
+  const checkWarehouseCodeMutation = useCheckWarehouseCode();
 
   const form = useForm({
-    ...createWarehouseFormOptions,
-    transform: useTransform(
-      (baseForm) => mergeForm(baseForm, state ?? {}),
-      [state],
-    ),
+    defaultValues: {
+      name: "",
+      code: "",
+      streetAddress: "",
+      city: "",
+      province: "",
+      postalCode: "",
+      country: "Indonesia",
+      contactName: "",
+      contactPhone: "",
+      contactEmail: "",
+      notes: "",
+    },
+    validators: {
+      onSubmit: warehouseCreateSchema,
+    },
+    onSubmit: async ({ value }) => {
+      setServerError(null);
+
+      try {
+        await createWarehouseMutation.mutateAsync(value);
+        onSuccess?.();
+      } catch (error) {
+        setServerError(
+          getWarehouseErrorMessage(
+            error,
+            "Failed to create warehouse. Please try again.",
+          ),
+        );
+      }
+    },
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);
@@ -49,24 +67,22 @@ export function WarehouseForm({ onSuccess }: WarehouseFormProps) {
     (formState) => formState.values?.notes?.length || 0,
   );
 
-  useEffect(() => {
-    if (!state && !isPending) {
-      onSuccess?.();
-    }
-  }, [state, isPending, onSuccess]);
-
   return (
     <form
-      action={action as never}
-      onSubmit={() => form.handleSubmit()}
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void form.handleSubmit();
+      }}
       className="space-y-6"
       noValidate
     >
-      {formErrors.length > 0 && (
+      {(formErrors.length > 0 || serverError) && (
         <div className="text-destructive text-sm" role="alert">
           {formErrors.map((error) => (
             <p key={String(error)}>{String(error)}</p>
           ))}
+          {serverError ? <p>{serverError}</p> : null}
         </div>
       )}
 
@@ -122,10 +138,14 @@ export function WarehouseForm({ onSuccess }: WarehouseFormProps) {
                 ) {
                   return undefined;
                 }
-                const res = await checkWarehouseCode(trimmed);
-                return res.available
-                  ? undefined
-                  : "Warehouse code already exists in your organization";
+                try {
+                  const res = await checkWarehouseCodeMutation.mutateAsync(trimmed);
+                  return res.available
+                    ? undefined
+                    : "Warehouse code already exists in your organization";
+                } catch {
+                  return "Unable to validate warehouse code right now";
+                }
               },
               onBlurAsync: async ({ value }) => {
                 const trimmed = value?.trim();
@@ -136,10 +156,14 @@ export function WarehouseForm({ onSuccess }: WarehouseFormProps) {
                 ) {
                   return undefined;
                 }
-                const res = await checkWarehouseCode(trimmed);
-                return res.available
-                  ? undefined
-                  : "Warehouse code already exists in your organization";
+                try {
+                  const res = await checkWarehouseCodeMutation.mutateAsync(trimmed);
+                  return res.available
+                    ? undefined
+                    : "Warehouse code already exists in your organization";
+                } catch {
+                  return "Unable to validate warehouse code right now";
+                }
               },
             }}
           >

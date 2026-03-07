@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Trash2, RotateCcw, Loader2, MapPin, Calendar } from "lucide-react";
 import type { Warehouse as WarehouseEntity } from "../../domain/entities/warehouse";
 import { Button } from "@/shared/presentation/components/ui/button";
-import { restoreWarehouse } from "../actions/warehouse.actions";
 import { toast } from "sonner";
+import { getWarehouseErrorMessage } from "../queries/get-warehouse-error-message";
+import { useRestoreWarehouse } from "../queries/use-restore-warehouse";
+import { useWarehousesTrash } from "../queries/use-warehouses";
 
 interface WarehouseTrashListProps {
   warehouses: WarehouseEntity[];
@@ -31,29 +34,28 @@ function WarehouseTrashItem({
   warehouse: WarehouseEntity;
   onRestoreSuccess: () => void;
 }) {
+  const router = useRouter();
   const [isRestoring, setIsRestoring] = useState(false);
+  const restoreWarehouseMutation = useRestoreWarehouse();
 
   const handleRestore = useCallback(async () => {
     setIsRestoring(true);
     try {
-      const formData = new FormData();
-      formData.append("id", warehouse.id);
-
-      const result = await restoreWarehouse(formData);
-
-      if (result.success) {
-        toast.success(`"${warehouse.name}" restored successfully`);
-        onRestoreSuccess();
-      } else {
-        toast.error(result.error || "Failed to restore warehouse");
-      }
+      await restoreWarehouseMutation.mutateAsync(warehouse.id);
+      toast.success(`"${warehouse.name}" restored successfully`);
+      router.refresh();
+      onRestoreSuccess();
     } catch (error) {
-      console.error("Error restoring warehouse:", error);
-      toast.error("Failed to restore warehouse. Please try again.");
+      toast.error(
+        getWarehouseErrorMessage(
+          error,
+          "Failed to restore warehouse. Please try again.",
+        ),
+      );
     } finally {
       setIsRestoring(false);
     }
-  }, [warehouse.id, warehouse.name, onRestoreSuccess]);
+  }, [onRestoreSuccess, restoreWarehouseMutation, router, warehouse.id, warehouse.name]);
 
   return (
     <div className="flex items-center justify-between p-4 border-b last:border-b-0">
@@ -98,13 +100,14 @@ function WarehouseTrashItem({
 
 export function WarehouseTrashList({ warehouses, onRestore }: WarehouseTrashListProps) {
   const [key, setKey] = useState(0);
+  const { data: trashWarehouses = warehouses } = useWarehousesTrash(warehouses);
 
   const handleRestoreSuccess = useCallback(() => {
     setKey((prev) => prev + 1);
     onRestore?.();
   }, [onRestore]);
 
-  if (warehouses.length === 0) {
+  if (trashWarehouses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="rounded-full bg-muted p-4 mb-4">
@@ -121,7 +124,7 @@ export function WarehouseTrashList({ warehouses, onRestore }: WarehouseTrashList
 
   return (
     <div key={key} className="rounded-md border">
-      {warehouses.map((warehouse) => (
+      {trashWarehouses.map((warehouse) => (
         <WarehouseTrashItem
           key={warehouse.id}
           warehouse={warehouse}

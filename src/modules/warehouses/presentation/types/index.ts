@@ -1,13 +1,7 @@
 /**
  * Presentation-layer types for the Warehouse module.
- * These types are specific to the presentation layer (components, actions, pages).
+ * These types are specific to the presentation layer (components, pages).
  */
-
-/** Result shape for non-form server actions (soft-delete, restore) */
-export interface WarehouseActionResult {
-  success: boolean;
-  error?: string;
-}
 
 /** Column definition for warehouse list table */
 export type WarehouseListColumn =

@@ -6,12 +6,16 @@ import type { Warehouse } from "@/modules/warehouses/domain/entities/warehouse";
 import { WarehouseList } from "./warehouse-list";
 import { WarehouseEmptyState } from "./warehouse-empty-state";
 import { WarehouseSearch } from "./warehouse-search";
+import { useWarehouses } from "../queries/use-warehouses";
 
 interface WarehouseListServerProps {
   warehouses: Warehouse[];
   searchQuery: string;
   province?: string;
   provinces: string[];
+  page: number;
+  limit: number;
+  totalCount: number;
 }
 
 export function WarehouseListServer({
@@ -19,9 +23,27 @@ export function WarehouseListServer({
   searchQuery,
   province,
   provinces,
+  page,
+  limit,
+  totalCount,
 }: WarehouseListServerProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const { data } = useWarehouses(
+    {
+      search: searchQuery || undefined,
+      province: province || undefined,
+      page,
+      limit,
+    },
+    {
+      items: warehouses,
+      totalCount,
+      provinces,
+    },
+  );
+  const warehousesData = data?.items ?? warehouses;
+  const provincesData = data?.provinces ?? provinces;
 
   const handleSearchChange = (value: string) => {
     startTransition(() => {
@@ -55,7 +77,7 @@ export function WarehouseListServer({
           onChange={handleSearchChange}
           disabled={isPending}
         />
-        {provinces.length > 0 && (
+        {provincesData.length > 0 && (
           <select
             value={province || "all"}
             onChange={(e) => handleProvinceChange(e.target.value)}
@@ -63,7 +85,7 @@ export function WarehouseListServer({
             aria-label="Filter by province"
           >
             <option value="all">All Provinces</option>
-            {provinces.map((p) => (
+            {provincesData.map((p) => (
               <option key={p} value={p}>
                 {p}
               </option>
@@ -72,8 +94,8 @@ export function WarehouseListServer({
         )}
       </div>
 
-      {warehouses.length > 0 ? (
-        <WarehouseList warehouses={warehouses} />
+      {warehousesData.length > 0 ? (
+        <WarehouseList warehouses={warehousesData} />
       ) : (
         <WarehouseEmptyState
           searchQuery={searchQuery}

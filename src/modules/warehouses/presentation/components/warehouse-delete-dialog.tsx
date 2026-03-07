@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Trash2, Loader2 } from "lucide-react";
 import {
   AlertDialog,
@@ -14,8 +15,9 @@ import {
   AlertDialogTrigger,
 } from "@/shared/presentation/components/ui/alert-dialog";
 import { Button } from "@/shared/presentation/components/ui/button";
-import { softDeleteWarehouse } from "../actions/warehouse.actions";
 import { toast } from "sonner";
+import { getWarehouseErrorMessage } from "../queries/get-warehouse-error-message";
+import { useDeleteWarehouse } from "../queries/use-delete-warehouse";
 
 interface DeleteWarehouseDialogProps {
   warehouseId: string;
@@ -30,31 +32,30 @@ export function DeleteWarehouseDialog({
   onSuccess,
   trigger,
 }: DeleteWarehouseDialogProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const deleteWarehouseMutation = useDeleteWarehouse();
 
   const handleDelete = useCallback(async () => {
     setIsDeleting(true);
     try {
-      const formData = new FormData();
-      formData.append("id", warehouseId);
-
-      const result = await softDeleteWarehouse(formData);
-
-      if (result.success) {
-        toast.success("Warehouse deleted successfully");
-        setOpen(false);
-        onSuccess?.();
-      } else {
-        toast.error(result.error || "Failed to delete warehouse");
-      }
+      await deleteWarehouseMutation.mutateAsync(warehouseId);
+      toast.success("Warehouse deleted successfully");
+      setOpen(false);
+      router.refresh();
+      onSuccess?.();
     } catch (error) {
-      console.error("Error deleting warehouse:", error);
-      toast.error("Failed to delete warehouse. Please try again.");
+      toast.error(
+        getWarehouseErrorMessage(
+          error,
+          "Failed to delete warehouse. Please try again.",
+        ),
+      );
     } finally {
       setIsDeleting(false);
     }
-  }, [warehouseId, onSuccess]);
+  }, [deleteWarehouseMutation, onSuccess, router, warehouseId]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>

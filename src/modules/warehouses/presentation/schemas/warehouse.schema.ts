@@ -203,3 +203,62 @@ export const warehouseUpdateSchema = warehouseBaseSchema;
 export type WarehouseBaseFormData = z.infer<typeof warehouseBaseSchema>;
 export type WarehouseCreateFormData = z.infer<typeof warehouseCreateSchema>;
 export type WarehouseUpdateFormData = z.infer<typeof warehouseUpdateSchema>;
+
+export const warehouseIdParamsSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export const warehouseCodeCheckQuerySchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(1, { message: "Warehouse code is required" })
+    .max(50, { message: "Code must be 50 characters or less" })
+    .regex(/^[a-zA-Z0-9_-]+$/, {
+      message: "Code can only contain letters, numbers, hyphens, and underscores",
+    }),
+});
+
+export const warehouseResponseSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  code: z.string(),
+  streetAddress: z.string().nullable(),
+  city: z.string().nullable(),
+  province: z.string().nullable(),
+  postalCode: z.string().nullable(),
+  country: z.string(),
+  contactName: z.string().nullable(),
+  contactPhone: z.string().nullable(),
+  contactEmail: z.string().nullable(),
+  notes: z.string().nullable(),
+  organizationId: z.string().uuid(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  deletedAt: z.date().nullable(),
+});
+
+export const warehouseCodeAvailabilityResponseSchema = z.object({
+  available: z.boolean(),
+});
+
+export const mutationSuccessResponseSchema = z.object({
+  success: z.literal(true),
+});
+
+export const warehouseErrorResponseSchema = z.object({
+  error: z.string(),
+});
+
+export const warehouseListQuerySchema = z.object({
+  search: z.string().optional(),
+  province: z.string().optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
+export const warehouseListResponseSchema = z.object({
+  items: z.array(warehouseResponseSchema),
+  totalCount: z.number().int().nonnegative(),
+  provinces: z.array(z.string()),
+});

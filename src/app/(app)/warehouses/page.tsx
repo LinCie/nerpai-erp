@@ -81,6 +81,9 @@ export default async function WarehousesPage({ searchParams }: WarehousesPagePro
             searchQuery={searchQuery}
             province={province}
             provinces={provinces}
+            page={page}
+            limit={limit}
+            totalCount={totalCount}
           />
           {totalCount > limit && (
             <div className="flex items-center justify-between">
