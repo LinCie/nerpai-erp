@@ -21,17 +21,18 @@ Setup (Next.js catch-all route):
 
 Route Handler Patterns:
 
-- Define request body and response schemas with Zod for runtime validation
+- Define request body and response schemas with TypeBox (Elysia's `t`) or Zod for runtime validation
 - Define response schemas per status code for type-safe error handling
 - Use `guard` for shared validation across route groups
 - Use `group` for resource prefix organization
 - Use Elysia plugins to encapsulate feature module routes
-- Reuse Zod schemas from `presentation/schemas/` in route definitions
-- Example:
+- Reuse Zod schemas from `presentation/schemas/` in route definitions (when using Zod)
+- TypeBox (`t`) is the default for native Elysia integration with automatic OpenAPI generation
+- Example with TypeBox:
   ```
   const productRoutes = new Elysia({ prefix: '/products' })
     .get('/', () => getProducts(), {
-      response: { 200: z.array(ProductSchema) }
+      response: { 200: t.Array(ProductSchema) }
     })
     .post('/', ({ body }) => createProduct(body), {
       body: CreateProductSchema,
@@ -63,11 +64,11 @@ Authentication via Elysia:
 
 Validation:
 
-- Elysia route schemas MUST use Zod (not TypeBox) for runtime validation
-- Zod schemas from `presentation/schemas/` SHOULD be reused in route handlers
-- A single Zod schema can serve route validation, form validation, and type
-  inference
-- TanStack Form client validators are complementary, not a substitute
+- Elysia route schemas MAY use TypeBox (Elysia's `t` object) OR Zod for runtime validation
+- TypeBox is the default choice for native Elysia integration with automatic TypeScript inference and OpenAPI generation
+- Zod schemas from `presentation/schemas/` SHOULD be reused in route handlers when the same validation is needed for both forms and API routes
+- A single Zod schema can serve form validation (TanStack Form), route validation (Elysia), and type inference (TypeScript)
+- Mixing TypeBox and Zod within the same route group is permitted; choose the validator based on reuse needs (Zod for shared schemas, TypeBox for route-native integration)
 
 Error Handling:
 

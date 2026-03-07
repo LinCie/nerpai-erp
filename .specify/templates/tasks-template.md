@@ -70,7 +70,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T009 Setup environment configuration management
 - [ ] T00X Define/confirm Elysia API route contracts for success + recoverable errors in `contracts/`
 - [ ] T00Y Add DB integrity constraints and required extension/index migrations for planned query patterns
-- [ ] T00Z Verify Elysia route handlers define Zod request/response schemas per Constitution XII
+- [ ] T00Z Verify Elysia route handlers define TypeBox or Zod request/response schemas per Constitution XII
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -175,7 +175,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
 - [ ] TXXX Security hardening
 - [ ] TXXX Contract parity audit (spec/contracts vs implementation behavior)
-- [ ] TXXX Elysia API audit: verify all route handlers have Zod schemas and no `'use server'` directives exist (XII)
+- [ ] TXXX Elysia API audit: verify all route handlers have TypeBox or Zod schemas and no `'use server'` directives exist (XII)
 - [ ] TXXX TanStack Query audit: verify all client data fetching uses useQuery/useMutation, no useEffect+setState fetch patterns, query key factories per module (XIII)
 - [ ] TXXX Capture performance evidence (benchmark note or EXPLAIN plan) for verified claims
 - [ ] TXXX Run quickstart.md validation

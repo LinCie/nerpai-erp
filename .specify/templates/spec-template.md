@@ -99,7 +99,7 @@ _Example of marking unclear requirements:_
 
 - **CR-001**: Elysia API routes MUST define explicit success and recoverable error behaviors (validation, not found, forbidden) in contracts.
 - **CR-002**: Implementation MUST match documented contract shapes for all exposed mutation/read operations.
-- **CR-003**: Elysia route handlers MUST define Zod request body and response schemas per status code for end-to-end type safety (XII).
+- **CR-003**: Elysia route handlers MUST define TypeBox or Zod request body and response schemas per status code for end-to-end type safety (XII).
 - **CR-004**: All client-side API calls MUST use Eden Treaty client; raw `fetch` and `'use server'` directives are prohibited (XII).
 - **CR-005**: Client component data fetching MUST use TanStack Query hooks (`useQuery`/`useMutation`) wrapping Eden Treaty; direct Treaty calls and `useEffect` fetch patterns are prohibited (XIII).
 - **DIR-001**: Critical domain invariants MUST be enforced at the database layer where feasible (e.g., CHECK/NOT NULL/foreign key constraints).

@@ -2,42 +2,39 @@
 
 # SYNC IMPACT REPORT
 
-Version change: 2.1.0 → 2.2.0 (Minor - Elysia route validation changed
-from TypeBox to Zod)
+Version change: 2.2.0 → 2.3.0 (Minor - Elysia route validation now allows
+both TypeBox and Zod)
 
 Modified principles:
 
-- XII. Elysia REST API & Eden Treaty (TypeBox replaced with Zod for route
-  request/response schemas; examples updated to use Zod syntax; added note
-  on Zod integration approach)
+- XII. Elysia REST API & Eden Treaty (Zod and TypeBox both permitted for
+  route request/response schemas; TypeBox allowed as default for native
+  Elysia integration; Zod retained for form validation reuse)
 
 Modified sections:
 
-- Technology Standards (explicit note that Zod serves both form validation
-  and Elysia route schemas; TypeBox no longer required)
-- Development Workflow / Quality Gates (gate 15 updated from TypeBox to
-  Zod)
+- Technology Standards (explicit note that route validation may use
+  TypeBox or Zod; TypeBox for native Elysia integration, Zod for reuse
+  with forms)
+- Development Workflow / Quality Gates (gate 15 updated to allow both
+  TypeBox and Zod for route schemas)
 
 Templates requiring updates:
 ✅ .specify/templates/plan-template.md (Constitution Check XII updated
-  from TypeBox to Zod)
-✅ .specify/templates/spec-template.md (CR-003 updated from TypeBox to
-  Zod)
+  to allow TypeBox and Zod)
+✅ .specify/templates/spec-template.md (CR-003 updated to allow both)
 ✅ .specify/templates/tasks-template.md (foundational and audit tasks
-  updated from TypeBox to Zod)
+  updated to allow both)
 ⚠ .specify/templates/commands/*.md (directory not present; no command
   templates to validate)
 
 Runtime docs requiring updates:
-✅ .agent/rules/elysia-api-guide.md (TypeBox references and code examples
-  updated to Zod)
+✅ .agent/rules/elysia-api-guide.md (TypeBox allowed for routes,
+  Zod remains for forms)
 
 Follow-up TODOs:
 
-- Verify Elysia + Zod integration approach during implementation research
-  (Standard Schema support in Elysia 1.4.x or @elysiajs/zod plugin)
-- Migrate any existing TypeBox schemas in route handlers to Zod
-  equivalents
+- None
 
 -->
 
@@ -318,15 +315,18 @@ Actions are prohibited.
 - Treaty client MUST be configured with `{ fetch: { credentials: 'include' } }`
   for cookie-based auth
 
-**Zod Integration with Elysia**:
+**Validation in Route Handlers**:
 
-- Elysia route schemas MUST use Zod instead of Elysia's built-in TypeBox (`t`)
-- Integration MUST be established via Zod's Standard Schema support or the
-  `@elysiajs/zod` plugin (confirm approach during implementation research)
+- Elysia route schemas MAY use either Elysia's built-in TypeBox (`t`) OR Zod
+- TypeBox (Elysia's `t` object) is the default choice for native Elysia
+  integration with automatic TypeScript inference and OpenAPI generation
 - Zod schemas defined in `presentation/schemas/` SHOULD be reused in route
-  handler `body` and `response` definitions to avoid duplication
+  handlers when the same validation is needed for both forms and API routes
 - A single Zod schema can serve form validation (TanStack Form), route
   validation (Elysia), and type inference (TypeScript)
+- Mixing TypeBox and Zod within the same route group is permitted; choose
+  the validator based on reuse needs (Zod for shared schemas, TypeBox for
+  route-native integration)
 
 **Authentication via Elysia**:
 
@@ -432,8 +432,10 @@ only via idempotent migrations
 with `bun db:migrate`)
 **Type Generation**: `db:codegen` command for database types
 **Authentication**: better-auth 1.4.x (mounted on Elysia via `.mount()`)
-**Validation**: Zod 4.x (unified schema validation for Elysia routes, TanStack
-Form, and general type inference; replaces Elysia's default TypeBox)
+**Validation**: 
+- Zod 4.x (schema validation for forms, shared DTOs, and general type inference)
+- TypeBox via Elysia's `t` object (native Elysia route validation with automatic
+  TypeScript inference and OpenAPI generation)
 **Forms**: TanStack Form 1.x (headless form management with Zod integration)
 **Testing**: Jest v30.x + React Testing Library (when tests requested)
 **Linting**: ESLint 9.x with next/core-web-vitals config
@@ -474,7 +476,7 @@ Form, and general type inference; replaces Elysia's default TypeBox)
 14. Performance claims include reproducible evidence and matching
     extension/index strategy where applicable (VIII, XI)
 15. Elysia route handlers define explicit request body and response schemas
-    using Zod (XII)
+    using TypeBox or Zod (XII)
 16. All client-side API calls use Eden Treaty client, not raw `fetch` (XII)
 17. No `'use server'` directives or server action files in the codebase (XII)
 18. better-auth mounted on Elysia with auth macro for protected routes (V, XII)
@@ -552,4 +554,4 @@ project.
 - `AGENTS.md`: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 2.2.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-03-06
+**Version**: 2.3.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-03-07
