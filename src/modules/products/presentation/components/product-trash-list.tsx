@@ -1,11 +1,12 @@
 "use client";
 
 import { Package, RotateCcw } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { toast } from "sonner";
 import type { Product } from "../../domain/entities/product";
-import { restoreProduct } from "../actions/product.actions";
+import { useProductsTrash } from "../queries/use-products";
+import { useRestoreProduct } from "../queries/use-restore-product";
 
 interface ProductTrashListProps {
   products: Product[];
@@ -21,34 +22,25 @@ function formatDate(date: Date | string): string {
 }
 
 export function ProductTrashList({ products, onSuccess }: ProductTrashListProps) {
+  const { data: trashProducts = [] } = useProductsTrash(products);
+  const restoreProductMutation = useRestoreProduct();
   const [restoringId, setRestoringId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
 
-  const handleRestore = (product: Product) => {
+  const handleRestore = async (product: Product) => {
     setRestoringId(product.id);
-    
-    startTransition(async () => {
-      try {
-        const formData = new FormData();
-        formData.append("id", product.id);
 
-        const result = await restoreProduct(formData);
-        if (!result.success) {
-          toast.error(result.error);
-          return;
-        }
-
-        toast.success(`"${product.name}" has been restored`);
-        onSuccess?.();
-      } catch {
-        toast.error("Failed to restore product. Please try again.");
-      } finally {
-        setRestoringId(null);
-      }
-    });
+    try {
+      await restoreProductMutation.mutateAsync(product.id);
+      toast.success(`"${product.name}" has been restored`);
+      onSuccess?.();
+    } catch {
+      toast.error("Failed to restore product. Please try again.");
+    } finally {
+      setRestoringId(null);
+    }
   };
 
-  if (products.length === 0) {
+  if (trashProducts.length === 0) {
     return null;
   }
 
@@ -72,7 +64,7 @@ export function ProductTrashList({ products, onSuccess }: ProductTrashListProps)
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {trashProducts.map((product) => (
             <tr
               key={product.id}
               className="border-b transition-colors hover:bg-muted/50"
@@ -93,11 +85,14 @@ export function ProductTrashList({ products, onSuccess }: ProductTrashListProps)
                     variant="outline"
                     size="sm"
                     onClick={() => handleRestore(product)}
-                    disabled={isPending && restoringId === product.id}
+                    disabled={
+                      restoreProductMutation.isPending &&
+                      restoringId === product.id
+                    }
                     aria-label={`Restore ${product.name}`}
                   >
                     <RotateCcw className="mr-2 h-4 w-4" />
-                    {isPending && restoringId === product.id
+                    {restoreProductMutation.isPending && restoringId === product.id
                       ? "Restoring..."
                       : "Restore"}
                   </Button>

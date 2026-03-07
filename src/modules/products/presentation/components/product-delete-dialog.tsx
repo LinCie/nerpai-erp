@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/shared/presentation/components/ui/dialog";
 import { toast } from "sonner";
 import type { Product } from "../../domain/entities/product";
-import { softDeleteProduct } from "../actions/product.actions";
+import { useDeleteProduct } from "../queries/use-delete-product";
 
 interface ProductDeleteDialogProps {
   product: Product;
@@ -23,27 +23,17 @@ interface ProductDeleteDialogProps {
 
 export function ProductDeleteDialog({ product, onSuccess }: ProductDeleteDialogProps) {
   const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const deleteProductMutation = useDeleteProduct();
 
-  const handleDelete = () => {
-    startTransition(async () => {
-      try {
-        const formData = new FormData();
-        formData.append("id", product.id);
-
-        const result = await softDeleteProduct(formData);
-        if (!result.success) {
-          toast.error(result.error);
-          return;
-        }
-
-        toast.success(`"${product.name}" has been deleted`);
-        setOpen(false);
-        onSuccess?.();
-      } catch {
-        toast.error("Failed to delete product. Please try again.");
-      }
-    });
+  const handleDelete = async () => {
+    try {
+      await deleteProductMutation.mutateAsync(product.id);
+      toast.success(`"${product.name}" has been deleted`);
+      setOpen(false);
+      onSuccess?.();
+    } catch {
+      toast.error("Failed to delete product. Please try again.");
+    }
   };
 
   return (
@@ -67,15 +57,19 @@ export function ProductDeleteDialog({ product, onSuccess }: ProductDeleteDialogP
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={deleteProductMutation.isPending}
+          >
             Cancel
           </Button>
           <Button
             variant="destructive"
             onClick={handleDelete}
-            disabled={isPending}
+            disabled={deleteProductMutation.isPending}
           >
-            {isPending ? "Deleting..." : "Delete"}
+            {deleteProductMutation.isPending ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

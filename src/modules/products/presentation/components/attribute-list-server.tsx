@@ -2,18 +2,21 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { AttributeWithOptions } from "../../domain/types";
+import type { AttributeWithOptionsApi } from "../queries/use-attributes";
 import { AttributeList } from "./attribute-list";
 import { AttributeEmptyState } from "./attribute-empty-state";
 import { AddAttributeDialog } from "./attribute-add-dialog";
 import { ProductSearch } from "./product-search";
 
 interface AttributeListServerProps {
-  attributes: AttributeWithOptions[];
+  initialAttributes: AttributeWithOptionsApi[];
   searchQuery: string;
 }
 
-export function AttributeListServer({ attributes, searchQuery }: AttributeListServerProps) {
+export function AttributeListServer({
+  initialAttributes,
+  searchQuery,
+}: AttributeListServerProps) {
   const router = useRouter();
   const [isSearching, setIsSearching] = useState(false);
 
@@ -33,7 +36,7 @@ export function AttributeListServer({ attributes, searchQuery }: AttributeListSe
     router.refresh();
   }, [router]);
 
-  const hasAttributes = attributes.length > 0;
+  const hasAttributes = initialAttributes.length > 0;
 
   return (
     <div className="space-y-4">
@@ -48,7 +51,7 @@ export function AttributeListServer({ attributes, searchQuery }: AttributeListSe
       </div>
 
       {hasAttributes ? (
-        <AttributeList attributes={attributes} onSuccess={handleSuccess} />
+        <AttributeList initialAttributes={initialAttributes} onSuccess={handleSuccess} />
       ) : (
         <AttributeEmptyState
           searchQuery={searchQuery}

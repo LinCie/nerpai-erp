@@ -1,18 +1,65 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Package } from "lucide-react";
 import type { Product } from "../../domain/entities/product";
 import { EditProductDialog } from "./product-edit-dialog";
 import { ProductDeleteDialog } from "./product-delete-dialog";
+import { useProducts } from "../queries/use-products";
 
 interface ProductListProps {
   products: Product[];
   onSuccess?: () => void;
 }
 
+function getErrorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "value" in error) {
+    const errorValue = (error as { value?: unknown }).value;
+    if (
+      errorValue &&
+      typeof errorValue === "object" &&
+      "error" in errorValue &&
+      typeof (errorValue as { error?: unknown }).error === "string"
+    ) {
+      return (errorValue as { error: string }).error;
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return "Failed to load products.";
+}
+
 export function ProductList({ products, onSuccess }: ProductListProps) {
-  if (products.length === 0) {
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search") ?? undefined;
+  const {
+    data: activeProducts = [],
+    isLoading,
+    isError,
+    error,
+  } = useProducts({ search }, products);
+
+  if (isError) {
+    return (
+      <div className="rounded-md border p-4 text-sm text-destructive">
+        {getErrorMessage(error)}
+      </div>
+    );
+  }
+
+  if (isLoading && activeProducts.length === 0) {
+    return (
+      <div className="rounded-md border p-4 text-sm text-muted-foreground">
+        Loading products...
+      </div>
+    );
+  }
+
+  if (activeProducts.length === 0) {
     return null;
   }
 
@@ -33,7 +80,7 @@ export function ProductList({ products, onSuccess }: ProductListProps) {
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {activeProducts.map((product) => (
             <tr
               key={product.id}
               className="border-b transition-colors hover:bg-muted/50"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Sparkles, Check, Plus, RefreshCw } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Checkbox } from "@/shared/presentation/components/ui/checkbox";
@@ -16,7 +16,8 @@ import {
   TableRow,
 } from "@/shared/presentation/components/ui/table";
 import { toast } from "sonner";
-import { generateVariants, getExistingVariantCombinationKeys } from "../actions/variant.actions";
+import { useGetVariantCombinations } from "../queries/use-variant-combinations";
+import { useGenerateVariants } from "../queries/use-generate-variants";
 import type { AttributeWithOptions } from "../../domain/types";
 import type { ProductAttribute } from "../../domain/entities/product-attribute";
 
@@ -47,26 +48,23 @@ export function VariantCombinationMatrix({
   const [selections, setSelections] = useState<Record<string, Set<string>>>({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [onlyNew, setOnlyNew] = useState(true);
-  const [existingKeys, setExistingKeys] = useState<Set<string>>(new Set());
-  const [isLoadingKeys, setIsLoadingKeys] = useState(false);
+
+  const combinationsQuery = useGetVariantCombinations(productId);
+  const combinationData = combinationsQuery.data as
+    | { existingCombinations: string[][] }
+    | undefined;
+  const existingKeys = useMemo(() => {
+    const combos = combinationData?.existingCombinations ?? [];
+    return new Set(combos.map((arr: string[]) => [...arr].sort().join("|")));
+  }, [combinationData]);
+  const isLoadingKeys = existingVariantCount > 0 && combinationsQuery.isLoading;
+
+  const generateVariantsMutation = useGenerateVariants();
 
   const sortedAttributes = useMemo(
     () => [...attributes].sort((a, b) => a.productAttribute.displayOrder - b.productAttribute.displayOrder),
     [attributes]
   );
-
-  useEffect(() => {
-    if (existingVariantCount > 0) {
-      setIsLoadingKeys(true);
-      getExistingVariantCombinationKeys(productId)
-        .then((result) => {
-          if (result.success && result.keys) {
-            setExistingKeys(new Set(result.keys));
-          }
-        })
-        .finally(() => setIsLoadingKeys(false));
-    }
-  }, [productId, existingVariantCount]);
 
   const toggleOption = (attributeId: string, optionId: string) => {
     setSelections((prev) => {
@@ -96,8 +94,8 @@ export function VariantCombinationMatrix({
       const newOptionsForAttribute = new Set<string>();
       for (const option of options) {
         let isUsedInExisting = false;
-        for (const key of existingKeys) {
-          if (key.includes(option.id)) {
+        for (const key of existingKeys as Set<string>) {
+          if ((key as string).includes(option.id)) {
             isUsedInExisting = true;
             break;
           }
@@ -155,8 +153,8 @@ export function VariantCombinationMatrix({
     for (const { options } of sortedAttributes) {
       for (const option of options) {
         let usedInExisting = false;
-        for (const key of existingKeys) {
-          if (key.includes(option.id)) {
+        for (const key of existingKeys as Set<string>) {
+          if ((key as string).includes(option.id)) {
             usedInExisting = true;
             break;
           }
@@ -186,23 +184,18 @@ export function VariantCombinationMatrix({
         selectionsRecord[attrId] = Array.from(optionIds);
       }
 
-      const formData = new FormData();
-      formData.append("productId", productId);
-      formData.append("selections", JSON.stringify(selectionsRecord));
-      formData.append("onlyNew", onlyNew.toString());
-
-      const result = await generateVariants(formData);
-      if (result.success) {
-        if (result.skipped && result.skipped > 0) {
-          toast.success(`Generated ${result.created} new variant(s), skipped ${result.skipped} existing`);
-        } else {
-          toast.success(`Generated ${result.created} variant(s)`);
-        }
-        setSelections({});
-        onVariantsGenerated?.();
+      const result = (await generateVariantsMutation.mutateAsync({
+        productId,
+        selections: selectionsRecord,
+        onlyNew,
+      })) as { created: number; skipped?: number };
+      if (result.skipped && result.skipped > 0) {
+        toast.success(`Generated ${result.created} new variant(s), skipped ${result.skipped} existing`);
       } else {
-        toast.error(result.error || "Failed to generate variants");
+        toast.success(`Generated ${result.created} variant(s)`);
       }
+      setSelections({});
+      onVariantsGenerated?.();
     } catch {
       toast.error("Failed to generate variants");
     } finally {

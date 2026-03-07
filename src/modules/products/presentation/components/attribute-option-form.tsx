@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Input } from "@/shared/presentation/components/ui/input";
 import { toast } from "sonner";
-import { createAttributeOption } from "../actions/attribute.actions";
+import { useCreateAttributeOption } from "../queries/use-attribute-options";
 
 interface AttributeOptionFormProps {
   attributeId: string;
@@ -14,35 +14,27 @@ interface AttributeOptionFormProps {
 
 export function AttributeOptionForm({ attributeId, onSuccess }: AttributeOptionFormProps) {
   const [value, setValue] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const createAttributeOptionMutation = useCreateAttributeOption();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!value.trim()) {
       toast.error("Option value is required");
       return;
     }
 
-    startTransition(async () => {
-      try {
-        const formData = new FormData();
-        formData.append("attributeId", attributeId);
-        formData.append("value", value.trim());
-
-        const result = await createAttributeOption(undefined, formData);
-        
-        if (result === undefined) {
-          toast.success("Option added successfully");
-          setValue("");
-          onSuccess?.();
-        } else if (result.errors) {
-          toast.error(result.errors[0] ?? "Validation failed");
-        }
-      } catch {
-        toast.error("Failed to add option. Please try again.");
-      }
-    });
+    try {
+      await createAttributeOptionMutation.mutateAsync({
+        attributeId,
+        value: value.trim(),
+      });
+      toast.success("Option added successfully");
+      setValue("");
+      onSuccess?.();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
   };
 
   return (
@@ -51,11 +43,15 @@ export function AttributeOptionForm({ attributeId, onSuccess }: AttributeOptionF
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Add new option..."
-        disabled={isPending}
+        disabled={createAttributeOptionMutation.isPending}
         className="flex-1 h-9"
       />
-      <Button type="submit" size="sm" disabled={isPending || !value.trim()}>
-        {isPending ? (
+      <Button
+        type="submit"
+        size="sm"
+        disabled={createAttributeOptionMutation.isPending || !value.trim()}
+      >
+        {createAttributeOptionMutation.isPending ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <Plus className="h-4 w-4" />
@@ -63,4 +59,20 @@ export function AttributeOptionForm({ attributeId, onSuccess }: AttributeOptionF
       </Button>
     </form>
   );
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "value" in error) {
+    const errorValue = (error as { value?: unknown }).value;
+    if (
+      errorValue &&
+      typeof errorValue === "object" &&
+      "error" in errorValue &&
+      typeof (errorValue as { error?: unknown }).error === "string"
+    ) {
+      return (errorValue as { error: string }).error;
+    }
+  }
+
+  return "Failed to add option. Please try again.";
 }

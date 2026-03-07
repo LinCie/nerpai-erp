@@ -1,13 +1,7 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
-import {
-  initialFormState,
-  mergeForm,
-  useForm,
-  useStore,
-  useTransform,
-} from "@tanstack/react-form-nextjs";
+import { useState } from "react";
+import { useForm, useStore } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Input } from "@/shared/presentation/components/ui/input";
@@ -18,44 +12,48 @@ import {
   FieldLabel,
 } from "@/shared/presentation/components/ui/field";
 import { attributeSchema } from "../schemas/attribute.schema";
-import { createAttribute } from "../actions/attribute.actions";
+import { useCreateAttribute } from "../queries/use-create-attribute";
 
 interface AttributeFormProps {
   onSuccess?: () => void;
 }
 
 export function AttributeForm({ onSuccess }: AttributeFormProps) {
-  const [state, action, isPending] = useActionState(createAttribute, initialFormState);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const createAttributeMutation = useCreateAttribute();
 
   const form = useForm({
-    defaultValues: {
-      name: "",
+    defaultValues: { name: "" },
+    validators: { onSubmit: attributeSchema },
+    onSubmit: async ({ value }) => {
+      setServerError(null);
+
+      try {
+        await createAttributeMutation.mutateAsync(value);
+        onSuccess?.();
+      } catch (error) {
+        setServerError(getErrorMessage(error));
+      }
     },
-    validators: {
-      onSubmit: attributeSchema,
-    },
-    transform: useTransform((baseForm) => mergeForm(baseForm, state ?? {}), [state]),
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);
 
-  useEffect(() => {
-    if (!state && !isPending) {
-      onSuccess?.();
-    }
-  }, [state, isPending, onSuccess]);
-
   return (
     <form
-      action={action as never}
-      onSubmit={() => form.handleSubmit()}
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void form.handleSubmit();
+      }}
       className="space-y-4"
     >
-      {formErrors.length > 0 && (
+      {(formErrors.length > 0 || serverError) && (
         <div className="text-destructive text-sm">
           {formErrors.map((error) => (
             <p key={String(error)}>{String(error)}</p>
           ))}
+          {serverError ? <p>{serverError}</p> : null}
         </div>
       )}
 
@@ -73,7 +71,9 @@ export function AttributeForm({ onSuccess }: AttributeFormProps) {
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
                 placeholder="e.g., Color, Size, Material"
-                disabled={form.state.isSubmitting}
+                disabled={
+                  form.state.isSubmitting || createAttributeMutation.isPending
+                }
                 autoFocus
               />
               {field.state.meta.errors.length > 0 && (
@@ -104,4 +104,24 @@ export function AttributeForm({ onSuccess }: AttributeFormProps) {
       </div>
     </form>
   );
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "value" in error) {
+    const errorValue = (error as { value?: unknown }).value;
+    if (
+      errorValue &&
+      typeof errorValue === "object" &&
+      "error" in errorValue &&
+      typeof (errorValue as { error?: unknown }).error === "string"
+    ) {
+      return (errorValue as { error: string }).error;
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return "Failed to create attribute. Please try again.";
 }

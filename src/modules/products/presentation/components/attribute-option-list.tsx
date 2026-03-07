@@ -1,6 +1,5 @@
 "use client";
 
-import { useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import {
@@ -15,37 +14,30 @@ import {
   AlertDialogTrigger,
 } from "@/shared/presentation/components/ui/alert-dialog";
 import { toast } from "sonner";
-import type { AttributeOption } from "../../domain/entities/attribute-option";
-import { deleteAttributeOption } from "../actions/attribute.actions";
+import type { AttributeOptionApi } from "../queries/use-attributes";
+import { useDeleteAttributeOption } from "../queries/use-attribute-options";
 import { AttributeOptionForm } from "./attribute-option-form";
 
 interface AttributeOptionListProps {
   attributeId: string;
-  options: AttributeOption[];
+  options: AttributeOptionApi[];
   onSuccess?: () => void;
 }
 
 export function AttributeOptionList({ attributeId, options, onSuccess }: AttributeOptionListProps) {
-  const [isPending, startTransition] = useTransition();
+  const deleteAttributeOptionMutation = useDeleteAttributeOption();
 
-  const handleDelete = (option: AttributeOption) => {
-    startTransition(async () => {
-      try {
-        const formData = new FormData();
-        formData.append("id", option.id);
-
-        const result = await deleteAttributeOption(formData);
-        if (!result.success) {
-          toast.error(result.error);
-          return;
-        }
-
-        toast.success(`Option "${option.value}" has been deleted`);
-        onSuccess?.();
-      } catch {
-        toast.error("Failed to delete option. Please try again.");
-      }
-    });
+  const handleDelete = async (option: AttributeOptionApi) => {
+    try {
+      await deleteAttributeOptionMutation.mutateAsync({
+        attributeId,
+        id: option.id,
+      });
+      toast.success(`Option "${option.value}" has been deleted`);
+      onSuccess?.();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
   };
 
   return (
@@ -76,13 +68,19 @@ export function AttributeOptionList({ attributeId, options, onSuccess }: Attribu
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+                <AlertDialogCancel
+                  disabled={deleteAttributeOptionMutation.isPending}
+                >
+                  Cancel
+                </AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => handleDelete(option)}
-                  disabled={isPending}
+                  onClick={() => {
+                    void handleDelete(option);
+                  }}
+                  disabled={deleteAttributeOptionMutation.isPending}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  {isPending ? "Deleting..." : "Delete"}
+                  {deleteAttributeOptionMutation.isPending ? "Deleting..." : "Delete"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -99,4 +97,20 @@ export function AttributeOptionList({ attributeId, options, onSuccess }: Attribu
       </div>
     </div>
   );
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "value" in error) {
+    const errorValue = (error as { value?: unknown }).value;
+    if (
+      errorValue &&
+      typeof errorValue === "object" &&
+      "error" in errorValue &&
+      typeof (errorValue as { error?: unknown }).error === "string"
+    ) {
+      return (errorValue as { error: string }).error;
+    }
+  }
+
+  return "Failed to delete option. Please try again.";
 }

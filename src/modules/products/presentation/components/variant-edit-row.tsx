@@ -17,12 +17,10 @@ import {
   AlertDialogTitle,
 } from "@/shared/presentation/components/ui/alert-dialog";
 import { toast } from "sonner";
-import {
-  updateVariant,
-  checkSkuAvailability,
-  toggleVariantActive,
-  softDeleteVariant,
-} from "../actions/variant.actions";
+import { useUpdateVariant } from "../queries/use-update-variant";
+import { useCheckSkuAvailability } from "../queries/use-sku-check";
+import { useToggleVariantActive } from "../queries/use-toggle-variant";
+import { useSoftDeleteVariant } from "../queries/use-delete-variant";
 import type { VariantWithOptions } from "../../domain/types";
 
 interface VariantEditRowProps {
@@ -38,6 +36,10 @@ export function VariantEditRow({
 }: VariantEditRowProps) {
   const { variant, options } = variantWithOptions;
   const displayStock = totalStock ?? 0;
+  const updateVariantMutation = useUpdateVariant();
+  const checkSkuMutation = useCheckSkuAvailability();
+  const toggleActiveMutation = useToggleVariantActive();
+  const softDeleteMutation = useSoftDeleteVariant();
   const [isEditing, setIsEditing] = useState(false);
   const [editSku, setEditSku] = useState(variant.sku);
   const [editPrice, setEditPrice] = useState(
@@ -88,24 +90,21 @@ export function VariantEditRow({
       setSkuStatus("checking");
       setSkuMessage("Checking SKU availability...");
 
-      const formData = new FormData();
-      formData.append("id", variant.id);
-      formData.append("sku", trimmedSku);
-
-      const result = await checkSkuAvailability(formData);
-
-      if (!result.success) {
+      try {
+        const result = (await checkSkuMutation.mutateAsync({
+          sku: trimmedSku,
+          excludeVariantId: variant.id,
+        })) as { available: boolean };
+        if (result.available) {
+          setSkuStatus("available");
+          setSkuMessage("SKU is available");
+        } else {
+          setSkuStatus("unavailable");
+          setSkuMessage("SKU already exists in your organization.");
+        }
+      } catch {
         setSkuStatus("error");
-        setSkuMessage(result.error ?? "Could not check SKU availability");
-        return;
-      }
-
-      if (result.available) {
-        setSkuStatus("available");
-        setSkuMessage("SKU is available");
-      } else {
-        setSkuStatus("unavailable");
-        setSkuMessage("SKU already exists in your organization.");
+        setSkuMessage("Could not check SKU availability");
       }
     }, 350);
 
@@ -124,28 +123,25 @@ export function VariantEditRow({
 
     setIsSaving(true);
     try {
-      const formData = new FormData();
-      formData.append("id", variant.id);
-
-      if (editSku !== variant.sku) {
-        formData.append("sku", editSku.trim());
-      }
-
+      const payload: { id: string; sku?: string; price?: number } = {
+        id: variant.id,
+      };
+      if (editSku !== variant.sku) payload.sku = editSku.trim();
       const newPrice = parseFloat(editPrice);
-      if (!isNaN(newPrice) && newPrice !== parseFloat(variant.price)) {
-        formData.append("price", newPrice.toString());
+      if (!Number.isNaN(newPrice) && newPrice !== parseFloat(variant.price)) {
+        payload.price = newPrice;
       }
 
-      const result = await updateVariant(formData);
-      if (result.success) {
-        toast.success("Variant updated");
-        setIsEditing(false);
-        onUpdate?.();
-      } else {
-        toast.error(result.error || "Failed to update variant");
-      }
-    } catch {
-      toast.error("Failed to update variant");
+      await updateVariantMutation.mutateAsync(payload);
+      toast.success("Variant updated");
+      setIsEditing(false);
+      onUpdate?.();
+    } catch (error) {
+      const message =
+        error && typeof error === "object" && "message" in error
+          ? String((error as { message: unknown }).message)
+          : "Failed to update variant";
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -154,21 +150,20 @@ export function VariantEditRow({
   const handleToggleActive = async () => {
     setIsToggling(true);
     try {
-      const formData = new FormData();
-      formData.append("id", variant.id);
-      formData.append("isActive", String(!variant.isActive));
-
-      const result = await toggleVariantActive(formData);
-      if (result.success) {
-        toast.success(
-          variant.isActive ? "Variant deactivated" : "Variant activated",
-        );
-        onUpdate?.();
-      } else {
-        toast.error(result.error || "Failed to toggle variant status");
-      }
-    } catch {
-      toast.error("Failed to toggle variant status");
+      await toggleActiveMutation.mutateAsync({
+        id: variant.id,
+        isActive: !variant.isActive,
+      });
+      toast.success(
+        variant.isActive ? "Variant deactivated" : "Variant activated",
+      );
+      onUpdate?.();
+    } catch (error) {
+      const message =
+        error && typeof error === "object" && "message" in error
+          ? String((error as { message: unknown }).message)
+          : "Failed to toggle variant status";
+      toast.error(message);
     } finally {
       setIsToggling(false);
     }
@@ -176,18 +171,15 @@ export function VariantEditRow({
 
   const handleDelete = async () => {
     try {
-      const formData = new FormData();
-      formData.append("id", variant.id);
-
-      const result = await softDeleteVariant(formData);
-      if (result.success) {
-        toast.success("Variant deleted");
-        onUpdate?.();
-      } else {
-        toast.error(result.error || "Failed to delete variant");
-      }
-    } catch {
-      toast.error("Failed to delete variant");
+      await softDeleteMutation.mutateAsync(variant.id);
+      toast.success("Variant deleted");
+      onUpdate?.();
+    } catch (error) {
+      const message =
+        error && typeof error === "object" && "message" in error
+          ? String((error as { message: unknown }).message)
+          : "Failed to delete variant";
+      toast.error(message);
     }
   };
 

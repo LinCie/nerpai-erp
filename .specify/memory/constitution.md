@@ -1,44 +1,45 @@
-# <!--
+<!--
 
 # SYNC IMPACT REPORT
 
-Version change: 1.10.0 → 1.11.0 (Minor - added typed server action parameters
-principle)
+Version change: 2.1.0 → 2.2.0 (Minor - Elysia route validation changed
+from TypeBox to Zod)
 
 Modified principles:
 
-- III. Next.js App Router Standards (added typed-parameters-first guidance)
-
-Added principles:
-
-- XII. Typed Server Action Parameters
+- XII. Elysia REST API & Eden Treaty (TypeBox replaced with Zod for route
+  request/response schemas; examples updated to use Zod syntax; added note
+  on Zod integration approach)
 
 Modified sections:
 
-- Development Workflow / Quality Gates (added typed parameter gate)
-
-Added sections:
-
-- None
-
-Removed sections:
-
-- None
+- Technology Standards (explicit note that Zod serves both form validation
+  and Elysia route schemas; TypeBox no longer required)
+- Development Workflow / Quality Gates (gate 15 updated from TypeBox to
+  Zod)
 
 Templates requiring updates:
-✅ .specify/templates/plan-template.md
-✅ .specify/templates/spec-template.md
-✅ .specify/templates/tasks-template.md
-⚠ .specify/templates/commands/\*.md (directory not present; no command
-templates to validate)
+✅ .specify/templates/plan-template.md (Constitution Check XII updated
+  from TypeBox to Zod)
+✅ .specify/templates/spec-template.md (CR-003 updated from TypeBox to
+  Zod)
+✅ .specify/templates/tasks-template.md (foundational and audit tasks
+  updated from TypeBox to Zod)
+⚠ .specify/templates/commands/*.md (directory not present; no command
+  templates to validate)
 
 Runtime docs requiring updates:
-✅ .agent/rules/nextjs-server-action-guide.md
+✅ .agent/rules/elysia-api-guide.md (TypeBox references and code examples
+  updated to Zod)
 
 Follow-up TODOs:
 
-- # None
-  -->
+- Verify Elysia + Zod integration approach during implementation research
+  (Standard Schema support in Elysia 1.4.x or @elysiajs/zod plugin)
+- Migrate any existing TypeBox schemas in route handlers to Zod
+  equivalents
+
+-->
 
 # NERPAI ERP Constitution
 
@@ -78,21 +79,24 @@ cases.
 ### III. Next.js App Router Standards
 
 Leverage Next.js 16 App Router capabilities for optimal performance and UX.
+All API mutations and queries are handled by the Elysia REST API layer (see
+XIII); Next.js is responsible for rendering, routing, and server components.
 
 - Server Components are the default; use `'use client'` directive only when
   necessary
-- Server Actions handle mutations; validate inputs with Zod or similar
-- Server Actions MUST accept typed parameters, not `FormData` (see XII)
-- Server Actions and route handlers MUST match documented contracts for success,
-  validation, authorization, and not-found outcomes
+- Mutations and data fetching from client components MUST go through the
+  Eden Treaty client (see XIII)
+- API route contracts MUST match documented contracts for success, validation,
+  authorization, and not-found outcomes
 - Use streaming and Suspense for progressive loading
 - Implement proper `loading.tsx` and `error.tsx` boundaries
-- Route handlers follow RESTful conventions
+- Elysia API routes are mounted via a Next.js catch-all route handler at
+  `app/api/[[...slugs]]/route.ts`
 - Internationalization via next-intl for multi-language support
 
 **Rationale**: Server Components reduce client bundle size; proper error
-boundaries improve UX; standards ensure consistency between design docs and
-runtime behavior.
+boundaries improve UX; separating the API layer into Elysia enables a REST API
+that can be consumed by any client, not just the Next.js frontend.
 
 ### IV. Accessibility & Performance
 
@@ -118,7 +122,8 @@ practices.
 - Secrets and credentials MUST NEVER be committed
 - Sanitize and validate all user inputs
 - Use parameterized queries; never concatenate SQL
-- Authentication via better-auth; authorize on every protected route
+- Authentication via better-auth mounted on Elysia (see XIII); authorize on
+  every protected route using the Elysia auth macro
 - Log security-relevant events without exposing sensitive data
 
 **Rationale**: Security breaches are costly; code review catches issues
@@ -164,11 +169,11 @@ All feature code lives in `src/modules/[module-name]/` with four distinct layers
     clients, database mappers
 
 - **Presentation Layer**: Outward-facing interfaces
-  - Location: `presentation/actions/`, `presentation/api/`,
+  - Location: `presentation/routes/`, `presentation/api/`,
     `presentation/components/`, `presentation/stores/`, `presentation/types/`,
     `presentation/schemas/`
-  - Contains: Server Actions, API route handlers, React components, state
-    management (Zustand), Zod schemas, presentation types
+  - Contains: Elysia route handlers (grouped by resource), React components,
+    state management (Zustand), Zod schemas, presentation types
 
 **Cross-Cutting Concerns**:
 
@@ -241,8 +246,8 @@ isolation.
   foreign key to `organization.id`, not null)
 - All database queries MUST filter by current active organization context
 - Repository methods MUST accept `organizationId` as a required parameter
-- Server Actions and API routes MUST validate active organization membership
-  before data operations
+- Elysia API routes MUST validate active organization membership before data
+  operations (enforced via the auth macro or route-level guards)
 - Users can only access data from organizations where they are active members
 - Organization context is stored in session (`active_organization_id`) and
   validated on protected routes
@@ -260,8 +265,8 @@ scalable SaaS operation.
 Specifications and contracts MUST remain truthful to implementation, and
 completion claims MUST be evidence-backed.
 
-- Server Action/API contracts in specs (for example, `contracts/*.md`) MUST
-  define success and recoverable error behavior (`validation`, `not found`,
+- API route contracts in specs (for example, `contracts/*.md`) MUST define
+  success and recoverable error behavior (`validation`, `not found`,
   `forbidden`) and implementation MUST match those shapes
 - Recoverable domain outcomes MUST return explicit, typed responses; generic
   thrown errors are reserved for unexpected faults
@@ -273,38 +278,150 @@ completion claims MUST be evidence-backed.
 **Rationale**: Contract drift causes user-facing defects and wasted debugging.
 Evidence-based completion prevents false confidence in quality gates.
 
-### XII. Typed Server Action Parameters
+### XII. Elysia REST API & Eden Treaty
 
-Server Actions MUST accept typed parameters instead of `FormData`. The
-`FormData` API is reserved exclusively for scenarios where it is technically
-necessary.
+All API endpoints MUST be implemented using Elysia with end-to-end type safety
+provided by Eden Treaty. The Elysia API layer is the sole interface for data
+mutations and structured queries; `'use server'` directives and Next.js Server
+Actions are prohibited.
 
-- Server Actions MUST accept explicitly typed parameter objects (for example,
-  `createOrder(data: CreateOrderInput)`) instead of `FormData`
-- TanStack Form's `onSubmit({ value })` MUST pass the typed `value` directly
-  to the server action function; do NOT serialize form values into `FormData`
-- `FormData` is permitted ONLY when one of these conditions is met:
-  - File uploads that require `multipart/form-data` encoding
-  - Progressive enhancement where the form MUST function without JavaScript
-- When `FormData` is required, the reason MUST be documented in a code comment
-  at the action definition site
-- Zod validation MUST be applied to the typed parameters on the server side;
-  client-side validation via TanStack Form validators is complementary, not a
-  substitute
-- Server Action return types MUST be explicitly typed (for example,
-  `Promise<{ success: true } | { success: false; error: string }>`)
+**Elysia API Setup**:
 
-**Rationale**: `FormData` introduces unnecessary complexity: `formData.get()`
-returns `string | File | null` requiring manual type coercion, nested objects
-require JSON serialization workarounds, and checkbox/multi-value fields have
-unintuitive behavior. Typed parameters provide compile-time safety, eliminate
-coercion bugs, and align with the Type Safety First principle (I). TanStack Form
-already provides validated, typed values via `onSubmit` — converting these to
-`FormData` only to parse them back is wasteful indirection.
+- The Elysia app instance MUST be created with `{ prefix: '/api' }` and
+  mounted in a Next.js catch-all route at `app/api/[[...slugs]]/route.ts`
+- The Elysia app instance MUST be exported as a named export (`export const app`)
+  so Eden Treaty can import its type
+- All HTTP method handlers (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) MUST be
+  exported from the catch-all route file by assigning `app.fetch`
+
+**Route Handler Requirements**:
+
+- Route handlers MUST define explicit request body and response schemas using
+  Zod for runtime validation and type inference
+- Route handlers MUST define explicit response schemas per status code (for
+  example, `{ 200: z.object(...), 400: z.object(...) }`) for type-safe error
+  handling on the client
+- Use Elysia `guard` to apply shared validation (for example, auth headers) to
+  route groups
+- Use Elysia `group` to organize routes by resource prefix (for example,
+  `.group('/products', ...)`)
+- Use Elysia plugins to encapsulate reusable route sets per feature module
+
+**Eden Treaty Client**:
+
+- A single Eden Treaty client MUST be created in `src/lib/api-client.ts` using
+  the isomorphic pattern (direct instance on server, URL on client)
+- Client components MUST use TanStack Query hooks wrapping the Eden Treaty
+  client for all data fetching and mutations (see XIII)
+- Server-side data fetching in Server Components MAY call Elysia's app instance
+  directly (zero network overhead) via the Treaty client
+- Treaty client MUST be configured with `{ fetch: { credentials: 'include' } }`
+  for cookie-based auth
+
+**Zod Integration with Elysia**:
+
+- Elysia route schemas MUST use Zod instead of Elysia's built-in TypeBox (`t`)
+- Integration MUST be established via Zod's Standard Schema support or the
+  `@elysiajs/zod` plugin (confirm approach during implementation research)
+- Zod schemas defined in `presentation/schemas/` SHOULD be reused in route
+  handler `body` and `response` definitions to avoid duplication
+- A single Zod schema can serve form validation (TanStack Form), route
+  validation (Elysia), and type inference (TypeScript)
+
+**Authentication via Elysia**:
+
+- better-auth handler MUST be mounted on the Elysia instance using
+  `.mount(auth.handler)` or `.mount('/auth', auth.handler)`
+- An Elysia macro named `auth` MUST be defined using `resolve` to extract
+  session and user from request headers via `auth.api.getSession({ headers })`
+- Protected routes MUST use the `{ auth: true }` option to enforce
+  authentication
+- CORS MUST be configured using `@elysiajs/cors` with explicit origin,
+  credentials, and allowed headers
+
+**Prohibited Patterns**:
+
+- `'use server'` directives are prohibited; do NOT create server action files
+- `FormData` submission to server actions is prohibited; use Treaty client calls
+  with typed request bodies
+- Direct `fetch('/api/...')` calls from client components are prohibited; use
+  the Eden Treaty client for type safety
+
+**Rationale**: Elysia provides a type-safe, high-performance REST API layer that
+runs on Bun. Eden Treaty propagates route types to the client, eliminating
+manual type synchronization. Externalizing the API from Next.js enables
+consumption by mobile apps, third-party integrations, and other non-browser
+clients. Removing server actions eliminates the tight coupling between React
+components and server-side mutation logic.
+
+### XIII. Client-Side Data Fetching with TanStack Query
+
+All client-side data fetching and mutation state MUST be managed through
+TanStack Query (`@tanstack/react-query`) using the Eden Treaty client as the
+underlying fetch mechanism. TanStack Query provides caching, background
+refetching, deduplication, and optimistic updates on top of the type-safe
+Eden Treaty layer.
+
+**QueryClient Setup**:
+
+- A single `QueryClient` instance MUST be created in a client-side provider
+  component (e.g., `src/shared/presentation/providers/query-provider.tsx`)
+- The `QueryClientProvider` MUST wrap the application at the root layout level
+- Default options SHOULD configure sensible `staleTime` and `gcTime` policies
+  appropriate to the domain; `retry: 1` is the recommended default
+
+**Query Patterns**:
+
+- All data fetching in client components MUST use `useQuery` or
+  `useSuspenseQuery` from `@tanstack/react-query`
+- Query functions MUST use the Eden Treaty client (`api`) for the actual API
+  call and MUST unwrap the `{ data, error }` response to throw on error
+- Query keys MUST follow a consistent factory pattern per module (e.g.,
+  `productKeys.list(filters)`, `productKeys.detail(id)`)
+- Query key factories MUST be co-located in the module's
+  `presentation/queries/` directory
+
+**Mutation Patterns**:
+
+- Client-side mutations MUST use `useMutation` from `@tanstack/react-query`
+- Mutations MUST call the Eden Treaty client inside `mutationFn`
+- Successful mutations MUST invalidate relevant query keys via
+  `queryClient.invalidateQueries` in `onSuccess` or `onSettled`
+- Optimistic updates SHOULD be used for UI-critical mutations where perceived
+  latency matters
+- Mutation error handling MUST leverage the typed error responses from Eden
+  Treaty response schemas
+
+**File Organization**:
+
+- Query key factories: `presentation/queries/[resource]-keys.ts`
+- Custom query hooks: `presentation/queries/use-[resource].ts`
+- Custom mutation hooks: `presentation/queries/use-[mutation-name].ts`
+
+**Prohibited Patterns**:
+
+- `useEffect` + `setState` for data fetching is prohibited; use `useQuery`
+- Manual `isLoading` / `isError` state tracking for API calls is prohibited;
+  use TanStack Query's built-in states (`isPending`, `isError`, `data`)
+- Storing server-fetched data in Zustand stores is prohibited when TanStack
+  Query can manage the cache; Zustand remains appropriate for client-only UI
+  state
+- Direct Eden Treaty calls from client components without TanStack Query
+  wrapping are prohibited for read operations
+
+**Rationale**: TanStack Query eliminates boilerplate loading/error state
+management, provides automatic cache invalidation and background refetching,
+and integrates seamlessly with Eden Treaty's typed responses. This separation
+keeps components focused on rendering while the query layer manages server
+state lifecycle.
 
 ## Technology Standards
 
-**Framework**: Next.js 16.x with App Router
+**Framework**: Next.js 16.x with App Router (rendering, routing, SSR)
+**API Layer**: Elysia (REST API framework, mounted in Next.js catch-all route)
+**API Client**: @elysiajs/eden (Eden Treaty for end-to-end type-safe API calls)
+**Client Data Layer**: @tanstack/react-query 5.x (caching, deduplication,
+background refetching, optimistic updates on top of Eden Treaty)
 **Language**: TypeScript 5.x (strict mode)
 **UI Library**: React 19.x with React Compiler
 **Styling**: Tailwind CSS 4.x
@@ -314,7 +431,9 @@ only via idempotent migrations
 **Migrations**: kysely-ctl v0.20.x CLI (create with `bun db:migrate:create`, run
 with `bun db:migrate`)
 **Type Generation**: `db:codegen` command for database types
-**Authentication**: better-auth 1.4.x
+**Authentication**: better-auth 1.4.x (mounted on Elysia via `.mount()`)
+**Validation**: Zod 4.x (unified schema validation for Elysia routes, TanStack
+Form, and general type inference; replaces Elysia's default TypeBox)
 **Forms**: TanStack Form 1.x (headless form management with Zod integration)
 **Testing**: Jest v30.x + React Testing Library (when tests requested)
 **Linting**: ESLint 9.x with next/core-web-vitals config
@@ -349,13 +468,23 @@ with `bun db:migrate`)
     approval (IX)
 11. Multi-tenancy enforced: `organization_id` on all business entities, queries
     scoped to active org (X)
-12. Server Action/API behavior matches documented contracts, including
-    recoverable error semantics (III, XI)
+12. API route behavior matches documented contracts, including recoverable error
+    semantics (III, XI)
 13. DB constraints enforce critical domain invariants where feasible (VIII)
 14. Performance claims include reproducible evidence and matching
     extension/index strategy where applicable (VIII, XI)
-15. Server Actions accept typed parameters, not `FormData`, unless file upload
-    or progressive enhancement requires it (XII)
+15. Elysia route handlers define explicit request body and response schemas
+    using Zod (XII)
+16. All client-side API calls use Eden Treaty client, not raw `fetch` (XII)
+17. No `'use server'` directives or server action files in the codebase (XII)
+18. better-auth mounted on Elysia with auth macro for protected routes (V, XII)
+19. Client components use `useQuery`/`useMutation` from TanStack Query for all
+    data fetching and mutations; no `useEffect` + `setState` fetch patterns
+    (XIII)
+20. Query key factories exist per module in `presentation/queries/` with
+    consistent naming (XIII)
+21. Server-fetched data not duplicated into Zustand stores when TanStack Query
+    cache suffices (XIII)
 
 ### File Organization
 
@@ -372,17 +501,18 @@ src/
 │   │   │   └── types/    # getManyProps, getManyReturn, etc.
 │   │   ├── infrastructure/  # Repository implementations
 │   │   │   └── repositories/  # Concrete implementations (e.g., ProductRepository)
-│   │   └── presentation/ # Actions, APIs, components, stores, schemas
-│   │       ├── actions/  # Server Actions
-│   │       ├── api/      # API route handlers
+│   │   └── presentation/ # Routes, APIs, components, stores, queries, schemas
+│   │       ├── routes/   # Elysia route handler plugins (e.g., productRoutes)
+│   │       ├── queries/  # TanStack Query key factories + custom hooks
 │   │       ├── components/  # React components
-│   │       ├── stores/   # Zustand stores
+│   │       ├── stores/   # Zustand stores (client-only UI state)
 │   │       ├── types/    # Presentation-layer types
 │   │       └── schemas/  # Zod validation schemas
 │   ├── auth/             # Example: Authentication module
 │   ├── orders/           # Example: Orders module
 │   └── ...               # Other feature modules
 ├── lib/                  # Shared utilities and helpers
+│   └── api-client.ts     # Eden Treaty client (isomorphic)
 ├── types/                # Cross-module TypeScript definitions
 └── styles/               # Global styles, Tailwind config
 ```
@@ -395,6 +525,8 @@ src/
 - Infrastructure layer implements Application layer interfaces
 - Presentation layer can depend on Application and Infrastructure layers
 - Import direction: Domain ← Application ← Infrastructure ← Presentation
+- Elysia route plugins in `presentation/routes/` are composed into the main
+  Elysia app instance via `.use()`
 
 ## Governance
 
@@ -420,4 +552,4 @@ project.
 - `AGENTS.md`: Primary development guidance with rule references
 - `.agent/rules/*.md`: Detailed guides for specific domains
 
-**Version**: 1.11.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-03-04
+**Version**: 2.2.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-03-06

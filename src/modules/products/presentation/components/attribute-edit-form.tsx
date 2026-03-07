@@ -1,13 +1,7 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
-import {
-  initialFormState,
-  mergeForm,
-  useForm,
-  useStore,
-  useTransform,
-} from "@tanstack/react-form-nextjs";
+import { useState } from "react";
+import { useForm, useStore } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/shared/presentation/components/ui/button";
 import { Input } from "@/shared/presentation/components/ui/input";
@@ -18,48 +12,53 @@ import {
   FieldLabel,
 } from "@/shared/presentation/components/ui/field";
 import { attributeSchema } from "../schemas/attribute.schema";
-import { updateAttribute } from "../actions/attribute.actions";
-import type { Attribute } from "../../domain/entities/attribute";
+import { useUpdateAttribute } from "../queries/use-update-attribute";
+import type { AttributeWithOptionsApi } from "../queries/use-attributes";
 
 interface AttributeEditFormProps {
-  attribute: Attribute;
+  attribute: Pick<AttributeWithOptionsApi, "id" | "name">;
   onSuccess?: () => void;
 }
 
 export function AttributeEditForm({ attribute, onSuccess }: AttributeEditFormProps) {
-  const [state, action, isPending] = useActionState(updateAttribute, initialFormState);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const updateAttributeMutation = useUpdateAttribute();
 
   const form = useForm({
-    defaultValues: {
-      name: attribute.name,
+    defaultValues: { name: attribute.name },
+    validators: { onSubmit: attributeSchema },
+    onSubmit: async ({ value }) => {
+      setServerError(null);
+
+      try {
+        await updateAttributeMutation.mutateAsync({
+          id: attribute.id,
+          name: value.name,
+        });
+        onSuccess?.();
+      } catch (error) {
+        setServerError(getErrorMessage(error));
+      }
     },
-    validators: {
-      onSubmit: attributeSchema,
-    },
-    transform: useTransform((baseForm) => mergeForm(baseForm, state ?? {}), [state]),
   });
 
   const formErrors = useStore(form.store, (formState) => formState.errors);
 
-  useEffect(() => {
-    if (!state && !isPending) {
-      onSuccess?.();
-    }
-  }, [state, isPending, onSuccess]);
-
   return (
     <form
-      action={action as never}
-      onSubmit={() => form.handleSubmit()}
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void form.handleSubmit();
+      }}
       className="space-y-4"
     >
-      <input type="hidden" name="id" value={attribute.id} />
-      
-      {formErrors.length > 0 && (
+      {(formErrors.length > 0 || serverError) && (
         <div className="text-destructive text-sm">
           {formErrors.map((error) => (
             <p key={String(error)}>{String(error)}</p>
           ))}
+          {serverError ? <p>{serverError}</p> : null}
         </div>
       )}
 
@@ -77,7 +76,9 @@ export function AttributeEditForm({ attribute, onSuccess }: AttributeEditFormPro
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
                 placeholder="e.g., Color, Size, Material"
-                disabled={form.state.isSubmitting}
+                disabled={
+                  form.state.isSubmitting || updateAttributeMutation.isPending
+                }
                 autoFocus
               />
               {field.state.meta.errors.length > 0 && (
@@ -108,4 +109,24 @@ export function AttributeEditForm({ attribute, onSuccess }: AttributeEditFormPro
       </div>
     </form>
   );
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "value" in error) {
+    const errorValue = (error as { value?: unknown }).value;
+    if (
+      errorValue &&
+      typeof errorValue === "object" &&
+      "error" in errorValue &&
+      typeof (errorValue as { error?: unknown }).error === "string"
+    ) {
+      return (errorValue as { error: string }).error;
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return "Failed to update attribute. Please try again.";
 }

@@ -32,13 +32,11 @@ import {
   AlertDialogTitle,
 } from "@/shared/presentation/components/ui/alert-dialog";
 import { toast } from "sonner";
-import {
-  assignAttributeToProduct,
-  removeAttributeFromProduct,
-  reorderProductAttributes,
-} from "../actions/variant.actions";
 import type { AttributeWithOptions } from "../../domain/types";
 import type { ProductAttribute } from "../../domain/entities/product-attribute";
+import { useAssignAttribute } from "../../presentation/queries/use-assign-attribute";
+import { useRemoveAttribute } from "../../presentation/queries/use-remove-attribute";
+import { useReorderAttributes } from "../../presentation/queries/use-reorder-attributes";
 
 interface SortableAttributeItemProps {
   productAttribute: ProductAttribute;
@@ -132,6 +130,17 @@ interface ProductAttributeConfigProps {
   onAttributesChange?: () => void;
 }
 
+type AssignAttributeResponse = {
+  id: string;
+  displayOrder: number;
+};
+
+type RemoveAttributeResponse = {
+  deactivatedCount: number;
+  needsConfirmation?: boolean;
+  affectedCount?: number;
+};
+
 export function ProductAttributeConfig({
   productId,
   assignedAttributes,
@@ -145,6 +154,10 @@ export function ProductAttributeConfig({
     attributeId: string;
     affectedCount: number;
   } | null>(null);
+
+  const assignAttribute = useAssignAttribute();
+  const removeAttribute = useRemoveAttribute();
+  const reorderAttributes = useReorderAttributes();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -176,63 +189,50 @@ export function ProductAttributeConfig({
       setAttributes(newAttributes);
 
       try {
-        const formData = new FormData();
-        formData.append("productId", productId);
-        formData.append(
-          "orderedAttributeIds",
-          JSON.stringify(newAttributes.map((a) => a.productAttribute.attributeId))
-        );
-
-        const result = await reorderProductAttributes(formData);
-        if (!result.success) {
-          toast.error(result.error || "Failed to reorder attributes");
-          setAttributes(attributes);
-        } else {
-          onAttributesChange?.();
-        }
+        await reorderAttributes.mutateAsync({
+          productId,
+          orderedAttributeIds: newAttributes.map((a) => a.productAttribute.attributeId),
+        });
+        onAttributesChange?.();
       } catch {
         toast.error("Failed to reorder attributes");
         setAttributes(attributes);
       }
     },
-    [attributes, productId, onAttributesChange]
+    [attributes, productId, onAttributesChange, reorderAttributes]
   );
 
   const handleAddAttribute = async (attributeId: string) => {
     setAddingId(attributeId);
     try {
-      const formData = new FormData();
-      formData.append("productId", productId);
-      formData.append("attributeId", attributeId);
+      const result = (await assignAttribute.mutateAsync({
+        productId,
+        attributeId,
+      })) as AssignAttributeResponse;
 
-      const result = await assignAttributeToProduct(formData);
-      if (result.success && result.productAttribute) {
-        const attr = availableAttributes.find((a) => a.attribute.id === attributeId);
-        if (attr) {
-          const newProductAttribute: ProductAttribute = {
-            id: result.productAttribute.id,
-            productId,
-            attributeId,
-            displayOrder: result.productAttribute.displayOrder,
-            organizationId: attr.attribute.organizationId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            deletedAt: null,
-          };
-          setAttributes((prev) => [
-            ...prev,
-            {
-              productAttribute: newProductAttribute,
-              attribute: attr.attribute,
-              options: attr.options,
-            },
-          ]);
-        }
-        toast.success("Attribute added to product");
-        onAttributesChange?.();
-      } else {
-        toast.error(result.error || "Failed to add attribute");
+      const attr = availableAttributes.find((a) => a.attribute.id === attributeId);
+      if (attr) {
+        const newProductAttribute: ProductAttribute = {
+          id: result.id,
+          productId,
+          attributeId,
+          displayOrder: result.displayOrder,
+          organizationId: attr.attribute.organizationId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          deletedAt: null,
+        };
+        setAttributes((prev) => [
+          ...prev,
+          {
+            productAttribute: newProductAttribute,
+            attribute: attr.attribute,
+            options: attr.options,
+          },
+        ]);
       }
+      toast.success("Attribute added to product");
+      onAttributesChange?.();
     } catch {
       toast.error("Failed to add attribute");
     } finally {
@@ -243,12 +243,11 @@ export function ProductAttributeConfig({
   const handleRemoveAttribute = async (attributeId: string, confirmed: boolean = false) => {
     setRemovingId(attributeId);
     try {
-      const formData = new FormData();
-      formData.append("productId", productId);
-      formData.append("attributeId", attributeId);
-      formData.append("confirmed", String(confirmed));
-
-      const result = await removeAttributeFromProduct(formData);
+      const result = (await removeAttribute.mutateAsync({
+        productId,
+        attributeId,
+        confirmed,
+      })) as RemoveAttributeResponse;
 
       if (result.needsConfirmation && result.affectedCount) {
         setConfirmRemove({ attributeId, affectedCount: result.affectedCount });
@@ -256,19 +255,15 @@ export function ProductAttributeConfig({
         return;
       }
 
-      if (result.success) {
-        setAttributes((prev) =>
-          prev.filter((a) => a.productAttribute.attributeId !== attributeId)
-        );
-        toast.success(
-          result.deactivatedCount > 0
-            ? `Attribute removed. ${result.deactivatedCount} variant(s) deactivated.`
-            : "Attribute removed"
-        );
-        onAttributesChange?.();
-      } else {
-        toast.error(result.error || "Failed to remove attribute");
-      }
+      setAttributes((prev) =>
+        prev.filter((a) => a.productAttribute.attributeId !== attributeId)
+      );
+      toast.success(
+        result.deactivatedCount > 0
+          ? `Attribute removed. ${result.deactivatedCount} variant(s) deactivated.`
+          : "Attribute removed"
+      );
+      onAttributesChange?.();
     } catch {
       toast.error("Failed to remove attribute");
     } finally {
