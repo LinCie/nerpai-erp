@@ -8,10 +8,14 @@ export class ProductRepository implements IProductRepository {
     organizationId,
     search,
     includeDeleted = false,
+    page = 1,
+    limit = 10,
   }: {
     organizationId: string;
     search?: string;
     includeDeleted?: boolean;
+    page?: number;
+    limit?: number;
   }): Promise<Product[]> {
     let query = db
       .selectFrom("product")
@@ -28,9 +32,40 @@ export class ProductRepository implements IProductRepository {
       query = query.where("name", "ilike", `%${search}%`);
     }
 
-    query = query.orderBy("createdAt", "desc");
+    query = query
+      .orderBy("createdAt", "desc")
+      .limit(limit)
+      .offset((page - 1) * limit);
 
     return await query.execute();
+  }
+
+  async countMany({
+    organizationId,
+    search,
+    includeDeleted = false,
+  }: {
+    organizationId: string;
+    search?: string;
+    includeDeleted?: boolean;
+  }): Promise<number> {
+    let query = db
+      .selectFrom("product")
+      .select(db.fn.count<number>("id").as("count"))
+      .where("organizationId", "=", organizationId);
+
+    if (includeDeleted) {
+      query = query.where("deletedAt", "is not", null);
+    } else {
+      query = query.where("deletedAt", "is", null);
+    }
+
+    if (search) {
+      query = query.where("name", "ilike", `%${search}%`);
+    }
+
+    const result = await query.executeTakeFirst();
+    return Number(result?.count ?? 0);
   }
 
   async getById({

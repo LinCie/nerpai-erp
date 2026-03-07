@@ -20,9 +20,22 @@ export const productResponseDto = t.Object({
   deletedAt: t.Nullable(t.Date()),
 });
 
-export const productListResponseDto = t.Array(productResponseDto);
+export const paginationMetadataDto = t.Object({
+  totalItems: t.Number(),
+  itemCount: t.Number(),
+  itemsPerPage: t.Number(),
+  totalPages: t.Number(),
+  currentPage: t.Number(),
+});
+
+export const productListResponseDto = t.Object({
+  data: t.Array(productResponseDto),
+  metadata: paginationMetadataDto,
+});
 
 export type ProductDto = typeof productDto.static;
 export type CreateProductBodyDto = typeof createProductBodyDto.static;
 export type UpdateProductBodyDto = typeof updateProductBodyDto.static;
 export type ProductResponseDto = typeof productResponseDto.static;
+export type PaginationMetadataDto = typeof paginationMetadataDto.static;
+export type ProductListResponseDto = typeof productListResponseDto.static;

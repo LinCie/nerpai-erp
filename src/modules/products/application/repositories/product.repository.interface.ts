@@ -5,17 +5,22 @@ export interface IProductRepository {
     organizationId: string;
     search?: string;
     includeDeleted?: boolean;
+    page?: number;
+    limit?: number;
   }): Promise<Product[]>;
+
+  countMany(params: {
+    organizationId: string;
+    search?: string;
+    includeDeleted?: boolean;
+  }): Promise<number>;
 
   getById(params: {
     id: string;
     organizationId: string;
   }): Promise<Product | null>;
 
-  create(params: {
-    name: string;
-    organizationId: string;
-  }): Promise<Product>;
+  create(params: { name: string; organizationId: string }): Promise<Product>;
 
   update(params: {
     id: string;
@@ -23,13 +28,7 @@ export interface IProductRepository {
     organizationId: string;
   }): Promise<Product | null>;
 
-  softDelete(params: {
-    id: string;
-    organizationId: string;
-  }): Promise<boolean>;
+  softDelete(params: { id: string; organizationId: string }): Promise<boolean>;
 
-  restore(params: {
-    id: string;
-    organizationId: string;
-  }): Promise<boolean>;
+  restore(params: { id: string; organizationId: string }): Promise<boolean>;
 }

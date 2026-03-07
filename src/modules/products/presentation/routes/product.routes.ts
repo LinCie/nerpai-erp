@@ -16,6 +16,13 @@ const productService = new ProductService(productRepository);
 
 const querySchema = t.Object({
   search: t.Optional(t.String()),
+  page: t.Optional(t.Numeric({ default: 1 })),
+  limit: t.Optional(t.Numeric({ default: 10 })),
+});
+
+const trashQuerySchema = t.Object({
+  page: t.Optional(t.Numeric({ default: 1 })),
+  limit: t.Optional(t.Numeric({ default: 10 })),
 });
 
 const paramsSchema = t.Object({
@@ -42,6 +49,8 @@ export const productRoutes = new Elysia({ detail: { tags: ["Products"] } })
       return productService.getProducts({
         organizationId: organization.id,
         search: query.search,
+        page: query.page,
+        limit: query.limit,
       });
     },
     {
@@ -54,17 +63,20 @@ export const productRoutes = new Elysia({ detail: { tags: ["Products"] } })
   )
   .get(
     "/trash",
-    async ({ organization }) => {
+    async ({ organization, query }) => {
       if (!organization) {
         throw new Error("Organization context is missing");
       }
 
       return productService.getDeletedProducts({
         organizationId: organization.id,
+        page: query.page,
+        limit: query.limit,
       });
     },
     {
       auth: true,
+      query: trashQuerySchema,
       response: {
         200: productListResponseDto,
       },

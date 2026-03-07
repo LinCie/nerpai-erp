@@ -22,13 +22,40 @@ export class ProductService {
     return this.repository.create(params);
   }
 
-  async getProducts(params: GetProductsParams): Promise<Product[]> {
-    return this.repository.getMany(params);
+  async getProducts(params: GetProductsParams): Promise<{
+    data: Product[];
+    metadata: {
+      totalItems: number;
+      itemCount: number;
+      itemsPerPage: number;
+      totalPages: number;
+      currentPage: number;
+    };
+  }> {
+    const { page = 1, limit = 10, ...restParams } = params;
+
+    const [data, totalItems] = await Promise.all([
+      this.repository.getMany({ ...restParams, page, limit }),
+      this.repository.countMany({ ...restParams }),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+      data,
+      metadata: {
+        totalItems,
+        itemCount: data.length,
+        itemsPerPage: limit,
+        totalPages,
+        currentPage: page,
+      },
+    };
   }
 
   async getProductById(
     id: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<Product | null> {
     return this.repository.getById({ id, organizationId });
   }
@@ -50,10 +77,46 @@ export class ProductService {
     return this.repository.restore(params);
   }
 
-  async getDeletedProducts(params: { organizationId: string }): Promise<Product[]> {
-    return this.repository.getMany({
-      organizationId: params.organizationId,
-      includeDeleted: true,
-    });
+  async getDeletedProducts(params: {
+    organizationId: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    data: Product[];
+    metadata: {
+      totalItems: number;
+      itemCount: number;
+      itemsPerPage: number;
+      totalPages: number;
+      currentPage: number;
+    };
+  }> {
+    const { page = 1, limit = 10, ...restParams } = params;
+
+    const [data, totalItems] = await Promise.all([
+      this.repository.getMany({
+        ...restParams,
+        includeDeleted: true,
+        page,
+        limit,
+      }),
+      this.repository.countMany({
+        ...restParams,
+        includeDeleted: true,
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+      data,
+      metadata: {
+        totalItems,
+        itemCount: data.length,
+        itemsPerPage: limit,
+        totalPages,
+        currentPage: page,
+      },
+    };
   }
 }

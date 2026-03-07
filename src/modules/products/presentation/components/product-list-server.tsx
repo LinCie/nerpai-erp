@@ -8,11 +8,23 @@ import { ProductEmptyState } from "./product-empty-state";
 import { ProductSearch } from "./product-search";
 
 interface ProductListServerProps {
-  products: Product[];
+  productsData: {
+    data: Product[];
+    metadata: {
+      totalItems: number;
+      itemCount: number;
+      itemsPerPage: number;
+      totalPages: number;
+      currentPage: number;
+    };
+  };
   searchQuery: string;
 }
 
-export function ProductListServer({ products, searchQuery }: ProductListServerProps) {
+export function ProductListServer({
+  productsData,
+  searchQuery,
+}: ProductListServerProps) {
   const router = useRouter();
   const [isSearching, setIsSearching] = useState(false);
 
@@ -35,19 +47,16 @@ export function ProductListServer({ products, searchQuery }: ProductListServerPr
 
   return (
     <div className="space-y-4">
-      <ProductSearch 
-        value={searchQuery} 
+      <ProductSearch
+        value={searchQuery}
         onChange={handleSearchChange}
         disabled={isSearching}
       />
-      
-      {products.length > 0 ? (
-        <ProductList 
-          products={products}
-          onSuccess={handleSuccess}
-        />
+
+      {productsData.data.length > 0 ? (
+        <ProductList productsData={productsData} onSuccess={handleSuccess} />
       ) : (
-        <ProductEmptyState 
+        <ProductEmptyState
           searchQuery={searchQuery}
           onAddClick={() => {
             // This will be handled by the AddProductDialog trigger

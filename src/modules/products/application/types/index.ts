@@ -3,6 +3,8 @@ export interface GetProductsParams {
   organizationId: string;
   search?: string; // Optional name search filter
   includeDeleted?: boolean; // If true, returns ONLY deleted products (for Trash view)
+  page?: number;
+  limit?: number;
 }
 
 /** Params for creating a product */

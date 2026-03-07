@@ -1,6 +1,12 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/presentation/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/presentation/components/ui/card";
 import { Package } from "lucide-react";
 import { auth } from "@/shared/infrastructure/auth/auth";
 import { productRepository } from "@/modules/products/infrastructure/repositories/product.repository";
@@ -9,7 +15,7 @@ import { AddProductDialog } from "@/modules/products/presentation/components/pro
 import { ProductListServer } from "@/modules/products/presentation/components/product-list-server";
 
 interface ProductsPageProps {
-  searchParams: Promise<{ search?: string }>;
+  searchParams: Promise<{ search?: string; page?: string; limit?: string }>;
 }
 
 const productService = new ProductService(productRepository);
@@ -28,14 +34,21 @@ async function getSessionAndOrg() {
   return { session, organizationId };
 }
 
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+export default async function ProductsPage({
+  searchParams,
+}: ProductsPageProps) {
   const { organizationId } = await getSessionAndOrg();
   const params = await searchParams;
   const searchQuery = params.search || "";
 
-  const products = await productService.getProducts({
+  const page = params.page ? parseInt(params.page, 10) : 1;
+  const limit = params.limit ? parseInt(params.limit, 10) : 10;
+
+  const productsData = await productService.getProducts({
     organizationId,
     search: searchQuery || undefined,
+    page,
+    limit,
   });
 
   return (
@@ -43,9 +56,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">All Products</h1>
-          <p className="text-muted-foreground">
-            Manage your product catalog
-          </p>
+          <p className="text-muted-foreground">Manage your product catalog</p>
         </div>
         <AddProductDialog />
       </div>
@@ -56,13 +67,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <Package className="h-5 w-5" />
             Products
           </CardTitle>
-          <CardDescription>
-            View and manage all products
-          </CardDescription>
+          <CardDescription>View and manage all products</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ProductListServer 
-            products={products} 
+          <ProductListServer
+            productsData={productsData}
             searchQuery={searchQuery}
           />
         </CardContent>
