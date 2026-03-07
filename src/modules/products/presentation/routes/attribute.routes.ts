@@ -15,7 +15,7 @@ import {
   createAttributeOptionBodyDto,
   updateAttributeBodyDto,
   updateAttributeOptionBodyDto,
-} from "../schemas/attribute.dto";
+} from "../dtos/attribute.dto";
 
 const attributeService = new AttributeService(attributeRepository);
 

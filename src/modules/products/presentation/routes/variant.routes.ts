@@ -18,7 +18,7 @@ import {
   removeAttributeConfirmationResponseDto,
   skuAvailabilityResponseDto,
   assignAttributeResponseDto,
-} from "../schemas/variant.dto";
+} from "../dtos/variant.dto";
 
 const variantService = new VariantService(
   variantRepository,

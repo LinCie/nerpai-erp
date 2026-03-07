@@ -10,7 +10,7 @@ import {
   productListResponseDto,
   productResponseDto,
   updateProductBodyDto,
-} from "../schemas/product.dto";
+} from "../dtos/product.dto";
 
 const productService = new ProductService(productRepository);
 
